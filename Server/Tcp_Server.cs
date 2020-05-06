@@ -47,6 +47,7 @@ namespace Server
                 }
                 else
                 {
+                    client.Close();
                     client.Dispose();
                 }
             }
@@ -82,6 +83,19 @@ namespace Server
                     {
                         m.SetName(name);
                     }
+                    if(m.Content == "disconnect" && m.MessageType == MessageType.Status)
+                    {
+                        Helpers.SetMessage(stream, m);
+                        clients[name].Close();
+                        clients.Remove(name);
+                        Console.WriteLine(name + " Disconnected");
+
+                        foreach (KeyValuePair<string, NetworkStream> network in clients)
+                        {
+                            Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "Disconnected", MessageType.Status));
+                        }
+                        break;
+                    }
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
                         if (network.Key == name)
@@ -92,17 +106,7 @@ namespace Server
                         {
                             if (m.EndPoint == "")
                             {
-                                if (m.MessageType == MessageType.Transfer)
-                                {
-                                    byte[] bytes = Helpers.GetFileStream(stream);
-                                    Helpers.SetMessage(network.Value, m);
-                                    Helpers.SetFileStream(stream, bytes);
-                                    
-                                }
-                                else
-                                {
-                                    Helpers.SetMessage(network.Value, m);
-                                }
+                                Helpers.SetMessage(network.Value, m);
                             }
                             else
                             {
@@ -122,6 +126,17 @@ namespace Server
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
                         Helpers.SetMessage(network.Value, new Message(network.Key == name? "You" : name, "Disconnected", MessageType.Status));
+                    }
+                    break;
+                }
+                catch
+                {
+                    clients.Remove(name);
+                    Console.WriteLine(name + " Disconnected With Error");
+
+                    foreach (KeyValuePair<string, NetworkStream> network in clients)
+                    {
+                        Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "Disconnected With Error", MessageType.Status));
                     }
                     break;
                 }

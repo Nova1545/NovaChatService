@@ -40,12 +40,17 @@ namespace Client
 					{
 						print(message.Name + ": " + message.Content, Chat, message.Color, true);
 					}
-					else if (message.MessageType == MessageType.Transfer)
-					{
-						string filename = Path.GetRandomFileName() + (message.FileType == FileType.PNG ? ".png" : ".jpg");
-						File.WriteAllBytes(filename, Helpers.GetFileStream(stream));
-						print(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color, true);
-					}
+                    else if(message.MessageType == MessageType.Status && message.Content == "disconnect")
+                    {
+                        tcpClient.Close();
+                        break;
+                    }
+					//else if (message.MessageType == MessageType.Transfer)
+					//{
+					//	string filename = Path.GetRandomFileName() + (message.FileType == FileType.PNG ? ".png" : ".jpg");
+					//	File.WriteAllBytes(filename, Helpers.GetFileStream(stream));
+					//	print(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color, true);
+					//}
 					else
 					{
 						print(message.Name + " " + message.Content, Log, Color.Orange, true);
@@ -122,7 +127,8 @@ namespace Client
 					{
 						if (tcpClient.Connected)
 						{
-							tcpClient.Close();
+                            Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "disconnect", MessageType.Status));
+                            //tcpClient.Close();
 							ChangeConnectionInputState(true);
 							return;
 						}
