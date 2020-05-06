@@ -39,24 +39,24 @@ namespace Client
 					ChatLib.Message message = Helpers.GetMessage(stream);
 					if (message.MessageType == MessageType.Message)
 					{
-						print_Invoke(message.Name + ": " + message.Content, Chat, message.Color);
+						print(message.Name + ": " + message.Content, Chat, message.Color, true);
 					}
 					else if (message.MessageType == MessageType.Transfer)
 					{
 						string filename = Path.GetRandomFileName() + (message.FileType == FileType.PNG ? ".png" : ".jpg");
 						File.WriteAllBytes(filename, Helpers.GetFileStream(stream));
-						print_Invoke(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color);
+						print(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color, true);
 					}
 					else
 					{
-						print_Invoke(message.Name + " " + message.Content, Log, Color.Orange);
+						print(message.Name + " " + message.Content, Log, Color.Orange, true);
 					}
 					stream.Flush();
 				}
 			}
 			catch (Exception e)
 			{
-				print_Invoke("Disconnected from server.", Log, Color.Red);
+				print("Disconnected from server.", Log, Color.Red, true);
 				ChangeConnectionInputState(true);
 				File.WriteAllText("log.txt", e.Message);
 			}
@@ -129,7 +129,7 @@ namespace Client
 						}
 					}
 					
-					print_Invoke("Connecting... ", Log);
+					print("Connecting... ", Log, true);
 					tcpClient = new TcpClient(IPBox.Text, 8910);
 					stream = tcpClient.GetStream();
 
@@ -137,12 +137,12 @@ namespace Client
 					Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "name", MessageType.Info));
 
 					ChangeConnectionInputState(false);
-					print_Invoke("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen);
+					print("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen, true);
 					this.Listen(stream);
 				}
 				catch (Exception ex)
 				{
-					print_Invoke("Connection failed -> " + ex.Message, Log, Color.Red);
+					print("Connection failed -> " + ex.Message, Log, Color.Red, true);
 				}
 			});
 
@@ -193,28 +193,30 @@ namespace Client
 	}
 		#endregion
 
-		public void print(string text, RichTextBox output)
+		public void print(string text, RichTextBox output, bool invoke = false)
 		{
+			if (invoke)
+			{
+				output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n")));
+				output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
+				return;
+			}
+
 			output.AppendText(text + "\n");
 			output.ScrollToCaret();
 		}
 
-		public void print(string text, RichTextBox output, Color color)
+		public void print(string text, RichTextBox output, Color color, bool invoke=false)
 		{
+			if (invoke)
+			{
+				output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n", color)));
+				output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
+				return;
+			}
+
 			output.AppendText(text + "\n", color);
 			output.ScrollToCaret();
-		}
-
-		public void print_Invoke(string text, RichTextBox output)
-		{
-			output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n")));
-			output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
-		}
-
-		public void print_Invoke(string text, RichTextBox output, Color color)
-		{
-			output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n", color)));
-			output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
 		}
 
 		public void printToLog(string text)

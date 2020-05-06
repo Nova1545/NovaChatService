@@ -33,7 +33,7 @@ namespace Server
 
             while (true)
             {
-                Console.WriteLine("Waiting for connection");
+                Console.WriteLine("Waiting for Connection...");
                 TcpClient client = server.AcceptTcpClient();
                 NetworkStream stream = client.GetStream();
 
@@ -42,7 +42,7 @@ namespace Server
                 {
                     string name = message.Name;
                     clients.Add(name, stream);
-                    Console.WriteLine(name + " Connected!");
+                    Console.WriteLine(name + " connected!");
                     ThreadPool.QueueUserWorkItem(HandleClientWorker, new object[2] { name, stream });
                 }
                 else
@@ -71,7 +71,7 @@ namespace Server
             string name = (string)info[0];
             foreach (KeyValuePair<string, NetworkStream> network in clients)
             {
-                Helpers.SetMessage(network.Value, new Message(network.Key == name? "You" : name, "Connected", MessageType.Status));
+                Helpers.SetMessage(network.Value, new Message(network.Key == name? "You" : name, "connected", MessageType.Status));
             }
             while (true)
             {
