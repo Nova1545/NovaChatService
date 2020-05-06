@@ -129,10 +129,10 @@ namespace Server
                     }
                     break;
                 }
-                catch
+                catch (Exception ex)
                 {
                     clients.Remove(name);
-                    Console.WriteLine(name + " disconnected due to an error");
+                    Console.WriteLine(name + " disconnected due to an error. Details: " + ex.Message);
 
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
