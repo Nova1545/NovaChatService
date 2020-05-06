@@ -160,14 +160,16 @@ namespace Client
 			{
 				key = Registry.CurrentUser.CreateSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
 			}
-
-			try
+			else
 			{
-				toggleLogVisibility(bool.Parse(key.GetValue("ShowLog").ToString()));
-			}
-			catch
-			{
-				(Application.OpenForms["Tcp_Client"] as Tcp_Client).printToLog("Something went wrong while reading settings! Please report this bug to the creator.", Color.Red);
+				try
+				{
+					toggleLogVisibility(bool.Parse(key.GetValue("ShowLog").ToString()));
+				}
+				catch
+				{
+					(Application.OpenForms["Tcp_Client"] as Tcp_Client).printToLog("Something went wrong while reading settings! Please report this bug to the creator.", Color.Red);
+				}
 			}
 
 			key.Dispose();
