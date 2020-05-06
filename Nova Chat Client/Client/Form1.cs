@@ -57,7 +57,6 @@ namespace Client
 			{
 				print("Disconnected from server.", Log, Color.Red, true);
 				ChangeConnectionInputState(true);
-				File.WriteAllText("log.txt", e.Message);
 			}
 		}
 
