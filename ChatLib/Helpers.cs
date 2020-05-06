@@ -33,31 +33,21 @@ namespace ChatLib.Extras
             stream.Write(dataBytes, 0, dataBytes.Length);
         }
 
-        public static string GetExtension<T>(this T e) where T : IConvertible
+        public static void SetFileStream(Stream stream, byte[] file)
         {
-            if (e is Enum)
-            {
-                Type type = e.GetType();
-                Array values = System.Enum.GetValues(type);
-
-                foreach (int val in values)
-                {
-                    if (val == e.ToInt32(CultureInfo.InvariantCulture))
-                    {
-                        var memInfo = type.GetMember(type.GetEnumName(val));
-                        var descriptionAttribute = memInfo[0]
-                            .GetCustomAttributes(typeof(DescriptionAttribute), false)
-                            .FirstOrDefault() as DescriptionAttribute;
-
-                        if (descriptionAttribute != null)
-                        {
-                            return descriptionAttribute.Description;
-                        }
-                    }
-                }
-                return null; // could also return string.Empty
-            }
-            return null;
+            byte[] dataLen = BitConverter.GetBytes((Int32)file.Length);
+            stream.Write(dataLen, 0, 4);
+            stream.Write(file, 0, file.Length);
         }
+
+        public static byte[] GetFileStream(Stream stream)
+        {
+            byte[] len = new byte[4];
+            stream.Read(len, 0, 4);
+            int dataLen = BitConverter.ToInt32(len, 0);
+            byte[] bytes = new byte[dataLen];
+            stream.Read(bytes, 0, bytes.Length);
+            return bytes;
+        } 
     }
 }

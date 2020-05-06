@@ -42,7 +42,7 @@ namespace Client
                     else if(message.MessageType == MessageType.Transfer)
                     {
                         string filename = Path.GetRandomFileName() + (message.FileType == FileType.PNG ? ".png" : ".jpg");
-                        File.WriteAllBytes(filename, message.FileContent);
+                        File.WriteAllBytes(filename, Helpers.GetFileStream(stream));
                         print_Invoke(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color);
                     }
                     else
@@ -80,7 +80,8 @@ namespace Client
                 }
                 else if (chatBox.Text.StartsWith("/send"))
                 {
-                    Helpers.SetMessage(stream, new ChatLib.Message(name, File.ReadAllBytes("input.png"), MessageType.Transfer, FileType.PNG));
+                    Helpers.SetMessage(stream, new ChatLib.Message(name, MessageType.Transfer, FileType.PNG));
+                    Helpers.SetFileStream(stream, File.ReadAllBytes("input.png"));
                     print("Sent File!", Chat, Color.Green);
                 }
                 else

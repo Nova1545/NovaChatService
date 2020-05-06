@@ -80,7 +80,17 @@ namespace Server
                         {
                             if (m.EndPoint == "")
                             {
-                                Helpers.SetMessage(network.Value, m);
+                                if (m.MessageType == MessageType.Transfer)
+                                {
+                                    byte[] bytes = Helpers.GetFileStream(stream);
+                                    Helpers.SetMessage(network.Value, m);
+                                    Helpers.SetFileStream(stream, bytes);
+                                    
+                                }
+                                else
+                                {
+                                    Helpers.SetMessage(network.Value, m);
+                                }
                             }
                             else
                             {

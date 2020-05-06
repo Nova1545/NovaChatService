@@ -13,7 +13,6 @@ namespace ChatLib
         public MessageType MessageType { get; private set; }
         public Color Color { get; private set; }
         public string EndPoint { get; private set; }
-        public byte[] FileContent { get; private set; }
         public FileType FileType { get; private set; }
 
         public Message(string name, string content, MessageType type, string endpoint = "")
@@ -33,13 +32,12 @@ namespace ChatLib
             EndPoint = endpoint;
         }
 
-        public Message(string name, byte[] fileContent, MessageType type, FileType fileType, string endpoint = "")
+        public Message(string name, MessageType type, FileType fileType)
         {
             Name = name;
-            FileContent = fileContent;
             MessageType = type;
             FileType = fileType;
-            EndPoint = endpoint;
+            EndPoint = "";
         }
 
         public Message(Message m)
