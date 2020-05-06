@@ -24,7 +24,7 @@ namespace Server
         {
 
             TcpListener server = null;
-            IPAddress iPAddress = IPAddress.Parse("10.0.0.86");
+            IPAddress iPAddress = IPAddress.Parse(GetLocalIPAddress()) ;
 
             server = new TcpListener(iPAddress, 8910);
             server.Start();
@@ -50,6 +50,18 @@ namespace Server
                     client.Dispose();
                 }
             }
+        }
+        private static string GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+            throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
         private static void HandleClientWorker(object token)

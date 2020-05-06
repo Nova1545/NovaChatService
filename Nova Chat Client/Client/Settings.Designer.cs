@@ -33,7 +33,9 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.toggleLog = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -59,6 +61,7 @@
             this.tableLayoutPanel2.ColumnCount = 2;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.Controls.Add(this.toggleLog, 0, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 45);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -92,6 +95,19 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // toggleLog
+            // 
+            this.toggleLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.toggleLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F);
+            this.toggleLog.Location = new System.Drawing.Point(3, 3);
+            this.toggleLog.Name = "toggleLog";
+            this.toggleLog.Size = new System.Drawing.Size(391, 171);
+            this.toggleLog.TabIndex = 0;
+            this.toggleLog.Tag = "true";
+            this.toggleLog.Text = "Show Log";
+            this.toggleLog.UseVisualStyleBackColor = true;
+            this.toggleLog.Click += new System.EventHandler(this.toggleLog_Click);
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -102,8 +118,10 @@
             this.Name = "Settings";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
+            this.Load += new System.EventHandler(this.Settings_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            this.tableLayoutPanel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -114,5 +132,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button1;
+        public System.Windows.Forms.Button toggleLog;
     }
 }

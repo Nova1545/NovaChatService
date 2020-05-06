@@ -1,5 +1,6 @@
 ﻿using ChatLib.DataStates;
 using ChatLib.Extras;
+using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -17,16 +18,17 @@ namespace Client
 		NetworkStream stream;
 		About aboutBox = new About();
 		Settings settings = new Settings();
-        Random rnd = new Random();
-        Color color;
+		Random rnd = new Random();
+		Color color;
 
-        public Tcp_Client()
+		public Tcp_Client()
 		{
 			InitializeComponent();
 			print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.", Chat);
 			print("Press 'Delete' when focused in this box to clear it.", Chat);
-            color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-        }
+			color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+			LoadSettings();
+		}
 
 		private void Listen(NetworkStream stream)
 		{
@@ -34,28 +36,28 @@ namespace Client
 			{
 				while (true)
 				{
-                    ChatLib.Message message = Helpers.GetMessage(stream);
-                    if (message.MessageType == MessageType.Message)
-                    {
-                        print_Invoke(message.Name + ": " + message.Content, Chat, message.Color);
-                    }
-                    else if(message.MessageType == MessageType.Transfer)
-                    {
-                        string filename = Path.GetRandomFileName() + (message.FileType == FileType.PNG ? ".png" : ".jpg");
-                        File.WriteAllBytes(filename, Helpers.GetFileStream(stream));
-                        print_Invoke(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color);
-                    }
-                    else
-                    {
-                        print_Invoke(message.Name + " " + message.Content, Log, Color.Red);
-                    }
+					ChatLib.Message message = Helpers.GetMessage(stream);
+					if (message.MessageType == MessageType.Message)
+					{
+						print_Invoke(message.Name + ": " + message.Content, Chat, message.Color);
+					}
+					else if (message.MessageType == MessageType.Transfer)
+					{
+						string filename = Path.GetRandomFileName() + (message.FileType == FileType.PNG ? ".png" : ".jpg");
+						File.WriteAllBytes(filename, Helpers.GetFileStream(stream));
+						print_Invoke(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color);
+					}
+					else
+					{
+						print_Invoke(message.Name + " " + message.Content, Log, Color.Red);
+					}
 					stream.Flush();
 				}
 			}
 			catch (Exception e)
 			{
 				print_Invoke("The connection was lost.", Log, Color.Red);
-                File.WriteAllText("crash.txt", e.Message);
+				File.WriteAllText("crash.txt", e.Message);
 			}
 		}
 
@@ -65,30 +67,30 @@ namespace Client
 			{
 				string name = nameBox.Text;
 
-                if (chatBox.Text.StartsWith("/msg"))
-                {
-                    string[] text = chatBox.Text.Split('"', '"');
-                    try
-                    {
-                        Helpers.SetMessage(stream, new ChatLib.Message(name, text[3], MessageType.Message, color, text[1]));
-                        print(name + ": " + "Message privately sent to " + text[1], Chat, Color.Green);
-                    }
-                    catch
-                    {
-                        print("Couldnt run command", Chat, Color.Red);
-                    }
-                }
-                else if (chatBox.Text.StartsWith("/send"))
-                {
-                    Helpers.SetMessage(stream, new ChatLib.Message(name, MessageType.Transfer, FileType.PNG));
-                    Helpers.SetFileStream(stream, File.ReadAllBytes("input.png"));
-                    print("Sent File!", Chat, Color.Green);
-                }
-                else
-                {
-                    print(name + ": " + chatBox.Text, Chat, color);
-                    Helpers.SetMessage(stream, new ChatLib.Message(name, chatBox.Text, MessageType.Message, color));
-                }
+				if (chatBox.Text.StartsWith("/msg"))
+				{
+					string[] text = chatBox.Text.Split('"', '"');
+					try
+					{
+						Helpers.SetMessage(stream, new ChatLib.Message(name, text[3], MessageType.Message, color, text[1]));
+						print(name + ": " + "Message privately sent to " + text[1], Chat, Color.Green);
+					}
+					catch
+					{
+						print("Couldnt run command", Chat, Color.Red);
+					}
+				}
+				else if (chatBox.Text.StartsWith("/send"))
+				{
+					Helpers.SetMessage(stream, new ChatLib.Message(name, MessageType.Transfer, FileType.PNG));
+					Helpers.SetFileStream(stream, File.ReadAllBytes("input.png"));
+					print("Sent File!", Chat, Color.Green);
+				}
+				else
+				{
+					print(name + ": " + chatBox.Text, Chat, color);
+					Helpers.SetMessage(stream, new ChatLib.Message(name, chatBox.Text, MessageType.Message, color));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -118,7 +120,7 @@ namespace Client
 				IPBox.Text = "novastudios.tk";
 			}
 
-            Thread t = new Thread(delegate ()
+			Thread t = new Thread(delegate ()
 			{
 				try
 				{
@@ -126,10 +128,10 @@ namespace Client
 					tcpClient = new TcpClient(IPBox.Text, 8910);
 					stream = tcpClient.GetStream();
 
-                    // Send name
-                    Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "name", MessageType.Info));
+					// Send name
+					Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "name", MessageType.Info));
 
-                    print_Invoke("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen);
+					print_Invoke("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen);
 					this.Listen(stream);
 				}
 				catch (Exception ex)
@@ -142,57 +144,88 @@ namespace Client
 			t.Start();
 		}
 
-		private void button1_Click(object sender, EventArgs e)
+		#region Stuff I Dont Care About
+
+		#region SetttingsHandlers
+		private void LoadSettings()
 		{
-			Connect();
+			RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
+
+			if (key == null)
+			{
+				key = Registry.CurrentUser.CreateSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
+			}
+
+			try
+			{
+				toggleLogVisibility(bool.Parse(key.GetValue("ShowLog").ToString()));
+			}
+			catch
+			{
+				(Application.OpenForms["Tcp_Client"] as Tcp_Client).printToLog("Something went wrong while reading settings! Please report this bug to the creator.", Color.Red);
+			}
+
+			key.Dispose();
 		}
 
-        #region Stuff I Dont Care About
+		public void toggleLogVisibility(bool show)
+		{
+			if (!show)
+			{
+				Log.Visible = false;
+				label2.Visible = false;
+				tableLayoutPanel4.ColumnCount = 1;
+				settings.toggleLog.Tag = "false";
+			}
+			else
+			{
+				Log.Visible = true;
+				label2.Visible = true;
+				tableLayoutPanel4.ColumnCount = 2;
+				settings.toggleLog.Tag = "true";
+			}
+	}
+		#endregion
 
-        /// <summary>
-        /// Prints the given message to the given RichTextBox
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="output"></param>
-        private void print(string text, RichTextBox output)
+		public void print(string text, RichTextBox output)
 		{
 			output.AppendText(text + "\n");
 			output.ScrollToCaret();
 		}
 
-		/// <summary>
-		///  Prints the given message to the given RichTextBox in the specified color
-		/// </summary>
-		/// <param name="text"></param>
-		/// <param name="output"></param>
-		/// <param name="color"></param>
-		private void print(string text, RichTextBox output, Color color)
+		public void print(string text, RichTextBox output, Color color)
 		{
 			output.AppendText(text + "\n", color);
 			output.ScrollToCaret();
 		}
 
-		/// <summary>
-		/// Prints the given message to the given RichTextBox (Cross Thread)
-		/// </summary>
-		/// <param name="text"></param>
-		/// <param name="output"></param>
-		private void print_Invoke(string text, RichTextBox output)
+		public void print_Invoke(string text, RichTextBox output)
 		{
 			output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n")));
 			output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
 		}
 
-		/// <summary>
-		/// Prints the given message to the given RichTextBox in the specified color (Cross Thread)
-		/// </summary>
-		/// <param name="text"></param>
-		/// <param name="output"></param>
-		/// <param name="color"></param>
-		private void print_Invoke(string text, RichTextBox output, Color color)
+		public void print_Invoke(string text, RichTextBox output, Color color)
 		{
 			output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n", color)));
 			output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
+		}
+
+		public void printToLog(string text)
+		{
+			Log.AppendText(text + "\n", color);
+			Log.ScrollToCaret();
+		}
+
+		public void printToLog(string text, Color color)
+		{
+			Log.AppendText(text + "\n", color);
+			Log.ScrollToCaret();
+		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			Connect();
 		}
 
 		private void nameBox_Leave(object sender, EventArgs e)
@@ -288,14 +321,13 @@ namespace Client
 			Log.Clear();
 		}
 
-        private void Chat_LinkClicked(object sender, LinkClickedEventArgs e)
-        {
-            File.WriteAllText("info.txt", new Uri(e.LinkText).AbsolutePath);
-            Process.Start(new Uri(e.LinkText).AbsolutePath);
-        }
-    }
-
-    public static class RichTextBoxExtensions
+		private void Chat_LinkClicked(object sender, LinkClickedEventArgs e)
+		{
+			File.WriteAllText("info.txt", new Uri(e.LinkText).AbsolutePath);
+			Process.Start(new Uri(e.LinkText).AbsolutePath);
+		}
+	}
+	public static class RichTextBoxExtensions
 	{
 		public static void AppendText(this RichTextBox box, string text, Color color)
 		{
