@@ -88,11 +88,11 @@ namespace Server
                         Helpers.SetMessage(stream, m);
                         clients[name].Close();
                         clients.Remove(name);
-                        Console.WriteLine(name + " Disconnected");
+                        Console.WriteLine(name + " disconnected");
 
                         foreach (KeyValuePair<string, NetworkStream> network in clients)
                         {
-                            Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "Disconnected", MessageType.Status));
+                            Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "disconnected", MessageType.Status));
                         }
                         break;
                     }
@@ -121,22 +121,22 @@ namespace Server
                 catch (IOException)
                 {
                     clients.Remove(name);
-                    Console.WriteLine(name + " Disconnected");
+                    Console.WriteLine(name + " disconnected");
 
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
-                        Helpers.SetMessage(network.Value, new Message(network.Key == name? "You" : name, "Disconnected", MessageType.Status));
+                        Helpers.SetMessage(network.Value, new Message(network.Key == name? "You" : name, "disconnected", MessageType.Status));
                     }
                     break;
                 }
                 catch
                 {
                     clients.Remove(name);
-                    Console.WriteLine(name + " Disconnected With Error");
+                    Console.WriteLine(name + " disconnected due to an error");
 
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
-                        Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "Disconnected With Error", MessageType.Status));
+                        Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "disconnected due to an error", MessageType.Status));
                     }
                     break;
                 }
