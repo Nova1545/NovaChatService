@@ -171,9 +171,9 @@ namespace Client
 				{
 					toggleLogVisibility(bool.Parse(key.GetValue("ShowLog").ToString()));
 				}
-				catch
+				catch (Exception ex)
 				{
-					(Application.OpenForms["Tcp_Client"] as Tcp_Client).printToLog("Something went wrong while reading settings! Please report this bug to the creator.", Color.Red);
+					(Application.OpenForms["Tcp_Client"] as Tcp_Client).printToLog("Something went wrong while reading settings! Please report this error to the creator with the following: " + ex.Message, Color.Red);
 				}
 			}
 
