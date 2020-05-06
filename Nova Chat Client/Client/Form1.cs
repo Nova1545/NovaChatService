@@ -45,13 +45,13 @@ namespace Client
                         tcpClient.Close();
                         break;
                     }
-					//else if (message.MessageType == MessageType.Transfer)
-					//{
-					//	string filename = Path.GetRandomFileName() + (message.FileType == FileType.PNG ? ".png" : ".jpg");
-					//	File.WriteAllBytes(filename, Helpers.GetFileStream(stream));
-					//	print(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color, true);
-					//}
-					else
+                    else if (message.MessageType == MessageType.Transfer)
+                    {
+                        string filename = Path.GetRandomFileName() + (message.FileType == FileType.PNG ? ".png" : ".jpg");
+                        File.WriteAllBytes(filename, message.FileContent);
+                        print(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color, true);
+                    }
+                    else
 					{
 						print(message.Name + " " + message.Content, Log, Color.Orange, true);
 					}
@@ -352,8 +352,7 @@ namespace Client
 
 		private void Chat_LinkClicked(object sender, LinkClickedEventArgs e)
 		{
-			File.WriteAllText("info.txt", new Uri(e.LinkText).AbsolutePath);
-			Process.Start(new Uri(e.LinkText).AbsolutePath);
+			Process.Start(new Uri(e.LinkText).AbsolutePath.Replace("/", @"\").Replace("%20", " "));
 		}
 
 		private void Tcp_Client_FormClosing(object sender, FormClosingEventArgs e)
@@ -365,8 +364,7 @@ namespace Client
 		{
 			try
 			{
-				Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, MessageType.Transfer, FileType.PNG));
-				Helpers.SetFileStream(stream, File.ReadAllBytes(openFileDialog1.FileName));
+				Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, File.ReadAllBytes(openFileDialog1.FileName), MessageType.Transfer, FileType.PNG));
 				print("File Sent!", Chat, Color.Green);
 			}
 			catch (Exception ex)
