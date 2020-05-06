@@ -49,15 +49,16 @@ namespace Client
 					}
 					else
 					{
-						print_Invoke(message.Name + " " + message.Content, Log, Color.Red);
+						print_Invoke(message.Name + " " + message.Content, Log, Color.Orange);
 					}
 					stream.Flush();
 				}
 			}
 			catch (Exception e)
 			{
-				print_Invoke("The connection was lost.", Log, Color.Red);
-				File.WriteAllText("crash.txt", e.Message);
+				print_Invoke("Disconnected from server.", Log, Color.Red);
+				connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Connect"; }));
+				File.WriteAllText("log.txt", e.Message);
 			}
 		}
 
@@ -79,12 +80,6 @@ namespace Client
 					{
 						print("Couldnt run command", Chat, Color.Red);
 					}
-				}
-				else if (chatBox.Text.StartsWith("/send"))
-				{
-					Helpers.SetMessage(stream, new ChatLib.Message(name, MessageType.Transfer, FileType.PNG));
-					Helpers.SetFileStream(stream, File.ReadAllBytes("input.png"));
-					print("Sent File!", Chat, Color.Green);
 				}
 				else
 				{
@@ -124,6 +119,19 @@ namespace Client
 			{
 				try
 				{
+					if (tcpClient != null)
+					{
+						if (tcpClient.Connected)
+						{
+							tcpClient.Close();
+							connectButton.Invoke(new MethodInvoker(() =>
+							{
+								connectButton.Text = "Connect";
+							}));
+							return;
+						}
+					}
+					
 					print_Invoke("Connecting... ", Log);
 					tcpClient = new TcpClient(IPBox.Text, 8910);
 					stream = tcpClient.GetStream();
@@ -131,12 +139,13 @@ namespace Client
 					// Send name
 					Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "name", MessageType.Info));
 
+					connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Disconnect"; })) ;
 					print_Invoke("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen);
 					this.Listen(stream);
 				}
 				catch (Exception ex)
 				{
-					print_Invoke("Connection attmept failed -> " + ex.Message, Log, Color.Red);
+					print_Invoke("Connection failed -> " + ex.Message, Log, Color.Red);
 				}
 			});
 
@@ -223,6 +232,7 @@ namespace Client
 			Log.ScrollToCaret();
 		}
 
+		#region EventHandlers
 		private void button1_Click(object sender, EventArgs e)
 		{
 			Connect();
@@ -326,7 +336,33 @@ namespace Client
 			File.WriteAllText("info.txt", new Uri(e.LinkText).AbsolutePath);
 			Process.Start(new Uri(e.LinkText).AbsolutePath);
 		}
+
+		private void Tcp_Client_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			File.WriteAllText("log.txt", DateTime.Now.ToString() + "\n" + Log.Text);
+		}
+
+		private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			try
+			{
+				Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, MessageType.Transfer, FileType.PNG));
+				Helpers.SetFileStream(stream, File.ReadAllBytes(openFileDialog1.FileName));
+				print("File Sent!", Chat, Color.Green);
+			}
+			catch (Exception ex)
+			{
+				print("Error Sending File ->" + ex.Message, Log, Color.Red);
+			}
+		}
+
+		private void button1_Click_1(object sender, EventArgs e)
+		{
+			openFileDialog1.ShowDialog();
+		}
 	}
+	#endregion
+
 	public static class RichTextBoxExtensions
 	{
 		public static void AppendText(this RichTextBox box, string text, Color color)

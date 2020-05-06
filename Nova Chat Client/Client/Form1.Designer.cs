@@ -1,4 +1,6 @@
-﻿namespace Client
+﻿using System;
+
+namespace Client
 {
     partial class Tcp_Client
     {
@@ -31,10 +33,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Tcp_Client));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.nameBox = new System.Windows.Forms.TextBox();
             this.IPBox = new System.Windows.Forms.TextBox();
             this.connectButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.nameBox = new System.Windows.Forms.TextBox();
             this.chatBox = new System.Windows.Forms.TextBox();
             this.sendButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
@@ -48,6 +50,8 @@
             this.clearHistoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.button1 = new System.Windows.Forms.Button();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -63,14 +67,14 @@
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel3, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 28);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 30);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 8.767773F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 83.88625F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.582938F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 422);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 82.70142F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 8.767773F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 420);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // tableLayoutPanel2
@@ -90,6 +94,19 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(794, 32);
             this.tableLayoutPanel2.TabIndex = 2;
+            // 
+            // nameBox
+            // 
+            this.nameBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.nameBox.Location = new System.Drawing.Point(481, 2);
+            this.nameBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.nameBox.Multiline = true;
+            this.nameBox.Name = "nameBox";
+            this.nameBox.Size = new System.Drawing.Size(169, 28);
+            this.nameBox.TabIndex = 1;
+            this.nameBox.Text = "Enter a Name";
+            this.nameBox.Enter += new System.EventHandler(this.nameBox_Enter);
+            this.nameBox.Leave += new System.EventHandler(this.nameBox_Leave);
             // 
             // IPBox
             // 
@@ -120,43 +137,31 @@
             // 
             // tableLayoutPanel3
             // 
-            this.tableLayoutPanel3.ColumnCount = 2;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 131F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Controls.Add(this.chatBox, 0, 0);
-            this.tableLayoutPanel3.Controls.Add(this.sendButton, 1, 0);
+            this.tableLayoutPanel3.ColumnCount = 3;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.09068F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 71.03275F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.75063F));
+            this.tableLayoutPanel3.Controls.Add(this.chatBox, 1, 0);
+            this.tableLayoutPanel3.Controls.Add(this.sendButton, 2, 0);
+            this.tableLayoutPanel3.Controls.Add(this.button1, 0, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 391);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 384);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(794, 29);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(794, 34);
             this.tableLayoutPanel3.TabIndex = 3;
-            // 
-            // nameBox
-            // 
-            this.nameBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.nameBox.Location = new System.Drawing.Point(481, 2);
-            this.nameBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.nameBox.Multiline = true;
-            this.nameBox.Name = "nameBox";
-            this.nameBox.Size = new System.Drawing.Size(169, 28);
-            this.nameBox.TabIndex = 1;
-            this.nameBox.Text = "Enter a Name";
-            this.nameBox.Enter += new System.EventHandler(this.nameBox_Enter);
-            this.nameBox.Leave += new System.EventHandler(this.nameBox_Leave);
             // 
             // chatBox
             // 
             this.chatBox.AcceptsReturn = true;
             this.chatBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.chatBox.Location = new System.Drawing.Point(3, 2);
+            this.chatBox.Location = new System.Drawing.Point(99, 2);
             this.chatBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chatBox.Multiline = true;
             this.chatBox.Name = "chatBox";
-            this.chatBox.Size = new System.Drawing.Size(657, 25);
+            this.chatBox.Size = new System.Drawing.Size(558, 30);
             this.chatBox.TabIndex = 3;
             this.chatBox.Text = "Message";
             this.chatBox.Enter += new System.EventHandler(this.ChatBox_Enter);
@@ -166,10 +171,10 @@
             // sendButton
             // 
             this.sendButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sendButton.Location = new System.Drawing.Point(666, 2);
+            this.sendButton.Location = new System.Drawing.Point(663, 2);
             this.sendButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.sendButton.Name = "sendButton";
-            this.sendButton.Size = new System.Drawing.Size(125, 25);
+            this.sendButton.Size = new System.Drawing.Size(128, 30);
             this.sendButton.TabIndex = 4;
             this.sendButton.Text = "Send";
             this.sendButton.UseVisualStyleBackColor = true;
@@ -191,17 +196,17 @@
             this.tableLayoutPanel4.RowCount = 2;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.847953F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 94.15205F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(794, 349);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(794, 342);
             this.tableLayoutPanel4.TabIndex = 4;
             // 
             // Chat
             // 
             this.Chat.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Chat.Location = new System.Drawing.Point(3, 22);
+            this.Chat.Location = new System.Drawing.Point(3, 21);
             this.Chat.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Chat.Name = "Chat";
             this.Chat.ReadOnly = true;
-            this.Chat.Size = new System.Drawing.Size(541, 325);
+            this.Chat.Size = new System.Drawing.Size(541, 319);
             this.Chat.TabIndex = 5;
             this.Chat.Text = "";
             this.Chat.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.Chat_LinkClicked);
@@ -210,11 +215,11 @@
             // Log
             // 
             this.Log.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Log.Location = new System.Drawing.Point(550, 22);
+            this.Log.Location = new System.Drawing.Point(550, 21);
             this.Log.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Log.Name = "Log";
             this.Log.ReadOnly = true;
-            this.Log.Size = new System.Drawing.Size(241, 325);
+            this.Log.Size = new System.Drawing.Size(241, 319);
             this.Log.TabIndex = 6;
             this.Log.Text = "";
             this.Log.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Log_KeyDown);
@@ -225,7 +230,7 @@
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label1.Location = new System.Drawing.Point(3, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(541, 20);
+            this.label1.Size = new System.Drawing.Size(541, 19);
             this.label1.TabIndex = 3;
             this.label1.Text = "Chat";
             this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -236,7 +241,7 @@
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label2.Location = new System.Drawing.Point(550, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(241, 20);
+            this.label2.Size = new System.Drawing.Size(241, 19);
             this.label2.TabIndex = 4;
             this.label2.Text = "Log";
             this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -249,7 +254,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(800, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(800, 30);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -261,7 +266,7 @@
             this.settingsToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
-            this.menuToolStripMenuItem.Size = new System.Drawing.Size(60, 24);
+            this.menuToolStripMenuItem.Size = new System.Drawing.Size(60, 26);
             this.menuToolStripMenuItem.Text = "Menu";
             // 
             // aboutToolStripMenuItem
@@ -292,6 +297,23 @@
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
+            // button1
+            // 
+            this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button1.Location = new System.Drawing.Point(3, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(90, 28);
+            this.button1.TabIndex = 5;
+            this.button1.Text = "Upload File";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            this.openFileDialog1.Filter = "PNG files (*.png)|*.png";
+            this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
+            // 
             // Tcp_Client
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -305,6 +327,7 @@
             this.Name = "Tcp_Client";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Nova Chat Client";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Tcp_Client_FormClosing);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
@@ -340,5 +363,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ToolStripMenuItem clearHistoryToolStripMenuItem;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }

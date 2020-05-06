@@ -114,7 +114,7 @@ namespace Server
                         }
                     }
                 }
-                catch (IOException e)
+                catch (IOException)
                 {
                     clients.Remove(name);
                     Console.WriteLine(name + " Disconnected");
@@ -127,6 +127,5 @@ namespace Server
                 }
             }
         }
-
     }
 }
