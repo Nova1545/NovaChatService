@@ -57,7 +57,7 @@ namespace Client
 			catch (Exception e)
 			{
 				print_Invoke("Disconnected from server.", Log, Color.Red);
-				connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Connect"; }));
+				ChangeConnectionInputState(true);
 				File.WriteAllText("log.txt", e.Message);
 			}
 		}
@@ -124,10 +124,7 @@ namespace Client
 						if (tcpClient.Connected)
 						{
 							tcpClient.Close();
-							connectButton.Invoke(new MethodInvoker(() =>
-							{
-								connectButton.Text = "Connect";
-							}));
+							ChangeConnectionInputState(true);
 							return;
 						}
 					}
@@ -139,7 +136,7 @@ namespace Client
 					// Send name
 					Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "name", MessageType.Info));
 
-					connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Disconnect"; })) ;
+					ChangeConnectionInputState(false);
 					print_Invoke("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen);
 					this.Listen(stream);
 				}
@@ -230,6 +227,20 @@ namespace Client
 		{
 			Log.AppendText(text + "\n", color);
 			Log.ScrollToCaret();
+		}
+
+		private void ChangeConnectionInputState(bool state)
+		{
+			IPBox.Invoke(new MethodInvoker(() => IPBox.Enabled = state));
+			nameBox.Invoke(new MethodInvoker(() => nameBox.Enabled = state));
+			if (state)
+			{
+				connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Connect"; }));
+			}
+			else
+			{
+				connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Disconnect"; }));
+			}
 		}
 
 		#region EventHandlers
