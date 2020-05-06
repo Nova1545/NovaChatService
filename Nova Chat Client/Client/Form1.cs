@@ -27,7 +27,6 @@ namespace Client
 			print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.", Chat);
 			print("Press 'Delete' when focused in this box to clear it.", Chat);
 			color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-			LoadSettings();
 		}
 
 		private void Listen(NetworkStream stream)
@@ -373,10 +372,15 @@ namespace Client
 		{
 			openFileDialog1.ShowDialog();
 		}
-	}
-	#endregion
 
-	public static class RichTextBoxExtensions
+        private void Tcp_Client_Load(object sender, EventArgs e)
+        {
+            LoadSettings();
+        }
+    }
+    #endregion
+
+    public static class RichTextBoxExtensions
 	{
 		public static void AppendText(this RichTextBox box, string text, Color color)
 		{
