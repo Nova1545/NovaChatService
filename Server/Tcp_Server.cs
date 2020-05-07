@@ -96,6 +96,17 @@ namespace Server
                         }
                         break;
                     }
+                    if(m.MessageType == MessageType.Transfer)
+                    {
+                        byte[] bytes = new byte[m.FileLength];
+                        stream.Read(bytes, 0, bytes.Length);
+                        foreach (KeyValuePair<string, NetworkStream> network in clients)
+                        {
+                            Helpers.SetMessage(network.Value, m);
+                            network.Value.Flush();
+                            network.Value.Write(bytes, 0, bytes.Length);
+                        }
+                    }
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
                         if (network.Key == name)

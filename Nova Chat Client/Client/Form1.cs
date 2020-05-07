@@ -35,25 +35,26 @@ namespace Client
 			{
 				while (true)
 				{
-					ChatLib.Message message = Helpers.GetMessage(stream);
-					if (message.MessageType == MessageType.Message)
+					ChatLib.Message m = Helpers.GetMessage(stream);
+					if (m.MessageType == MessageType.Message)
 					{
-						print(message.Name + ": " + message.Content, Chat, message.Color, true);
+						print(m.Name + ": " + m.Content, Chat, m.Color, true);
 					}
-                    else if(message.MessageType == MessageType.Status && message.Content == "disconnect")
+                    else if(m.MessageType == MessageType.Status && m.Content == "disconnect")
                     {
                         tcpClient.Close();
                         break;
                     }
-                    else if (message.MessageType == MessageType.Transfer)
+                    else if (m.MessageType == MessageType.Transfer)
                     {
-                        string filename = Path.GetRandomFileName() + (message.FileType == FileType.PNG ? ".png" : ".jpg");
-                        File.WriteAllBytes(filename, message.FileContent);
-                        print(message.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + filename).Replace(@"\", "/"), Chat, color, true);
+                        byte[] bytes = new byte[m.FileLength];
+                        stream.Read(bytes, 0, bytes.Length);
+                        File.WriteAllBytes(m.Filename, bytes);
+                        print(m.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + m.Filename).Replace(@"\", "/"), Chat, color, true);
                     }
                     else
 					{
-						print(message.Name + " " + message.Content, Log, Color.Orange, true);
+						print(m.Name + " " + m.Content, Log, Color.Orange, true);
 					}
 					stream.Flush();
 				}
@@ -364,7 +365,10 @@ namespace Client
 		{
 			try
 			{
-				Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, File.ReadAllBytes(openFileDialog1.FileName), MessageType.Transfer, FileType.PNG));
+                byte[] bytes = File.ReadAllBytes(openFileDialog1.FileName);
+                FileInfo info = new FileInfo(openFileDialog1.FileName);
+				Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, info.Name, bytes.Length, MessageType.Transfer, FileType.PNG));
+                stream.Write(bytes, 0, bytes.Length);
 				print("File Sent!", Chat, Color.Green);
 			}
 			catch (Exception ex)

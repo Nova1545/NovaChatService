@@ -8,13 +8,17 @@ namespace ChatLib
     [Serializable]
     public class Message
     {
+        // General Message info
         public string Name { get; private set; }
         public string Content { get; private set; }
         public MessageType MessageType { get; private set; }
         public Color Color { get; private set; }
         public string EndPoint { get; private set; }
-        public byte[] FileContent { get; private set; }
+
+        // File info
         public FileType FileType { get; private set; }
+        public int FileLength { get; private set; }
+        public string Filename { get; private set; }
 
         public Message(string name, string content, MessageType type, string endpoint = "")
         {
@@ -33,13 +37,14 @@ namespace ChatLib
             EndPoint = endpoint;
         }
 
-        public Message(string name, byte[] fileContent, MessageType type, FileType fileType)
+        public Message(string name, string filename, int fileLength, MessageType type, FileType fileType, string endpoint = "")
         {
             Name = name;
-            FileContent = fileContent;
+            FileLength = fileLength;
             MessageType = type;
             FileType = fileType;
-            EndPoint = "";
+            Filename = filename;
+            EndPoint = endpoint;
         }
 
         public Message(Message m)
