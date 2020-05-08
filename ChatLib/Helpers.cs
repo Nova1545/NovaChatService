@@ -17,9 +17,9 @@ namespace ChatLib.Extras
             byte[] len = new byte[4];
             stream.Read(len, 0, 4);
             int dataLen = BitConverter.ToInt32(len, 0);
-            Console.WriteLine("Got " + dataLen + " bytes");
             byte[] bytes = new byte[dataLen];
-            stream.Read(bytes, 0, bytes.Length);
+            int i = stream.Read(bytes, 0, bytes.Length);
+            Console.WriteLine("Got " + i + " bytes");
             MemoryStream ms = new MemoryStream(bytes);
             return (Message)new BinaryFormatter().Deserialize(ms);
         }
