@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 using ChatLib.DataStates;
 using System.Drawing;
 
@@ -14,11 +13,7 @@ namespace ChatLib
         public MessageType MessageType { get; private set; }
         public Color Color { get; private set; }
         public string EndPoint { get; private set; }
-
-        // File info
-        public FileType FileType { get; private set; }
-        public int FileLength { get; private set; }
-        public string Filename { get; private set; }
+        public byte[] FileContents { get; private set; }
 
         public Message(string name, string content, MessageType type, string endpoint = "")
         {
@@ -37,13 +32,11 @@ namespace ChatLib
             EndPoint = endpoint;
         }
 
-        public Message(string name, string filename, int fileLength, MessageType type, FileType fileType, string endpoint = "")
+        public Message(string name, byte[] fileContents, MessageType type, string endpoint = "")
         {
             Name = name;
-            FileLength = fileLength;
+            FileContents = fileContents;
             MessageType = type;
-            FileType = fileType;
-            Filename = filename;
             EndPoint = endpoint;
         }
 

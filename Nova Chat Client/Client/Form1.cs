@@ -45,13 +45,6 @@ namespace Client
                         tcpClient.Close();
                         break;
                     }
-                    else if (m.MessageType == MessageType.Transfer)
-                    {
-                        byte[] bytes = new byte[m.FileLength];
-                        stream.Read(bytes, 0, bytes.Length);
-                        File.WriteAllBytes(m.Filename, bytes);
-                        print(m.Name + " Sent : " + "file://" + (new FileInfo(Application.ExecutablePath).DirectoryName + @"\" + m.Filename).Replace(@"\", "/"), Chat, color, true);
-                    }
                     else
 					{
 						print(m.Name + " " + m.Content, Log, Color.Orange, true);
@@ -157,6 +150,7 @@ namespace Client
 
 		#region Stuff I Dont Care About
 
+
 		#region SetttingsHandlers
 		private void LoadSettings()
 		{
@@ -215,7 +209,7 @@ namespace Client
 
 		public void print(string text, RichTextBox output, Color color, bool invoke=false)
 		{
-			if (invoke)
+			if (output.InvokeRequired)
 			{
 				output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n", color)));
 				output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
@@ -367,10 +361,9 @@ namespace Client
 			{
                 byte[] bytes = File.ReadAllBytes(openFileDialog1.FileName);
                 FileInfo info = new FileInfo(openFileDialog1.FileName);
-				Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, info.Name, bytes.Length, MessageType.Transfer, FileType.PNG));
-                stream.Write(bytes, 0, bytes.Length);
-				print("File Sent!", Chat, Color.Green);
-			}
+                Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, bytes, MessageType.Transfer));
+                print("File Sent!", Chat, Color.Green);
+            }
 			catch (Exception ex)
 			{
 				print("Error Sending File ->" + ex.Message, Log, Color.Red);
