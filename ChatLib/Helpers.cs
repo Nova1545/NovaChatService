@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,29 +13,40 @@ namespace ChatLib.Extras
 {
     public static class Helpers
     {
-        public static Message GetMessage(Stream stream)
+        public static Message GetMessage(NetworkStream stream)
         {
             byte[] len = new byte[4];
             stream.Read(len, 0, 4);
             int dataLen = BitConverter.ToInt32(len, 0);
             byte[] bytes = new byte[dataLen];
-            int i;
-            if (dataLen > 1000)
+            MemoryStream ms = new MemoryStream();
+            if (dataLen > 1024)
             {
-                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-                { }
+                Console.WriteLine("Coping");
+                var total = 0;
+                var readed = -1;
+                var buffer = new
+                    byte[4096];
+                while(readed != 0)
+                {
+                    readed = stream.Read(buffer, 0, buffer.Length);
+                    total += readed;
+                    ms.Write(buffer, 0, readed);
+                    //Console.WriteLine("Copied " + readed);
+                    Console.WriteLine("Copy complete: " + total);
+                }
+                Console.WriteLine("Copy complete: " + total);
             }
             else
             {
-                i = dataLen;
                 stream.Read(bytes, 0, bytes.Length);
+                ms = new MemoryStream(bytes);
             }
-            Console.WriteLine("Got " + i + " bytes");
-            MemoryStream ms = new MemoryStream(bytes);
+            //Console.WriteLine("Got " + numBytesRead + " bytes");
             return (Message)new BinaryFormatter().Deserialize(ms);
         }
 
-        public static void SetMessage(Stream stream, Message message)
+        public static void SetMessage(NetworkStream stream, Message message)
         {
             MemoryStream ms = new MemoryStream();
             new BinaryFormatter().Serialize(ms, message);
