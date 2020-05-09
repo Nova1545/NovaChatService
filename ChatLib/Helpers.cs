@@ -27,6 +27,7 @@ namespace ChatLib.Extras
             else
             {
                 i = dataLen;
+                stream.Read(bytes, 0, bytes.Length);
             }
             Console.WriteLine("Got " + i + " bytes");
             MemoryStream ms = new MemoryStream(bytes);
