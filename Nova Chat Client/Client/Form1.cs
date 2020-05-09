@@ -52,7 +52,7 @@ namespace Client
 					stream.Flush();
 				}
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				print("Disconnected from server.", Log, Color.Red, true);
 				ChangeConnectionInputState(true);
