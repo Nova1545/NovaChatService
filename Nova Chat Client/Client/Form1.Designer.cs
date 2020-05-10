@@ -158,9 +158,8 @@ namespace Client
             this.chatBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chatBox.Location = new System.Drawing.Point(99, 2);
             this.chatBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.chatBox.Multiline = true;
             this.chatBox.Name = "chatBox";
-            this.chatBox.Size = new System.Drawing.Size(558, 30);
+            this.chatBox.Size = new System.Drawing.Size(558, 22);
             this.chatBox.TabIndex = 3;
             this.chatBox.Text = "Message";
             this.chatBox.Enter += new System.EventHandler(this.ChatBox_Enter);
