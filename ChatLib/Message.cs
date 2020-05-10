@@ -39,7 +39,7 @@ namespace ChatLib
         {
             Name = name;
             FileContents = fileContents;
-            Filename = filename;
+            Filename = filename.Replace(" ", "-");
             MessageType = type;
             EndPoint = endpoint;
         }
