@@ -137,7 +137,7 @@ namespace Client
 					stream = tcpClient.GetStream();
 
 					// Send name
-					Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "name", MessageType.Info));
+					Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "name", MessageType.Initionalize));
 
 					ChangeConnectionInputState(false);
 					print("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen, true);

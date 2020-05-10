@@ -20,6 +20,7 @@ namespace Server
     {
 
         static Dictionary<string, NetworkStream> clients;
+        static List<Message> buffer;
         Random rnd = new Random();
         static void Main(string[] args)
         {
@@ -31,6 +32,7 @@ namespace Server
             server.Start();
 
             clients = new Dictionary<string, NetworkStream>();
+            buffer = new List<Message>();
 
             while (true)
             {
@@ -39,7 +41,7 @@ namespace Server
                 NetworkStream stream = client.GetStream();
 
                 Message message = Helpers.GetMessage(stream);
-                if (message.MessageType == MessageType.Info && !clients.ContainsKey(message.Name) && message.Content == "name")
+                if (message.MessageType == MessageType.Initionalize && !clients.ContainsKey(message.Name) && message.Content == "name")
                 {
                     string name = message.Name;
                     clients.Add(name, stream);
@@ -71,15 +73,32 @@ namespace Server
             object[] info = (object[])token;
             NetworkStream stream = (NetworkStream)info[1];
             string name = (string)info[0];
+
+            // Tell all connected clients that we are connected
             foreach (KeyValuePair<string, NetworkStream> network in clients)
             {
                 Helpers.SetMessage(network.Value, new Message(network.Key == name? "You" : name, "connected", MessageType.Status));
             }
+
+            // Send The Server Message Buffer
+            foreach (Message message in buffer)
+            {
+                Helpers.SetMessage(stream, message);
+            }
+
             while (true)
             {
                 try
                 {
                     Message m = Helpers.GetMessage(stream);
+
+                    // Manage Message buffer
+                    buffer.Add(m);
+                    if(buffer.Count > 10)
+                    {
+                        buffer.RemoveRange(0, buffer.Count - 10);
+                    }
+
                     if(m.Name != name)
                     {
                         m.SetName(name);
@@ -133,13 +152,12 @@ namespace Server
                 }
                 catch (Exception ex)
                 {
-                    clients.Remove(name);
-                    Console.WriteLine(name + " disconnected due to an error. Details: " + ex.Message);
-
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
                         Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "disconnected due to an error", MessageType.Status));
                     }
+                    clients.Remove(name);
+                    Console.WriteLine(name + " disconnected due to an error. Details: " + ex.Message);
                     break;
                 }
             }
