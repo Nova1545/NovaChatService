@@ -79,7 +79,6 @@ namespace Server
             {
                 try
                 {
-                    Console.WriteLine("Getting data");
                     Message m = Helpers.GetMessage(stream);
                     if(m.Name != name)
                     {
@@ -97,11 +96,6 @@ namespace Server
                             Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "disconnected", MessageType.Status));
                         }
                         break;
-                    }
-                    if(m.MessageType == MessageType.Transfer)
-                    {
-                        File.WriteAllBytes("Test.png", m.FileContents);
-                        continue;
                     }
 
                     foreach (KeyValuePair<string, NetworkStream> network in clients)

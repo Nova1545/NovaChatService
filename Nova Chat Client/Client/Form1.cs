@@ -45,6 +45,11 @@ namespace Client
                         tcpClient.Close();
                         break;
                     }
+                    else if(m.MessageType == MessageType.Transfer)
+                    {
+                        File.WriteAllBytes(m.Filename, m.FileContents);
+                        print(m.Name + ": file://" + new FileInfo(m.Filename).FullName.Replace(@"\", "/"), Chat, true);
+                    }
                     else
 					{
 						print(m.Name + " " + m.Content, Log, Color.Orange, true);
@@ -347,7 +352,7 @@ namespace Client
 
 		private void Chat_LinkClicked(object sender, LinkClickedEventArgs e)
 		{
-			Process.Start(new Uri(e.LinkText).AbsolutePath.Replace("/", @"\").Replace("%20", " "));
+            Process.Start(new Uri(e.LinkText).AbsolutePath.Replace("/", @"\").Replace("%20", " "));
 		}
 
 		private void Tcp_Client_FormClosing(object sender, FormClosingEventArgs e)
@@ -361,7 +366,7 @@ namespace Client
 			{
                 byte[] bytes = File.ReadAllBytes(openFileDialog1.FileName);
                 FileInfo info = new FileInfo(openFileDialog1.FileName);
-                Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, bytes, MessageType.Transfer));
+                Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, info.Name, bytes, MessageType.Transfer));
                 print("File Sent!", Chat, Color.Green);
             }
 			catch (Exception ex)
