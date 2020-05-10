@@ -12,6 +12,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using ChatLib.DataStates;
 using ChatLib.Extras;
+using System.Threading.Tasks;
 
 namespace Server
 {
@@ -78,6 +79,7 @@ namespace Server
             {
                 try
                 {
+                    Console.WriteLine("Getting data");
                     Message m = Helpers.GetMessage(stream);
                     if(m.Name != name)
                     {
@@ -98,7 +100,8 @@ namespace Server
                     }
                     if(m.MessageType == MessageType.Transfer)
                     {
-
+                        File.WriteAllBytes("Test.png", m.FileContents);
+                        continue;
                     }
 
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
@@ -130,7 +133,7 @@ namespace Server
 
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
-                        Helpers.SetMessage(network.Value, new Message(network.Key == name? "You" : name, "disconnected", MessageType.Status));
+                        Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "disconnected", MessageType.Status));
                     }
                     break;
                 }

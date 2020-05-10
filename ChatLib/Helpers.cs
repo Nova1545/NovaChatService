@@ -19,31 +19,27 @@ namespace ChatLib.Extras
             stream.Read(len, 0, 4);
             int dataLen = BitConverter.ToInt32(len, 0);
             byte[] bytes = new byte[dataLen];
-            MemoryStream ms = new MemoryStream();
+            byte[] buffer = new byte[1024];
             if (dataLen > 1024)
             {
-                Console.WriteLine("Coping");
-                var total = 0;
-                var readed = -1;
-                var buffer = new
-                    byte[4096];
-                while(readed != 0)
+                MemoryStream ms = new MemoryStream();
+                int total = 0;
+                while(total < dataLen)
                 {
-                    readed = stream.Read(buffer, 0, buffer.Length);
-                    total += readed;
-                    ms.Write(buffer, 0, readed);
-                    //Console.WriteLine("Copied " + readed);
-                    Console.WriteLine("Copy complete: " + total);
+                    int readcount = stream.Read(buffer, 0, buffer.Length);
+                    total += readcount;
+                    ms.Write(buffer, 0, readcount);
                 }
-                Console.WriteLine("Copy complete: " + total);
+                bytes = ms.ToArray();
+                Console.WriteLine("Data Received");
             }
             else
             {
                 stream.Read(bytes, 0, bytes.Length);
-                ms = new MemoryStream(bytes);
             }
-            //Console.WriteLine("Got " + numBytesRead + " bytes");
-            return (Message)new BinaryFormatter().Deserialize(ms);
+            Console.WriteLine("Got " + bytes.Length + " bytes");
+            stream.Flush();
+            return (Message)new BinaryFormatter().Deserialize(new MemoryStream(bytes));
         }
 
         public static void SetMessage(NetworkStream stream, Message message)
