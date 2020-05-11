@@ -24,7 +24,7 @@ namespace Server
         Random rnd = new Random();
         static void Main(string[] args)
         {
-
+            Console.WriteLine(GetLocalIPAddress());
             TcpListener server = null;
             IPAddress iPAddress = IPAddress.Parse(GetLocalIPAddress()) ;
 
@@ -41,7 +41,7 @@ namespace Server
                 NetworkStream stream = client.GetStream();
 
                 Message message = Helpers.GetMessage(stream);
-                if (message.MessageType == MessageType.Initionalize && !clients.ContainsKey(message.Name) && message.Content == "name")
+                if (message.MessageType == MessageType.Initionalize && !clients.ContainsKey(message.Name))
                 {
                     string name = message.Name;
                     clients.Add(name, stream);
@@ -55,6 +55,7 @@ namespace Server
                 }
             }
         }
+
         private static string GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -77,7 +78,9 @@ namespace Server
             // Tell all connected clients that we are connected
             foreach (KeyValuePair<string, NetworkStream> network in clients)
             {
-                Helpers.SetMessage(network.Value, new Message(network.Key == name? "You" : name, "connected", MessageType.Status));
+                Message m = new Message(name, MessageType.Status);
+                m.SetStatusType(StatusType.Connected);
+                Helpers.SetMessage(network.Value, m);
             }
 
             // Send The Server Message Buffer
@@ -103,16 +106,19 @@ namespace Server
                     {
                         m.SetName(name);
                     }
-                    if(m.Content == "disconnect" && m.MessageType == MessageType.Status)
+                    if(m.StatusType == StatusType.Disconnecting && m.MessageType == MessageType.Status)
                     {
                         Helpers.SetMessage(stream, m);
                         clients[name].Close();
                         clients.Remove(name);
                         Console.WriteLine(name + " disconnected");
 
+                        Message d = new Message(name, MessageType.Status);
+                        d.SetStatusType(StatusType.Disconnected);
+
                         foreach (KeyValuePair<string, NetworkStream> network in clients)
                         {
-                            Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "disconnected", MessageType.Status));
+                            Helpers.SetMessage(network.Value, d);
                         }
                         break;
                     }
@@ -146,7 +152,9 @@ namespace Server
 
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
-                        Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "disconnected", MessageType.Status));
+                        Message d = new Message(network.Key == name ? "You" : name, MessageType.Status);
+                        d.SetStatusType(StatusType.Disconnected);
+                        Helpers.SetMessage(network.Value, d);
                     }
                     break;
                 }
@@ -154,8 +162,11 @@ namespace Server
                 {
                     foreach (KeyValuePair<string, NetworkStream> network in clients)
                     {
-                        Helpers.SetMessage(network.Value, new Message(network.Key == name ? "You" : name, "disconnected due to an error", MessageType.Status));
+                        Message e = new Message(network.Key == name ? "You" : name, MessageType.Status);
+                        e.SetStatusType(StatusType.ErrorDisconnect);
+                        Helpers.SetMessage(network.Value, e);
                     }
+                    
                     clients.Remove(name);
                     Console.WriteLine(name + " disconnected due to an error. Details: " + ex.Message);
                     break;

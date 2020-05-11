@@ -68,7 +68,7 @@ namespace Client
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 24);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 8.767773F));
@@ -88,7 +88,7 @@ namespace Client
             this.tableLayoutPanel2.Controls.Add(this.connectButton, 2, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(2, 2);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -99,7 +99,7 @@ namespace Client
             // 
             this.nameBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.nameBox.Location = new System.Drawing.Point(361, 2);
-            this.nameBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.nameBox.Margin = new System.Windows.Forms.Padding(2);
             this.nameBox.Name = "nameBox";
             this.nameBox.Size = new System.Drawing.Size(127, 20);
             this.nameBox.TabIndex = 1;
@@ -113,7 +113,7 @@ namespace Client
             this.IPBox.AcceptsReturn = true;
             this.IPBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IPBox.Location = new System.Drawing.Point(2, 2);
-            this.IPBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.IPBox.Margin = new System.Windows.Forms.Padding(2);
             this.IPBox.Name = "IPBox";
             this.IPBox.Size = new System.Drawing.Size(355, 20);
             this.IPBox.TabIndex = 0;
@@ -126,7 +126,7 @@ namespace Client
             // 
             this.connectButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.connectButton.Location = new System.Drawing.Point(492, 2);
-            this.connectButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.connectButton.Margin = new System.Windows.Forms.Padding(2);
             this.connectButton.Name = "connectButton";
             this.connectButton.Size = new System.Drawing.Size(102, 21);
             this.connectButton.TabIndex = 2;
@@ -145,7 +145,7 @@ namespace Client
             this.tableLayoutPanel3.Controls.Add(this.button1, 0, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(2, 313);
-            this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(2);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -157,7 +157,7 @@ namespace Client
             this.chatBox.AcceptsReturn = true;
             this.chatBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.chatBox.Location = new System.Drawing.Point(74, 2);
-            this.chatBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.chatBox.Margin = new System.Windows.Forms.Padding(2);
             this.chatBox.Name = "chatBox";
             this.chatBox.Size = new System.Drawing.Size(419, 20);
             this.chatBox.TabIndex = 3;
@@ -170,7 +170,7 @@ namespace Client
             // 
             this.sendButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.sendButton.Location = new System.Drawing.Point(497, 2);
-            this.sendButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.sendButton.Margin = new System.Windows.Forms.Padding(2);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(97, 23);
             this.sendButton.TabIndex = 4;
@@ -182,7 +182,7 @@ namespace Client
             // 
             this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.button1.Location = new System.Drawing.Point(2, 2);
-            this.button1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(68, 23);
             this.button1.TabIndex = 5;
@@ -201,7 +201,7 @@ namespace Client
             this.tableLayoutPanel4.Controls.Add(this.label2, 1, 0);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel4.Location = new System.Drawing.Point(2, 31);
-            this.tableLayoutPanel4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tableLayoutPanel4.Margin = new System.Windows.Forms.Padding(2);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 2;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.847953F));
@@ -213,7 +213,7 @@ namespace Client
             // 
             this.Chat.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Chat.Location = new System.Drawing.Point(2, 18);
-            this.Chat.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Chat.Margin = new System.Windows.Forms.Padding(2);
             this.Chat.Name = "Chat";
             this.Chat.ReadOnly = true;
             this.Chat.Size = new System.Drawing.Size(407, 258);
@@ -226,7 +226,7 @@ namespace Client
             // 
             this.Log.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Log.Location = new System.Drawing.Point(413, 18);
-            this.Log.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Log.Margin = new System.Windows.Forms.Padding(2);
             this.Log.Name = "Log";
             this.Log.ReadOnly = true;
             this.Log.Size = new System.Drawing.Size(181, 258);
@@ -323,7 +323,7 @@ namespace Client
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Tcp_Client";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Nova Chat Client";

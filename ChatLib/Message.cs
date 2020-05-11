@@ -14,46 +14,34 @@ namespace ChatLib
         public Color Color { get; private set; }
         public string EndPoint { get; private set; }
 
+        //Ststus info
+        public StatusType StatusType { get; private set; }
+
         // File transfer data
         public byte[] FileContents { get; private set; }
         public string Filename { get; private set; }
 
-        public Message(string name, string content, MessageType type, string endpoint = "")
+        // Other Information
+        private readonly string MessageID;
+
+        public Message(string name, MessageType messageType, string endPoint = "")
         {
             Name = name;
-            Content = content;
-            MessageType = type;
-            EndPoint = endpoint;
+            MessageType = messageType;
+            EndPoint = endPoint;
+            MessageID = Guid.NewGuid().ToString();
         }
 
-        public Message(string name, string content, MessageType type, Color color, string endpoint = "")
-        {
-            Name = name;
-            Content = content;
-            MessageType = type;
-            Color = color;
-            EndPoint = endpoint;
-        }
+        public void SetName(string name) => Name = name;
 
-        public Message(string name, string filename, byte[] fileContents, MessageType type, string endpoint = "")
-        {
-            Name = name;
-            FileContents = fileContents;
-            Filename = filename.Replace(" ", "_");
-            MessageType = type;
-            EndPoint = endpoint;
-        }
+        public void SetContent(string content) => Content = content;
 
-        public Message(Message m)
-        {
-            Name = m.Name;
-            Content = m.Content;
-            MessageType = m.MessageType;
-        }
+        public void SetColor(Color color) => Color = color;
 
-        public void SetName(string name)
-        {
-            Name = name;
-        }
+        public void SetStatusType(StatusType statusType) => StatusType = statusType;
+
+        public void SetFileContents(byte[] fileContents) => FileContents = fileContents;
+
+        public void SetFilename(string filename) => Filename = filename;
     }
 }

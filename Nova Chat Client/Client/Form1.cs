@@ -1,5 +1,6 @@
 ﻿using ChatLib.DataStates;
 using ChatLib.Extras;
+using ChatLib;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
@@ -15,9 +16,9 @@ namespace Client
 	public partial class Tcp_Client : Form
 	{
 		TcpClient tcpClient;
-		NetworkStream stream;
 		About aboutBox = new About();
 		Settings settings = new Settings();
+        User user;
 		Random rnd = new Random();
 		Color color;
 
@@ -29,54 +30,17 @@ namespace Client
 			color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
 		}
 
-		private void Listen(NetworkStream stream)
-		{
-			try
-			{
-				while (true)
-				{
-					ChatLib.Message m = Helpers.GetMessage(stream);
-					if (m.MessageType == MessageType.Message)
-					{
-						print(m.Name + ": " + m.Content, Chat, m.Color, true);
-					}
-                    else if(m.MessageType == MessageType.Status && m.Content == "disconnect")
-                    {
-                        tcpClient.Close();
-                        break;
-                    }
-                    else if(m.MessageType == MessageType.Transfer)
-                    {
-                        File.WriteAllBytes(m.Filename, m.FileContents);
-                        print(m.Name + ": file://" + new FileInfo(m.Filename).FullName.Replace(@"\", "/"), Chat, true);
-                    }
-                    else
-					{
-						print(m.Name + " " + m.Content, Log, Color.Orange, true);
-					}
-					stream.Flush();
-				}
-			}
-			catch (Exception)
-			{
-				print("Disconnected from server.", Log, Color.Red, true);
-				ChangeConnectionInputState(true);
-			}
-		}
-
 		private void SendMessage()
 		{
 			try
 			{
-				string name = nameBox.Text;
-
 				if (chatBox.Text.StartsWith("/msg"))
 				{
 					string[] text = chatBox.Text.Split('"', '"');
 					try
 					{
-						Helpers.SetMessage(stream, new ChatLib.Message(name, text[3], MessageType.Message, color, text[1]));
-						print(name + ": " + "Message privately sent to " + text[1], Chat, Color.Green);
+                        user.CreateWisper(text[3], color, text[1]);
+						print(nameBox.Text + ": " + "Message privately sent to " + text[1], Chat, color);
 					}
 					catch
 					{
@@ -85,15 +49,14 @@ namespace Client
 				}
 				else
 				{
-					print(name + ": " + chatBox.Text, Chat, color);
-					Helpers.SetMessage(stream, new ChatLib.Message(name, chatBox.Text, MessageType.Message, color));
+					print(nameBox.Text + ": " + chatBox.Text, Chat, color);
+                    user.CreateMessage(chatBox.Text, color);
 				}
 			}
 			catch (Exception ex)
 			{
 				print("Error Sending Message -> " + ex.Message, Log, Color.Red);
 			}
-
 			chatBox.Clear();
 		}
 
@@ -125,27 +88,32 @@ namespace Client
 					{
 						if (tcpClient.Connected)
 						{
-                            Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "disconnect", MessageType.Status));
-                            //tcpClient.Close();
+                            user.CreateStatus(StatusType.Disconnecting);
 							ChangeConnectionInputState(true);
 							return;
 						}
 					}
 					
-					print("Connecting... ", Log, true);
+					print("Connecting... ", Log);
 					tcpClient = new TcpClient(IPBox.Text, 8910);
-					stream = tcpClient.GetStream();
 
-					// Send name
-					Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, "name", MessageType.Initionalize));
+                    // Send name
+                    user = new User(nameBox.Text, tcpClient.GetStream());
+                    user.Init();
+
+                    // Setup Callbacks
+                    user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
+                    user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
+                    user.OnMessageTransferReceivedCallback += User_OnMessageTransferReceivedCallback;
+                    user.OnMessageWisperReceivedCallback += User_OnMessageWisperReceivedCallback;
+                    user.OnErrorCallback += (e) => { print(e.Message, Log); };
 
 					ChangeConnectionInputState(false);
-					print("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen, true);
-					this.Listen(stream);
+					print("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen);
 				}
 				catch (Exception ex)
 				{
-					print("Connection failed -> " + ex.Message, Log, Color.Red, true);
+					print("Connection failed -> " + ex.Message, Log, Color.Red);
 				}
 			});
 
@@ -153,11 +121,47 @@ namespace Client
 			t.Start();
 		}
 
-		#region Stuff I Dont Care About
+        private void User_OnMessageWisperReceivedCallback(ChatLib.Message message)
+        {
+            print("Private Message From " + message.Name + ": " + message.Content, Chat, message.Color);
+        }
+
+        private void User_OnMessageTransferReceivedCallback(ChatLib.Message message)
+        {
+            File.WriteAllBytes(message.Filename, message.FileContents);
+            print(message.Name + ": file://" + new FileInfo(message.Filename).FullName.Replace(@"\", "/"), Chat, message.Color);
+        }
+
+        private void User_OnMessageStatusReceivedCallback(ChatLib.Message message)
+        {
+            if (message.StatusType == StatusType.Connected) {
+                print(message.Name + " Connected", Log);
+            }
+            else if (message.StatusType == StatusType.Disconnected)
+            {
+                print(message.Name + " Disconnected", Log);
+            }
+            else if (message.StatusType == StatusType.Disconnecting)
+            {
+                user.Close();
+                tcpClient.Close();
+            }
+            else
+            {
+                print(message.Name + " Disconnected With Error", Log);
+            }
+        }
+
+        private void User_OnMessageReceivedCallback(ChatLib.Message message)
+        {
+            print(message.Name + ": " + message.Content, Chat, message.Color);
+        }
+
+        #region Stuff I Dont Care About
 
 
-		#region SetttingsHandlers
-		private void LoadSettings()
+        #region SetttingsHandlers
+        private void LoadSettings()
 		{
 			RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
 
@@ -199,9 +203,9 @@ namespace Client
 	}
 		#endregion
 
-		public void print(string text, RichTextBox output, bool invoke = false)
+		public void print(string text, RichTextBox output)
 		{
-			if (invoke)
+			if (output.InvokeRequired)
 			{
 				output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n")));
 				output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
@@ -212,7 +216,7 @@ namespace Client
 			output.ScrollToCaret();
 		}
 
-		public void print(string text, RichTextBox output, Color color, bool invoke=false)
+		public void print(string text, RichTextBox output, Color color)
 		{
 			if (output.InvokeRequired)
 			{
@@ -357,7 +361,10 @@ namespace Client
 
 		private void Tcp_Client_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			File.WriteAllText("log.txt", DateTime.Now.ToString() + "\n" + Log.Text);
+            if (user != null)
+            {
+                user.Close();
+            }
 		}
 
 		private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
@@ -366,7 +373,7 @@ namespace Client
 			{
                 byte[] bytes = File.ReadAllBytes(openFileDialog1.FileName);
                 FileInfo info = new FileInfo(openFileDialog1.FileName);
-                Helpers.SetMessage(stream, new ChatLib.Message(nameBox.Text, info.Name, bytes, MessageType.Transfer));
+                user.CreateTransfer(bytes, info.Name, color);
                 print("File Sent!", Chat, Color.Green);
             }
 			catch (Exception ex)
