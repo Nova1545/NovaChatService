@@ -85,9 +85,9 @@ namespace Client
 
 			Thread t = new Thread(delegate ()
 			{
-				try
-				{
-					if (tcpClient != null)
+                try
+                {
+                    if (tcpClient != null)
 					{
 						if (tcpClient.Connected)
 						{
@@ -114,12 +114,12 @@ namespace Client
 
 					ChangeConnectionInputState(false);
 					print("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen);
-				}
-				catch (Exception ex)
-				{
-					print("Connection failed -> " + ex.Message, Log, Color.Red);
-				}
-			});
+                }
+                catch (Exception ex)
+                {
+                    print("Connection failed -> " + ex.Message, Log, Color.Red);
+                }
+            });
 
 			t.IsBackground = true;
 			t.Start();
@@ -149,12 +149,14 @@ namespace Client
             {
                 user.Close();
                 tcpClient.Close();
-                ChangeConnectionInputState(false);
+                ChangeConnectionInputState(true);
             }
-            else
+            else if (message.StatusType == StatusType.ErrorDisconnect)
             {
-                print(message.Name + " Disconnected With Error", Log);
-                ChangeConnectionInputState(false);
+                print(message.Content, Log);
+                user.Close();
+                tcpClient.Close();
+                ChangeConnectionInputState(true);
             }
         }
 

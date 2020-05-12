@@ -42,12 +42,14 @@ namespace ChatLib
 
         // If you choose to not use auto send
         private Message m;
+        private bool Active;
         
         public User(string name, NetworkStream stream, bool autoSend = true)
         {
             Name = name;
             AutoSend = autoSend;
             Stream = stream;
+            Active = true;
             t = new Thread(() => Listen(Stream));
             t.Start();
         }
@@ -121,7 +123,7 @@ namespace ChatLib
 
         public void Close()
         {
-            t.Abort();
+            Active = false;
             Stream.Close();
         }
 
@@ -129,7 +131,7 @@ namespace ChatLib
         {
             try
             {
-                while (true)
+                while (Active)
                 {
                     Message m = Helpers.GetMessage(stream);
                     switch (m.MessageType)
@@ -155,7 +157,7 @@ namespace ChatLib
             }
             catch (Exception e)
             {
-                OnErrorCallback(e);
+                OnErrorCallback?.Invoke(e);
             }
         }
     }

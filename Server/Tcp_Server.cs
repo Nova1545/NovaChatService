@@ -18,7 +18,6 @@ namespace Server
         Random rnd = new Random();
         static void Main(string[] args)
         {
-            Console.WriteLine(GetLocalIPAddress());
             TcpListener server = null;
             IPAddress iPAddress = IPAddress.Parse(GetLocalIPAddress()) ;
 
@@ -44,8 +43,10 @@ namespace Server
                 }
                 else
                 {
+                    Console.WriteLine("Name Already Exsits: " + message.Name);
                     Message h = new Message(message.Name, MessageType.Status);
-                    h.SetStatusType(StatusType.Disconnecting);
+                    h.SetStatusType(StatusType.ErrorDisconnect);
+                    h.SetContent("User with that name already exsists");
                     Helpers.SetMessage(stream, h);
                     client.Close();
                     client.Dispose();
