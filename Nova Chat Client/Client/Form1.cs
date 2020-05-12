@@ -149,10 +149,12 @@ namespace Client
             {
                 user.Close();
                 tcpClient.Close();
+                ChangeConnectionInputState(false);
             }
             else
             {
                 print(message.Name + " Disconnected With Error", Log);
+                ChangeConnectionInputState(false);
             }
         }
 
