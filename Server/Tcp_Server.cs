@@ -44,6 +44,8 @@ namespace Server
                 }
                 else
                 {
+                    Message h = new Message(message.Name, MessageType.Status);
+                    h.SetStatusType(StatusType.Disconnecting);
                     client.Close();
                     client.Dispose();
                 }
