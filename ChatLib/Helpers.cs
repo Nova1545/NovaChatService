@@ -31,13 +31,11 @@ namespace ChatLib.Extras
                     ms.Write(buffer, 0, readcount);
                 }
                 bytes = ms.ToArray();
-                Console.WriteLine("Data Received");
             }
             else
             {
                 stream.Read(bytes, 0, bytes.Length);
             }
-            Console.WriteLine("Got " + bytes.Length + " bytes");
             stream.Flush();
             return (Message)new BinaryFormatter().Deserialize(new MemoryStream(bytes));
         }
@@ -47,27 +45,9 @@ namespace ChatLib.Extras
             MemoryStream ms = new MemoryStream();
             new BinaryFormatter().Serialize(ms, message);
             byte[] dataBytes = ms.ToArray();
-            Console.WriteLine("Sent " + dataBytes.Length + " bytes");
             byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
             stream.Write(dataLen, 0, 4);
             stream.Write(dataBytes, 0, dataBytes.Length);
         }
-
-        public static void SetFileStream(Stream stream, byte[] file)
-        {
-            byte[] dataLen = BitConverter.GetBytes((Int32)file.Length);
-            stream.Write(dataLen, 0, 4);
-            stream.Write(file, 0, file.Length);
-        }
-
-        public static byte[] GetFileStream(Stream stream)
-        {
-            byte[] len = new byte[4];
-            stream.Read(len, 0, 4);
-            int dataLen = BitConverter.ToInt32(len, 0);
-            byte[] bytes = new byte[dataLen];
-            stream.Read(bytes, 0, bytes.Length);
-            return bytes;
-        } 
     }
 }

@@ -70,6 +70,7 @@ namespace ChatLib
         {
             m = new Message(Name, MessageType.Message);
             m.SetContent(content);
+            m.SetColor(color);
             if (AutoSend)
             {
                 Helpers.SetMessage(Stream, m);

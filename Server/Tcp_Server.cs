@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using ChatLib;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using ChatLib.DataStates;
 using ChatLib.Extras;
-using System.Threading.Tasks;
 
 namespace Server
 {
