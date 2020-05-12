@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
+using System.Media;
 
 namespace Client
 {
@@ -21,6 +22,7 @@ namespace Client
         User user;
 		Random rnd = new Random();
 		Color color;
+		SoundPlayer player = new SoundPlayer();
 
 		public Tcp_Client()
 		{
@@ -64,6 +66,7 @@ namespace Client
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
+				e.SuppressKeyPress = true;
 				SendMessage();
 			}
 		}
@@ -106,7 +109,8 @@ namespace Client
                     user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
                     user.OnMessageTransferReceivedCallback += User_OnMessageTransferReceivedCallback;
                     user.OnMessageWisperReceivedCallback += User_OnMessageWisperReceivedCallback;
-                    user.OnErrorCallback += (e) => { print(e.Message, Log); };
+					user.OnMessageAnyReceivedCallback += User_OnMessageAnyReceivedCallback;
+					user.OnErrorCallback += (e) => { print(e.Message, Log); };
 
 					ChangeConnectionInputState(false);
 					print("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen);
@@ -124,13 +128,13 @@ namespace Client
         private void User_OnMessageWisperReceivedCallback(ChatLib.Message message)
         {
             print("Private Message From " + message.Name + ": " + message.Content, Chat, message.Color);
-        }
+		}
 
         private void User_OnMessageTransferReceivedCallback(ChatLib.Message message)
         {
             File.WriteAllBytes(message.Filename, message.FileContents);
             print(message.Name + ": file://" + new FileInfo(message.Filename).FullName.Replace(@"\", "/"), Chat, message.Color);
-        }
+		}
 
         private void User_OnMessageStatusReceivedCallback(ChatLib.Message message)
         {
@@ -157,11 +161,16 @@ namespace Client
             print(message.Name + ": " + message.Content, Chat, message.Color);
         }
 
-        #region Stuff I Dont Care About
+		private void User_OnMessageAnyReceivedCallback(ChatLib.Message message)
+		{
+			PlayNotificationSound();
+		}
+
+		#region Stuff I Dont Care About
 
 
-        #region SetttingsHandlers
-        private void LoadSettings()
+		#region SetttingsHandlers
+		private void LoadSettings()
 		{
 			RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
 
@@ -202,6 +211,12 @@ namespace Client
 			}
 	}
 		#endregion
+
+		private void PlayNotificationSound()
+		{
+			player.Stream = Properties.Resources.Notification;
+			player.Play();
+		}
 
 		public void print(string text, RichTextBox output)
 		{
@@ -331,6 +346,7 @@ namespace Client
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
+				e.SuppressKeyPress = true;
 				Connect();
 			}
 		}
