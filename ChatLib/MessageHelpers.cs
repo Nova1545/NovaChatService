@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
 using System.IO;
-using System.Linq;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChatLib.Extras
 {
-    public static class Helpers
+    public static class MessageHelpers
     {
         public static Message GetMessage(NetworkStream stream)
         {
@@ -36,7 +32,6 @@ namespace ChatLib.Extras
             {
                 stream.Read(bytes, 0, bytes.Length);
             }
-            stream.Flush();
             return (Message)new BinaryFormatter().Deserialize(new MemoryStream(bytes));
         }
 
@@ -48,6 +43,16 @@ namespace ChatLib.Extras
             byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
             stream.Write(dataLen, 0, 4);
             stream.Write(dataBytes, 0, dataBytes.Length);
+        }
+
+        public static async Task SetMessageAsync(NetworkStream stream, Message message)
+        {
+            MemoryStream ms = new MemoryStream();
+            new BinaryFormatter().Serialize(ms, message);
+            byte[] dataBytes = ms.ToArray();
+            byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
+            stream.Write(dataLen, 0, 4);
+            await stream.WriteAsync(dataBytes, 0, dataBytes.Length);
         }
     }
 }

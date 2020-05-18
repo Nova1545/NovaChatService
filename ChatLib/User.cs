@@ -7,6 +7,7 @@ using System.Threading;
 using ChatLib.Extras;
 using ChatLib.DataStates;
 using System.Drawing;
+using System.Net.Security;
 
 namespace ChatLib
 {
@@ -15,8 +16,6 @@ namespace ChatLib
         public string Name { get; private set; }
         public bool AutoSend { get; private set; }
         public NetworkStream Stream { get; private set; }
-
-        private Thread t;
 
         // Message Received Callbacks
         public delegate void OnMessageAnyReceived(Message message);
@@ -42,6 +41,7 @@ namespace ChatLib
 
         // If you choose to not use auto send
         private Message m;
+
         private bool Active;
         
         public User(string name, NetworkStream stream, bool autoSend = true)
@@ -50,15 +50,14 @@ namespace ChatLib
             AutoSend = autoSend;
             Stream = stream;
             Active = true;
-            t = new Thread(() => Listen(Stream));
-            t.Start();
+            ThreadPool.QueueUserWorkItem(Listen, Stream);
         }
 
         public bool Send()
         {
             if (m != null)
             {
-                Helpers.SetMessage(Stream, m);
+                MessageHelpers.SetMessage(Stream, m);
                 m = null;
                 return true;
             }
@@ -75,7 +74,7 @@ namespace ChatLib
             m.SetColor(color);
             if (AutoSend)
             {
-                Helpers.SetMessage(Stream, m);
+                MessageHelpers.SetMessage(Stream, m);
                 m = null;
             }
         }
@@ -87,7 +86,7 @@ namespace ChatLib
             m.SetColor(color);
             if (AutoSend)
             {
-                Helpers.SetMessage(Stream, m);
+                MessageHelpers.SetMessage(Stream, m);
                 m = null;
             }
         }
@@ -100,7 +99,7 @@ namespace ChatLib
             m.SetColor(color);
             if (AutoSend)
             {
-                Helpers.SetMessage(Stream, m);
+                MessageHelpers.SetMessage(Stream, m);
                 m = null;
             }
         }
@@ -111,29 +110,36 @@ namespace ChatLib
             m.SetStatusType(status);
             if (AutoSend)
             {
-                Helpers.SetMessage(Stream, m);
+                MessageHelpers.SetMessage(Stream, m);
                 m = null;
             }
         }
 
+        public void ForwardMessage(Message m)
+        {
+            MessageHelpers.SetMessage(Stream, m);
+        }
+
         public void Init()
         {
-            Helpers.SetMessage(Stream, new Message(Name, MessageType.Initionalize));
+            MessageHelpers.SetMessage(Stream, new Message(Name, MessageType.Initionalize));
         }
 
         public void Close()
         {
             Active = false;
             Stream.Close();
+            Stream.Dispose();
         }
 
-        private void Listen(NetworkStream stream)
+        private void Listen(object stream)
         {
             try
             {
+                NetworkStream nStream = (NetworkStream)stream;
                 while (Active)
                 {
-                    Message m = Helpers.GetMessage(stream);
+                    Message m = MessageHelpers.GetMessage(nStream);
                     switch (m.MessageType)
                     {
                         case MessageType.Message:

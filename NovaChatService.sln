@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client_UI", "Nova Chat Clie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{FC2261D1-720D-41C4-99A9-CE312FD0495E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "Testing\Testing.csproj", "{BE7AB503-7DF8-4AEF-9C5F-0922588F2DDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{FC2261D1-720D-41C4-99A9-CE312FD0495E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC2261D1-720D-41C4-99A9-CE312FD0495E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC2261D1-720D-41C4-99A9-CE312FD0495E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE7AB503-7DF8-4AEF-9C5F-0922588F2DDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE7AB503-7DF8-4AEF-9C5F-0922588F2DDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE7AB503-7DF8-4AEF-9C5F-0922588F2DDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE7AB503-7DF8-4AEF-9C5F-0922588F2DDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

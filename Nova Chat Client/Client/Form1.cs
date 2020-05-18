@@ -1,5 +1,4 @@
 ﻿using ChatLib.DataStates;
-using ChatLib.Extras;
 using ChatLib;
 using Microsoft.Win32;
 using System;
@@ -7,14 +6,15 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Net.Sockets;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
 using System.Media;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Client
 {
-	public partial class Tcp_Client : Form
+    public partial class Tcp_Client : Form
 	{
 		TcpClient tcpClient;
 		About aboutBox = new About();
@@ -25,7 +25,7 @@ namespace Client
 		SoundPlayer player = new SoundPlayer();
 
 		public Tcp_Client()
-		{
+		{      
 			InitializeComponent();
 			print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.", Chat);
 			print("Press 'Delete' when focused in this box to clear it.", Chat);
@@ -36,7 +36,7 @@ namespace Client
 		{
 			try
 			{
-				if (chatBox.Text.StartsWith("/msg"))
+				if (chatBox.Text.StartsWith("/wisper"))
 				{
 					string[] text = chatBox.Text.Split('"', '"');
 					try
@@ -49,10 +49,25 @@ namespace Client
 						print("Couldnt run command", Chat, Color.Red);
 					}
 				}
+                else if (chatBox.Text.StartsWith("/color"))
+                {
+                    string[] text = chatBox.Text.Replace("/color ", "").Split(' ');
+                    if(text.Length > 1)
+                    {
+                        color = Color.FromArgb(int.Parse(text[0]), int.Parse(text[1]), int.Parse(text[2]));
+                    }
+                    else
+                    {
+                        color = Color.FromName(text[0]);
+                    }
+                }
 				else
 				{
-					print(nameBox.Text + ": " + chatBox.Text, Chat, color);
-                    user.CreateMessage(chatBox.Text, color);
+                    if (user != null)
+                    {
+                        print(nameBox.Text + ": " + chatBox.Text, Chat, color);
+                        user.CreateMessage(chatBox.Text, color);
+                    }
 				}
 			}
 			catch (Exception ex)
@@ -92,13 +107,16 @@ namespace Client
 						if (tcpClient.Connected)
 						{
                             user.CreateStatus(StatusType.Disconnecting);
-							ChangeConnectionInputState(true);
+                            ChangeConnectionInputState(true);
 							return;
 						}
 					}
 					
 					print("Connecting... ", Log);
 					tcpClient = new TcpClient(IPBox.Text, 8910);
+
+                    //SslStream ssl = new SslStream(tcpClient.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+                    //ssl.AuthenticateAsClient("novastudios.tk");
 
                     // Send name
                     user = new User(nameBox.Text, tcpClient.GetStream());
@@ -125,6 +143,17 @@ namespace Client
 			t.Start();
 		}
 
+        public static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            if (sslPolicyErrors == SslPolicyErrors.None)
+                return true;
+
+            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+
+            // Do not allow this client to communicate with unauthenticated servers.
+            return false;
+        }
+
         private void User_OnMessageWisperReceivedCallback(ChatLib.Message message)
         {
             print("Private Message From " + message.Name + ": " + message.Content, Chat, message.Color);
@@ -147,8 +176,15 @@ namespace Client
             }
             else if (message.StatusType == StatusType.Disconnecting)
             {
+                if(message.Content != null || message.Content != "")
+                {
+                    print(message.Content, Log, Color.Red);
+                }
+                print(message.Name + " Disconnected", Log);
                 user.Close();
                 tcpClient.Close();
+                user = null;
+                tcpClient.Dispose();
                 ChangeConnectionInputState(true);
             }
             else if (message.StatusType == StatusType.ErrorDisconnect)
@@ -156,6 +192,8 @@ namespace Client
                 print(message.Content, Log);
                 user.Close();
                 tcpClient.Close();
+                user = null;
+                tcpClient.Dispose();
                 ChangeConnectionInputState(true);
             }
         }
@@ -381,6 +419,8 @@ namespace Client
 
 		private void Tcp_Client_FormClosing(object sender, FormClosingEventArgs e)
 		{
+            user.CreateStatus(StatusType.Disconnecting);
+            ChangeConnectionInputState(true);
             if (user != null)
             {
                 user.Close();
@@ -389,18 +429,26 @@ namespace Client
 
 		private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
 		{
-			try
-			{
-                byte[] bytes = File.ReadAllBytes(openFileDialog1.FileName);
-                FileInfo info = new FileInfo(openFileDialog1.FileName);
-                user.CreateTransfer(bytes, info.Name, color);
-                print("File Sent!", Chat, Color.Green);
-            }
-			catch (Exception ex)
-			{
-				print("Error Sending File ->" + ex.Message, Log, Color.Red);
-			}
-		}
+            new Thread(() =>
+            {
+                try
+                {
+                    FileInfo info = new FileInfo(openFileDialog1.FileName);
+                    if (info.Length > 10485760)
+                    {
+                        MessageBox.Show("File larger than 10 megabytes");
+                        return;
+                    }
+                    byte[] bytes = File.ReadAllBytes(openFileDialog1.FileName);
+                    user.CreateTransfer(bytes, info.Name, color);
+                    print("File Sent!", Chat, Color.Green);
+                }
+                catch (Exception ex)
+                {
+                    print("Error Sending File ->" + ex.Message, Log, Color.Red);
+                }
+            }).Start();
+        }
 
 		private void button1_Click_1(object sender, EventArgs e)
 		{

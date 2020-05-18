@@ -1,30 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using ChatLib.DataStates;
 using System.Drawing;
 
 namespace ChatLib
 {
-    [Serializable]
-    public class Message
+    public class JsonMessage
     {
-        // General Message info
+        // General JsonMessage Info
         public string Name { get; private set; }
         public string Content { get; private set; }
         public MessageType MessageType { get; private set; }
         public Color Color { get; private set; }
         public string EndPoint { get; private set; }
 
-        //Ststus info
+        // Status info
         public StatusType StatusType { get; private set; }
-
-        // File transfer data
-        public byte[] FileContents { get; private set; }
-        public string Filename { get; private set; }
 
         // Other Information
         private readonly string MessageID;
 
-        public Message(string name, MessageType messageType, string endPoint = "")
+        public JsonMessage(string name, MessageType messageType, string endPoint = "")
         {
             Name = name;
             MessageType = messageType;
@@ -42,8 +41,9 @@ namespace ChatLib
 
         public void SetEndpoint(string endPoint) => EndPoint = endPoint;
 
-        public void SetFileContents(byte[] fileContents) => FileContents = fileContents;
-
-        public void SetFilename(string filename) => Filename = filename;
+        public override string ToString()
+        {
+            return $"Name: {Name} Content: {Content} MessageType: {MessageType} Color: {Color.ToString()} Endpoint: {EndPoint} StatusType: {StatusType}";
+        }
     }
 }
