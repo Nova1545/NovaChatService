@@ -8,8 +8,9 @@ using ChatLib.Extras;
 using ChatLib.DataStates;
 using System.Drawing;
 using System.Net.Security;
+using ChatLib;
 
-namespace ChatLib
+namespace Client
 {
     public class User
     {
@@ -35,6 +36,9 @@ namespace ChatLib
 
         public delegate void OnMessageInitReceived(Message message);
         public event OnMessageInitReceived OnMessageInitReceivedCallback;
+
+        public delegate void OnMesssageInformationReceived(Message message);
+        public event OnMesssageInformationReceived OnMesssageInformationReceivedCallback;
 
         public delegate void OnError(Exception exception);
         public event OnError OnErrorCallback;
@@ -104,10 +108,11 @@ namespace ChatLib
             }
         }
 
-        public void CreateStatus(StatusType status)
+        public void CreateStatus(StatusType status, string content = "")
         {
             m = new Message(Name, MessageType.Status);
             m.SetStatusType(status);
+            m.SetContent(content);
             if (AutoSend)
             {
                 MessageHelpers.SetMessage(Stream, m);
@@ -118,6 +123,17 @@ namespace ChatLib
         public void ForwardMessage(Message m)
         {
             MessageHelpers.SetMessage(Stream, m);
+        }
+
+        public void CreateInformation(InfomationType infomationType)
+        {
+            m = new Message(Name, MessageType.Infomation);
+            m.SetInformationType(infomationType);
+            if (AutoSend)
+            {
+                MessageHelpers.SetMessage(Stream, m);
+                m = null;
+            }
         }
 
         public void Init()
@@ -156,6 +172,9 @@ namespace ChatLib
                             break;
                         case MessageType.Initionalize:
                             OnMessageInitReceivedCallback?.Invoke(m);
+                            break;
+                        case MessageType.Infomation:
+                            OnMesssageInformationReceivedCallback?.Invoke(m);
                             break;
                     }
                     OnMessageAnyReceivedCallback?.Invoke(m);

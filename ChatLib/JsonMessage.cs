@@ -21,14 +21,16 @@ namespace ChatLib
         public StatusType StatusType { get; private set; }
 
         // Other Information
-        private readonly string MessageID;
+        private readonly string GUID;
+        public InfomationType InfomationType { get; private set; }
+        public RequestType RequestType { get; private set; }
 
         public JsonMessage(string name, MessageType messageType, string endPoint = "")
         {
             Name = name;
             MessageType = messageType;
             EndPoint = endPoint;
-            MessageID = Guid.NewGuid().ToString();
+            GUID = Guid.NewGuid().ToString();
         }
 
         public void SetName(string name) => Name = name;
@@ -40,6 +42,10 @@ namespace ChatLib
         public void SetStatusType(StatusType statusType) => StatusType = statusType;
 
         public void SetEndpoint(string endPoint) => EndPoint = endPoint;
+
+        public void SetInformationType(InfomationType infomationType) => InfomationType = infomationType;
+
+        public void SetRequestType(RequestType requestType) => RequestType = requestType;
 
         public override string ToString()
         {

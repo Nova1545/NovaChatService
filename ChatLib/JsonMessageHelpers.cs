@@ -165,7 +165,11 @@ namespace ChatLib.Json
             {
                 frame[i + indexStartData] = raw[i];
             }
-            stream.Write(frame, 0, frame.Length);
+            try
+            {
+                stream.Write(frame, 0, frame.Length);
+            }
+            catch { }
         }
 
         public static async Task SetJsonMessageAsync(NetworkStream stream, JsonMessage json)
@@ -209,7 +213,11 @@ namespace ChatLib.Json
             {
                 frame[i + indexStartData] = raw[i];
             }
-            await stream.WriteAsync(frame, 0, frame.Length);
+            try
+            {
+                await stream.WriteAsync(frame, 0, frame.Length);
+            }
+            catch { }
         }
     }
 }

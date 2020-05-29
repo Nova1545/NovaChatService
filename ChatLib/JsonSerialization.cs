@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ChatLib.DataStates;
 using Newtonsoft.Json;
 using System.Drawing;
+using ChatLib.Extras;
 
 namespace ChatLib.Json
 {
@@ -27,6 +26,12 @@ namespace ChatLib.Json
 
                 writer.WritePropertyName("Content");
                 writer.WriteValue(json.Content);
+
+                writer.WritePropertyName("InformationType");
+                writer.WriteValue(json.InfomationType);
+
+                writer.WritePropertyName("RequestType");
+                writer.WriteValue(json.RequestType);
 
                 writer.WritePropertyName("Color");
                 writer.WriteStartArray();
@@ -95,6 +100,14 @@ namespace ChatLib.Json
                     {
                         m.SetStatusType((StatusType)reader.ReadAsInt32());
                     }
+                    else if(value == "InformationType")
+                    {
+                        m.SetInformationType((InfomationType)reader.ReadAsInt32());
+                    }
+                    else if(value == "RequestType")
+                    {
+                        m.SetRequestType((RequestType)reader.ReadAsInt32());
+                    }
                     else if(value == "Color") { }
                     else
                     {
@@ -111,6 +124,8 @@ namespace ChatLib.Json
             m.SetColor(json.Color);
             m.SetContent(json.Content);
             m.SetStatusType(json.StatusType);
+            m.SetInformationType(json.InfomationType);
+            m.SetRequestType(json.RequestType);
             return m;
         }
 
@@ -120,7 +135,64 @@ namespace ChatLib.Json
             js.SetColor(message.Color);
             js.SetContent(message.Content);
             js.SetStatusType(message.StatusType);
+            js.SetInformationType(message.InfomationType);
+            js.SetRequestType(message.RequestType);
             return js;
+        }
+
+        public static string Serialize(this Dictionary<string, Room> rooms)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                writer.Formatting = Formatting.None;
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("Rooms");
+                writer.WriteStartArray();
+
+                foreach (KeyValuePair<string, Room> room in rooms)
+                {
+                    writer.WriteStartObject();
+
+                    writer.WritePropertyName("Name");
+                    writer.WriteValue(room.Value.Name);
+
+                    writer.WritePropertyName("ID");
+                    writer.WriteValue(room.Value.ID);
+
+                    writer.WriteEndObject();
+                }
+                writer.WriteEndArray();
+            }
+            return sb.ToString();
+        }
+
+        public static string Serialize(this Dictionary<string, ClientInfo> clients)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                writer.Formatting = Formatting.None;
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("Users");
+                writer.WriteStartArray();
+
+                foreach (KeyValuePair<string, ClientInfo> room in clients)
+                {
+                    writer.WriteStartObject();
+
+                    writer.WritePropertyName("Name");
+                    writer.WriteValue(room.Value.Name);
+
+                    writer.WriteEndObject();
+                }
+                writer.WriteEndArray();
+            }
+            return sb.ToString();
         }
     }
 }

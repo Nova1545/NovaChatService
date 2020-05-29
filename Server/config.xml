@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <!-- overrideDefault -> removes default rooms -->
+  <Rooms overrideDefault="true">
+    <!-- 0 and 1 are already taken by the default rooms -->
+    <!-- Set overrideDefault to true to use id 0 and 1-->
+    <Room id="0" userLimit="10" maxBufferSize="30">Main 1</Room>
+    <Room id="1" userLimit="10" maxBufferSize="30">Main 2</Room>
+    <Room id="2" userLimit="10" maxBufferSize="30">Main 3</Room>
+  </Rooms>
+  <GeneralSettings>
+    <!-- Leave blank for automatic (Only automatic rn) -->
+    <ServerIp></ServerIp>
+    <!-- Need either WebPort, DesktopPort or both. Can be left blank to use the default ports -->
+    <WebPort>8911</WebPort>
+    <DesktopPort>8910</DesktopPort>
+    <AdminPassword></AdminPassword> <!-- Leave blank for no admin (Not Implemented) -->
+    <ServerPassword></ServerPassword> <!-- Only allows users with the password to join (Not Implemented) -->
+  </GeneralSettings>
+</Config>

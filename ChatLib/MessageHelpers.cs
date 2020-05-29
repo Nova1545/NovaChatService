@@ -41,8 +41,12 @@ namespace ChatLib.Extras
             new BinaryFormatter().Serialize(ms, message);
             byte[] dataBytes = ms.ToArray();
             byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
-            stream.Write(dataLen, 0, 4);
-            stream.Write(dataBytes, 0, dataBytes.Length);
+            try
+            {
+                stream.Write(dataLen, 0, 4);
+                stream.Write(dataBytes, 0, dataBytes.Length);
+            }
+            catch { }
         }
 
         public static async Task SetMessageAsync(NetworkStream stream, Message message)
@@ -51,8 +55,12 @@ namespace ChatLib.Extras
             new BinaryFormatter().Serialize(ms, message);
             byte[] dataBytes = ms.ToArray();
             byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
-            stream.Write(dataLen, 0, 4);
-            await stream.WriteAsync(dataBytes, 0, dataBytes.Length);
+            try
+            {
+                stream.Write(dataLen, 0, 4);
+                await stream.WriteAsync(dataBytes, 0, dataBytes.Length);
+            }
+            catch { }
         }
     }
 }

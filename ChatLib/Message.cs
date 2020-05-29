@@ -14,22 +14,26 @@ namespace ChatLib
         public Color Color { get; private set; }
         public string EndPoint { get; private set; }
 
-        //Ststus info
+        //Status info
         public StatusType StatusType { get; private set; }
 
         // File transfer data
         public byte[] FileContents { get; private set; }
         public string Filename { get; private set; }
 
+        // Other
+        public InfomationType InfomationType { get; private set; }
+        public RequestType RequestType { get; private set; }
+
         // Other Information
-        private readonly string MessageID;
+        private readonly string GUID;
 
         public Message(string name, MessageType messageType, string endPoint = "")
         {
             Name = name;
             MessageType = messageType;
             EndPoint = endPoint;
-            MessageID = Guid.NewGuid().ToString();
+            GUID = Guid.NewGuid().ToString();
         }
 
         public void SetName(string name) => Name = name;
@@ -45,5 +49,9 @@ namespace ChatLib
         public void SetFileContents(byte[] fileContents) => FileContents = fileContents;
 
         public void SetFilename(string filename) => Filename = filename;
+
+        public void SetInformationType(InfomationType infomationType) => InfomationType = infomationType;
+
+        public void SetRequestType(RequestType requestType) => RequestType = requestType;
     }
 }

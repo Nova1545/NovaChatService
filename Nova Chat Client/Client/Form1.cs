@@ -1,5 +1,4 @@
 ﻿using ChatLib.DataStates;
-using ChatLib;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
@@ -9,8 +8,6 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Forms;
 using System.Media;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Client
 {
@@ -60,6 +57,39 @@ namespace Client
                     {
                         color = Color.FromName(text[0]);
                     }
+                }
+                else if (chatBox.Text.StartsWith("/info"))
+                {
+                    string[] command = chatBox.Text.Replace("/info ", "").Split(' ');
+                    if(command[0] == "users")
+                    {
+                        user.CreateInformation(InfomationType.ConnectedUsers);
+                    }
+                    else if(command[0] == "time")
+                    {
+                        user.CreateInformation(InfomationType.ConnectTime);
+                    }
+                    else if(command[0] == "sent")
+                    {
+                        user.CreateInformation(InfomationType.MessagesSent);
+                    }
+                    else if(command[0] == "uptime")
+                    {
+                        user.CreateInformation(InfomationType.ServerUptime);
+                    }
+                    else if(command[0] == "rooms")
+                    {
+                        user.CreateInformation(InfomationType.Rooms);
+                    }
+                    else
+                    {
+                        print("Unknown Parameter", Chat);
+                    }
+                }
+                else if (chatBox.Text.StartsWith("/changeroom"))
+                {
+                    string room = chatBox.Text.Replace("/changeroom ", "");
+                    user.CreateStatus(StatusType.ChangeRoom, room);
                 }
 				else
 				{
@@ -128,6 +158,7 @@ namespace Client
                     user.OnMessageTransferReceivedCallback += User_OnMessageTransferReceivedCallback;
                     user.OnMessageWisperReceivedCallback += User_OnMessageWisperReceivedCallback;
 					user.OnMessageAnyReceivedCallback += User_OnMessageAnyReceivedCallback;
+                    user.OnMesssageInformationReceivedCallback += User_OnMesssageInformationReceivedCallback;
 					user.OnErrorCallback += (e) => { print(e.Message, Log); };
 
 					ChangeConnectionInputState(false);
@@ -143,15 +174,9 @@ namespace Client
 			t.Start();
 		}
 
-        public static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        private void User_OnMesssageInformationReceivedCallback(ChatLib.Message message)
         {
-            if (sslPolicyErrors == SslPolicyErrors.None)
-                return true;
-
-            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
-
-            // Do not allow this client to communicate with unauthenticated servers.
-            return false;
+            print(message.Name + ": " + message.Content, Chat);
         }
 
         private void User_OnMessageWisperReceivedCallback(ChatLib.Message message)
@@ -419,8 +444,14 @@ namespace Client
 
 		private void Tcp_Client_FormClosing(object sender, FormClosingEventArgs e)
 		{
-            user.CreateStatus(StatusType.Disconnecting);
-            ChangeConnectionInputState(true);
+            if(tcpClient != null)
+            {
+                if (tcpClient.Connected && user != null)
+                {
+                    user.CreateStatus(StatusType.Disconnecting);
+                    ChangeConnectionInputState(true);
+                }
+            }
             if (user != null)
             {
                 user.Close();
@@ -459,8 +490,8 @@ namespace Client
         {
             LoadSettings();
         }
+        #endregion
     }
-    #endregion
 
     public static class RichTextBoxExtensions
 	{

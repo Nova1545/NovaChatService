@@ -1,10 +1,12 @@
 ﻿namespace ChatLib.DataStates
 {
-    public enum MessageType { Message, Initionalize, Status, Wisper, Transfer, Infomation }
+    public enum MessageType { Message, Initionalize, Status, Wisper, Transfer, Infomation, Request }
 
-    public enum StatusType { Connected, Disconnected, ErrorDisconnect, Disconnecting }
+    public enum StatusType { Connected, Disconnected, ErrorDisconnect, Disconnecting, ChangeRoom }
 
-    public enum ClientType { Web, Desktop }
+    public enum ClientType { Web, Desktop, Android, IOS }
 
-    public enum InfomationType { ConnectedUsers, ServerUptime, ConnectTime, MessagesSent }
+    public enum InfomationType { ConnectedUsers, ServerUptime, ConnectTime, MessagesSent, Rooms }
+
+    public enum RequestType { Rooms, Users }
 }
