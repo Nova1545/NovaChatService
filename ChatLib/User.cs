@@ -10,7 +10,7 @@ using System.Drawing;
 using System.Net.Security;
 using ChatLib;
 
-namespace Client
+namespace ChatLib
 {
     public class User
     {
@@ -71,7 +71,7 @@ namespace Client
             }
         }
 
-        public void CreateMessage(string content, Color color)
+        public void CreateMessage(string content, NColor color)
         {
             m = new Message(Name, MessageType.Message);
             m.SetContent(content);
@@ -83,7 +83,7 @@ namespace Client
             }
         }
 
-        public void CreateWisper(string content, Color color, string endpoint)
+        public void CreateWisper(string content, NColor color, string endpoint)
         {
             m = new Message(Name, MessageType.Wisper, endpoint);
             m.SetContent(content);
@@ -95,7 +95,7 @@ namespace Client
             }
         }
 
-        public void CreateTransfer(byte[] fileContents, string filename, Color color, string endpoint="")
+        public void CreateTransfer(byte[] fileContents, string filename, NColor color, string endpoint="")
         {
             m = new Message(Name, MessageType.Transfer, endpoint);
             m.SetFileContents(fileContents);

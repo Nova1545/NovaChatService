@@ -90,7 +90,7 @@ namespace ChatLib.Json
                         reader.Read();
                         int b = (int)reader.ReadAsInt32();
 
-                        m.SetColor(Color.FromArgb(r, g, b));
+                        m.SetColor(NColor.FromRGB(r, g, b));
                     }
                     else if(value == "EndPoint")
                     {

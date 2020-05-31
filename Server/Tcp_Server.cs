@@ -292,7 +292,7 @@ namespace Server
 
         static void WebListener()
         {
-            TcpListener server = new TcpListener(iPAddress, 8911);
+            TcpListener server = new TcpListener(iPAddress, WebPort);
             server.Start();
             while (true)
             {
@@ -333,7 +333,7 @@ namespace Server
 
         static void ClientListener()
         {
-            TcpListener server = new TcpListener(iPAddress, 8910);
+            TcpListener server = new TcpListener(iPAddress, DesktopPort);
             server.Start();
             while (true)
             {
@@ -453,7 +453,7 @@ namespace Server
                             if (!r.AddUser(cInfo))
                             {
                                 m = new Message("Server", MessageType.Message);
-                                m.SetColor(Color.Aquamarine);
+                                m.SetColor(ColorToNColor(Color.Aquamarine));
                                 m.SetContent("The requested room is full");
                                 MessageHelpers.SetMessage(stream, m);
                                 continue;
@@ -687,7 +687,7 @@ namespace Server
                             if (!r.AddUser(cInfo))
                             {
                                 m = new JsonMessage("Server", MessageType.Message);
-                                m.SetColor(Color.Aquamarine);
+                                m.SetColor(ColorToNColor(Color.Aquamarine));
                                 m.SetContent("The requested room is full");
                                 JsonMessageHelpers.SetJsonMessage(stream, m);
                                 continue;
@@ -884,7 +884,7 @@ namespace Server
             if(type == InfomationType.ConnectedUsers)
             {
                 Message m = new Message("Server", MessageType.Infomation);
-                m.SetColor(Color.Aquamarine);
+                m.SetColor(ColorToNColor(Color.Aquamarine));
                 m.SetContent(clients.Count.ToString() + " Connected Clients");
                 return m;
             }
@@ -892,14 +892,14 @@ namespace Server
             {
                 TimeSpan connectedTime = DateTime.UtcNow - clients[name].ConnectTime;
                 Message m = new Message("Server", MessageType.Infomation);
-                m.SetColor(Color.Aquamarine);
+                m.SetColor(ColorToNColor(Color.Aquamarine));
                 m.SetContent("You have been connected for " + connectedTime.ToString());
                 return m;
             }
             else if(type == InfomationType.MessagesSent)
             {
                 Message m = new Message("Server", MessageType.Infomation);
-                m.SetColor(Color.Aquamarine);
+                m.SetColor(ColorToNColor(Color.Aquamarine));
                 m.SetContent(TotalMessagesSent.ToString() + " Messages Sent");
                 return m;
             }
@@ -907,14 +907,14 @@ namespace Server
             {
                 TimeSpan connectedTime = DateTime.UtcNow - startup;
                 Message m = new Message("Server", MessageType.Infomation);
-                m.SetColor(Color.Aquamarine);
+                m.SetColor(ColorToNColor(Color.Aquamarine));
                 m.SetContent("The server has been online for " + connectedTime.ToString());
                 return m;
             }
             else if(type == InfomationType.Rooms)
             {
                 Message m = new Message("Server", MessageType.Infomation);
-                m.SetColor(Color.Aquamarine);
+                m.SetColor(ColorToNColor(Color.Aquamarine));
                 string content = "\n";
                 foreach (KeyValuePair<string, Room> room in Rooms)
                 {
@@ -926,10 +926,20 @@ namespace Server
             else
             {
                 Message m = new Message("Server", MessageType.Infomation);
-                m.SetColor(Color.Aquamarine);
+                m.SetColor(ColorToNColor(Color.Aquamarine));
                 m.SetContent("Unknown");
                 return m;
             }
+        }
+
+        static Color NColorToColor(NColor color)
+        {
+            return Color.FromArgb(color.R, color.G, color.B);
+        }
+
+        static NColor ColorToNColor(Color color)
+        {
+            return NColor.FromRGB(color.R, color.G, color.B);
         }
     }
 }

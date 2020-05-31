@@ -1,6 +1,6 @@
 ﻿using System;
 using ChatLib.DataStates;
-using System.Drawing;
+using ChatLib.Extras;
 
 namespace ChatLib
 {
@@ -11,7 +11,7 @@ namespace ChatLib
         public string Name { get; private set; }
         public string Content { get; private set; }
         public MessageType MessageType { get; private set; }
-        public Color Color { get; private set; }
+        public NColor Color { get; private set; }
         public string EndPoint { get; private set; }
 
         //Status info
@@ -40,7 +40,7 @@ namespace ChatLib
 
         public void SetContent(string content) => Content = content;
 
-        public void SetColor(Color color) => Color = color;
+        public void SetColor(NColor color) => Color = color;
 
         public void SetStatusType(StatusType statusType) => StatusType = statusType;
 
