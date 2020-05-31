@@ -15,11 +15,11 @@ namespace Client
 	{
 		TcpClient tcpClient;
 		About aboutBox = new About();
-		Settings settings = new Settings();
+		Settings settings;
         User user;
 		Random rnd = new Random();
-		Color color;
-		SoundPlayer player = new SoundPlayer();
+		public Color color { get; set; }
+		NotificationManager notifications = new NotificationManager();
 
 		public Tcp_Client()
 		{      
@@ -27,6 +27,8 @@ namespace Client
 			print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.", Chat);
 			print("Press 'Delete' when focused in this box to clear it.", Chat);
 			color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+
+			settings = new Settings(this);
 		}
 
 		private void SendMessage()
@@ -157,7 +159,7 @@ namespace Client
                     user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
                     user.OnMessageTransferReceivedCallback += User_OnMessageTransferReceivedCallback;
                     user.OnMessageWisperReceivedCallback += User_OnMessageWisperReceivedCallback;
-					user.OnMessageAnyReceivedCallback += User_OnMessageAnyReceivedCallback;
+					//user.OnMessageAnyReceivedCallback += User_OnMessageAnyReceivedCallback;
                     user.OnMesssageInformationReceivedCallback += User_OnMesssageInformationReceivedCallback;
 					user.OnErrorCallback += (e) => { print(e.Message, Log); };
 
@@ -226,11 +228,11 @@ namespace Client
         private void User_OnMessageReceivedCallback(ChatLib.Message message)
         {
             print(message.Name + ": " + message.Content, Chat, message.Color);
-        }
 
-		private void User_OnMessageAnyReceivedCallback(ChatLib.Message message)
-		{
-			PlayNotificationSound();
+			if (this.WindowState == FormWindowState.Minimized)
+			{
+				notifications.ShowNotification(message.Content);
+			}
 		}
 
 		#region Stuff I Dont Care About
@@ -278,12 +280,6 @@ namespace Client
 			}
 	}
 		#endregion
-
-		private void PlayNotificationSound()
-		{
-			player.Stream = Properties.Resources.Notification;
-			player.Play();
-		}
 
 		public void print(string text, RichTextBox output)
 		{
@@ -420,7 +416,7 @@ namespace Client
 
 		private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			aboutBox.ShowDialog();
+			
 		}
 
 		private void Chat_KeyDown(object sender, KeyEventArgs e)
@@ -491,6 +487,11 @@ namespace Client
             LoadSettings();
         }
         #endregion
+
+        private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+			aboutBox.ShowDialog();
+		}
     }
 
     public static class RichTextBoxExtensions

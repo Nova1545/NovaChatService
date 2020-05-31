@@ -7,9 +7,11 @@ namespace Client
 {
     public partial class Settings : Form
     {
-        public Settings()
+        private Tcp_Client parent;
+        public Settings(Tcp_Client parent)
         {
             InitializeComponent();
+            this.parent = parent;
         }
 
         private void Settings_Load(object sender, EventArgs e)
@@ -39,7 +41,7 @@ namespace Client
                 }
                 catch
                 {
-                    (Application.OpenForms["Tcp_Client"] as Tcp_Client).printToLog("Something went wrong while saving settings! Please report this bug to the creator.", Color.Red);
+                    parent.printToLog("Something went wrong while saving settings! Please report this bug to the creator.", Color.Red);
                 }
 
             key.Dispose();
@@ -56,14 +58,14 @@ namespace Client
             {
                 if (toggleLog.Tag.ToString() == "true")
                 {
-                    (Application.OpenForms["Tcp_Client"] as Tcp_Client).toggleLogVisibility(false);
+                    parent.toggleLogVisibility(false);
                     toggleLog.Tag = "false";
                     toggleLog.Text = "Show Log";
                     WriteSetting("ShowLog", "false");
                 }
                 else
                 {
-                    (Application.OpenForms["Tcp_Client"] as Tcp_Client).toggleLogVisibility(true);
+                    parent.toggleLogVisibility(true);
                     toggleLog.Tag = "true";
                     toggleLog.Text = "Hide Log";
                     WriteSetting("ShowLog", "true");
@@ -71,11 +73,26 @@ namespace Client
             }
             else
             {
-                (Application.OpenForms["Tcp_Client"] as Tcp_Client).toggleLogVisibility(true);
+                parent.toggleLogVisibility(true);
                 toggleLog.Tag = "true";
                 toggleLog.Text = "Hide Log";
                 WriteSetting("ShowLog", "true");
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Good try", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            textBox1.Text = "(" + parent.color.R.ToString() + ", " + parent.color.G.ToString() + ", " + parent.color.B.ToString() + ")";
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            
         }
     }
 }
