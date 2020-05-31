@@ -8,6 +8,8 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Forms;
 using System.Media;
+using ChatLib;
+using ChatLib.Extras;
 
 namespace Client
 {
@@ -18,8 +20,8 @@ namespace Client
 		Settings settings;
         User user;
 		Random rnd = new Random();
-		public Color color { get; set; }
 		NotificationManager notifications = new NotificationManager();
+		NColor color;
 
 		public Tcp_Client()
 		{      
@@ -27,8 +29,8 @@ namespace Client
 			print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.", Chat);
 			print("Press 'Delete' when focused in this box to clear it.", Chat);
 			color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-
 			settings = new Settings(this);
+			color = NColor.FromRGB(rnd.Next(256), rnd.Next(256), rnd.Next(256));
 		}
 
 		private void SendMessage()
@@ -41,7 +43,7 @@ namespace Client
 					try
 					{
                         user.CreateWisper(text[3], color, text[1]);
-						print(nameBox.Text + ": " + "Message privately sent to " + text[1], Chat, color);
+						print(nameBox.Text + ": " + "Message privately sent to " + text[1], Chat, NColorToColor(color));
 					}
 					catch
 					{
@@ -53,11 +55,11 @@ namespace Client
                     string[] text = chatBox.Text.Replace("/color ", "").Split(' ');
                     if(text.Length > 1)
                     {
-                        color = Color.FromArgb(int.Parse(text[0]), int.Parse(text[1]), int.Parse(text[2]));
+                        color = NColor.FromRGB(int.Parse(text[0]), int.Parse(text[1]), int.Parse(text[2]));
                     }
                     else
                     {
-                        color = Color.FromName(text[0]);
+                        color = ColorToNColor(Color.FromName(text[0]));
                     }
                 }
                 else if (chatBox.Text.StartsWith("/info"))
@@ -97,7 +99,7 @@ namespace Client
 				{
                     if (user != null)
                     {
-                        print(nameBox.Text + ": " + chatBox.Text, Chat, color);
+                        print(nameBox.Text + ": " + chatBox.Text, Chat, NColorToColor(color));
                         user.CreateMessage(chatBox.Text, color);
                     }
 				}
@@ -183,13 +185,13 @@ namespace Client
 
         private void User_OnMessageWisperReceivedCallback(ChatLib.Message message)
         {
-            print("Private Message From " + message.Name + ": " + message.Content, Chat, message.Color);
+            print("Private Message From " + message.Name + ": " + message.Content, Chat, NColorToColor(message.Color));
 		}
 
         private void User_OnMessageTransferReceivedCallback(ChatLib.Message message)
         {
             File.WriteAllBytes(message.Filename, message.FileContents);
-            print(message.Name + ": file://" + new FileInfo(message.Filename).FullName.Replace(@"\", "/"), Chat, message.Color);
+            print(message.Name + ": file://" + new FileInfo(message.Filename).FullName.Replace(@"\", "/"), Chat, NColorToColor(message.Color));
 		}
 
         private void User_OnMessageStatusReceivedCallback(ChatLib.Message message)
@@ -227,7 +229,8 @@ namespace Client
 
         private void User_OnMessageReceivedCallback(ChatLib.Message message)
         {
-            print(message.Name + ": " + message.Content, Chat, message.Color);
+            print(message.Name + ": " + message.Content, Chat, NColorToColor(message.Color));
+        }
 
 			if (this.WindowState == FormWindowState.Minimized)
 			{
@@ -235,11 +238,21 @@ namespace Client
 			}
 		}
 
-		#region Stuff I Dont Care About
+        private Color NColorToColor(NColor color)
+        {
+            return Color.FromArgb(color.R, color.G, color.B);
+        }
+
+        private NColor ColorToNColor(Color color)
+        {
+            return NColor.FromRGB(color.R, color.G, color.B);
+        }
+
+        #region Stuff I Dont Care About
 
 
-		#region SetttingsHandlers
-		private void LoadSettings()
+        #region SetttingsHandlers
+        private void LoadSettings()
 		{
 			RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
 
@@ -309,7 +322,7 @@ namespace Client
 
 		public void printToLog(string text)
 		{
-			Log.AppendText(text + "\n", color);
+			Log.AppendText(text + "\n", NColorToColor(color));
 			Log.ScrollToCaret();
 		}
 
