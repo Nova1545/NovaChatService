@@ -33,6 +33,8 @@ namespace AndroidClient
 
         // Other stuff i could care less about
         private string username;
+        private int port;
+        private string address;
         private NColor color;
         private Random rnd;
 
@@ -44,25 +46,9 @@ namespace AndroidClient
             color = NColor.FromRGB(rnd.Next(0, 255), rnd.Next(0, 255), rnd.Next(0, 255));
 
             // Create your application here
-            int port = int.Parse(Intent.GetStringExtra("Port"));
-            string address = Intent.GetStringExtra("Ip");
+            port = int.Parse(Intent.GetStringExtra("Port"));
+            address = Intent.GetStringExtra("Ip");
             username = Intent.GetStringExtra("Username");
-
-            client = new TcpClient(address, port);
-            Toast.MakeText(this, "Connected", ToastLength.Short).Show();
-
-            user = new User(username, client.GetStream());
-            user.Init();
-            user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
-            user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
-            user.OnMessageWisperReceivedCallback += User_OnMessageWisperReceivedCallback;
-
-            Messages = FindViewById<TextView>(Resource.Id.ChatList);
-            SendBtn = FindViewById<Button>(Resource.Id.button1);
-            SendBtn.Click += SendBtn_Click;
-            Message = FindViewById<EditText>(Resource.Id.input_message);
-
-            Message.KeyPress += Message_KeyPress;
         }
 
         private void Message_KeyPress(object sender, View.KeyEventArgs e)
@@ -129,7 +115,6 @@ namespace AndroidClient
 
         private void SendBtn_Click(object sender, EventArgs e)
         {
-
             var span = new SpannableString(username + ": " + Message.Text + "\n");
             span.SetSpan(new ForegroundColorSpan(NColorToColor(color)), 0, span.Length(), 0);
             Messages.Append(span);
@@ -142,6 +127,26 @@ namespace AndroidClient
         {
             base.OnStop();
             user.CreateStatus(StatusType.Disconnecting);
+        }
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+            client = new TcpClient(address, port);
+            Toast.MakeText(this, "Connected", ToastLength.Short).Show();
+
+            user = new User(username, client.GetStream());
+            user.Init();
+            user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
+            user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
+            user.OnMessageWisperReceivedCallback += User_OnMessageWisperReceivedCallback;
+
+            Messages = FindViewById<TextView>(Resource.Id.ChatList);
+            SendBtn = FindViewById<Button>(Resource.Id.button1);
+            SendBtn.Click += SendBtn_Click;
+            Message = FindViewById<EditText>(Resource.Id.input_message);
+
+            Message.KeyPress += Message_KeyPress;
         }
 
         Color NColorToColor(NColor color)

@@ -32,6 +32,11 @@ namespace Server
         static int TotalMessagesSent = 0;
         static DateTime startup;
 
+        static Thread web;
+        static Thread desktop;
+
+        enum ListenerState { Waiting, Accepting, Connected, Disconnected, Handshaking, UsernameSub, Quiting };
+
         static void Main(string[] args)
         {
             clients = new Dictionary<string, ClientInfo>();
@@ -146,7 +151,7 @@ namespace Server
 
             startup = DateTime.UtcNow;
 
-            // Bot Loader
+            #region Bot Loader
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Loading Bots...");
             foreach (string dll in Directory.GetDirectories(@"Bots"))
@@ -226,14 +231,18 @@ namespace Server
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Complete!");
             Console.ForegroundColor = ConsoleColor.White;
+            #endregion
 
-            Thread web = new Thread(() => WebListener())
+            ListenerState WebState = ListenerState.Waiting;
+            ListenerState DesktopState = ListenerState.Waiting;
+
+            web = new Thread(() => WebListener(ref WebState))
             {
                 IsBackground = true
             };
             web.Start();
 
-            Thread desktop = new Thread(() => ClientListener())
+            desktop = new Thread(() => ClientListener(ref DesktopState))
             {
                 IsBackground = true
             };
@@ -257,29 +266,64 @@ namespace Server
                             Console.WriteLine(client.ToString());
                         }
                     }
-                    //else if(command[1] == "rooms")
-                    //{
-                    //    Console.WriteLine("Rooms:");
-                    //    foreach (Room room in Rooms)
-                    //    {
-                    //        Console.WriteLine(room.ToString());
-                    //    }
-                    //}
+                    else if(command[1] == "threads")
+                    {
+                        Console.WriteLine("Web: ");
+                        Console.WriteLine("State -> " + WebState.ToString());
+                        Console.WriteLine("Status -> " + web.ThreadState.ToString());
+
+                        Console.WriteLine("Desktop: ");
+                        Console.WriteLine("State -> " + DesktopState.ToString());
+                        Console.WriteLine("Status -> " + desktop.ThreadState.ToString());
+                    }
+                }
+                else if(command[0] == "restart")
+                {
+                    if(command[1] == "web")
+                    {
+                        WebState = ListenerState.Quiting;
+                        while (web.IsAlive) ;
+
+                        WebState = ListenerState.Waiting;
+                        web = new Thread(() => WebListener(ref WebState))
+                        {
+                            IsBackground = true
+                        };
+                        web.Start();
+                    }
+                    else if(command[1] == "desktop")
+                    {
+                        DesktopState = ListenerState.Waiting;
+                        desktop = new Thread(() => ClientListener(ref DesktopState))
+                        {
+                            IsBackground = true
+                        };
+                        desktop.Start();
+                    }
+                    else if(command[1] == "both")
+                    {
+                        WebState = ListenerState.Waiting;
+                        DesktopState = ListenerState.Waiting;
+                        web.Abort();
+                        desktop.Abort();
+
+                        web = new Thread(() => WebListener(ref WebState))
+                        {
+                            IsBackground = true
+                        };
+                        web.Start();
+
+                        desktop = new Thread(() => ClientListener(ref DesktopState))
+                        {
+                            IsBackground = true
+                        };
+                        desktop.Start();
+                    }
                 }
                 else if(command[0] == "help")
                 {
                     Console.WriteLine("Coming soon");
                 }
-                //else if (command[0] == "addrm")
-                //{
-                //    Rooms.Add(new Room(command[1], int.Parse(command[2]), int.Parse(command[3]), int.Parse(command[4])));
-                //    Console.WriteLine("Added room");
-                //}
-                //else if (command[0] == "removerm")
-                //{
-                //    Rooms.Remove(Rooms.Where(x => x.Name == command[1]).First());
-                //    Console.WriteLine("Removed " + command[1]);
-                //}
             }
         }
 
@@ -290,24 +334,50 @@ namespace Server
             return frame.GetFileLineNumber();
         }
 
-        static void WebListener()
+        static void WebListener(ref ListenerState state)
         {
             TcpListener server = new TcpListener(iPAddress, WebPort);
             server.Start();
             while (true)
             {
+                state = ListenerState.Waiting;
                 TcpClient client = server.AcceptTcpClient();
+                state = ListenerState.Accepting;
 
                 //SslStream ssl = new SslStream(client.GetStream(), false);
                 //ssl.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
 
-                while (client.Available < 3) ;
+                while (client.Available < 3)
+                {
+                    if (state == ListenerState.Quiting)
+                    {
+                        break;
+                    }
+                }
+                if (state == ListenerState.Quiting)
+                {
+                    server.Stop();
+                    break;
+                }
+                state = ListenerState.Handshaking;
 
                 //JsonMessageHelpers.HandleHandshake(client.GetStream(), client.Available);
                 NetworkStream stream = client.GetStream();
                 JsonMessageHelpers.HandleHandshake(stream, client.Available);
 
-                while (client.Available < 3) ;
+                state = ListenerState.UsernameSub;
+                while (client.Available < 3)
+                {
+                    if (state == ListenerState.Quiting)
+                    {
+                        break;
+                    }
+                }
+                if (state == ListenerState.Quiting)
+                {
+                    server.Stop();
+                    break;
+                }
 
                 JsonMessage json = JsonMessageHelpers.GetJsonMessage(stream, client.Available);
 
@@ -316,6 +386,7 @@ namespace Server
                     ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web);
                     clients.Add(c.GUID, c);
                     ThreadPool.QueueUserWorkItem(HandleClientWebWorker, new object[2] { client, c });
+                    state = ListenerState.Connected;
                 }
                 else
                 {
@@ -327,11 +398,12 @@ namespace Server
                     stream.Dispose();
                     client.Close();
                     client.Dispose();
+                    state = ListenerState.Disconnected;
                 }
             }
         }
 
-        static void ClientListener()
+        static void ClientListener(ref ListenerState state)
         {
             TcpListener server = new TcpListener(iPAddress, DesktopPort);
             server.Start();
