@@ -22,7 +22,7 @@ namespace Client
 		Help HelpWindow = new Help();
 		Settings SettingsWindow;
 
-		ObservableDictionary<string, object> settings;
+		ObservableDictionary<string, object> settings = new ObservableDictionary<string, object>();
 
 		TcpClient tcpClient;
         User user;
@@ -48,13 +48,7 @@ namespace Client
 			print("Press 'Delete' when focused in this box to clear it, or use the 'Clear History' button in the menu.", Chat);
 			SettingsWindow = new Settings(this, settings);
 			TagColor = NColor.FromRGB(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-            this.settings.CollectionChanged += Settings_CollectionChanged;
 		}
-
-        private void Settings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         private void SendMessage()
 		{
@@ -574,6 +568,8 @@ namespace Client
         {
 			RegOps.ReadSettings(settings);
 
+			this.settings.CollectionChanged += Settings_CollectionChanged;
+
 			if (settings.ContainsKey("ShowLog"))
             {
 				if ((bool)settings["ShowLog"])
@@ -618,7 +614,12 @@ namespace Client
         {
 			ProcessUtils.KillAll(Process.GetCurrentProcess().ProcessName);
         }
-    }
+
+		private void Settings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+	}
 
     public static class RichTextBoxExtensions
 	{
