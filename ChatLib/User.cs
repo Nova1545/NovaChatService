@@ -156,6 +156,7 @@ namespace ChatLib
                 while (Active)
                 {
                     Message m = MessageHelpers.GetMessage(nStream);
+                    Console.WriteLine(m.MessageType);
                     switch (m.MessageType)
                     {
                         case MessageType.Message:

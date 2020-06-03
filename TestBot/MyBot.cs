@@ -93,6 +93,6 @@ namespace TestBot
         public void OnUserDisconnect(ClientInfo client)
         {
 
-        } 
+        }
     }
 }

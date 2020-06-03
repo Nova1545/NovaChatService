@@ -418,6 +418,11 @@ namespace Server
                 return;
             }
 
+            Message rooms = new Message("Server", MessageType.Request);
+            rooms.SetRequestType(RequestType.Rooms);
+            rooms.SetContent(Rooms.Serialize());
+            MessageHelpers.SetMessage(stream, rooms);
+
             // Send The Server Message Buffer
             foreach (Message message in r.Buffer)
             {
