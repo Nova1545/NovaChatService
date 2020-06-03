@@ -54,7 +54,7 @@ namespace TestBot
                     {
                         Message m = new Message("Server", MessageType.Message);
                         m.SetContent(client.Name + " Joined your room");
-                        m.SetColor(Color.Orange);
+                        m.SetColor(NColor.Orange);
                         if (info.Value.ClientType == ClientType.Web)
                         {
                             JsonMessageHelpers.SetJsonMessage(info.Value.Stream, m.ToJsonMessage());
@@ -68,7 +68,7 @@ namespace TestBot
                     {
                         Message m = new Message("Server", MessageType.Message);
                         m.SetContent(client.Name + " Left your room");
-                        m.SetColor(Color.Orange);
+                        m.SetColor(NColor.Orange);
                         if(info.Value.ClientType == ClientType.Web)
                         {
                             JsonMessageHelpers.SetJsonMessage(info.Value.Stream, m.ToJsonMessage());
@@ -85,7 +85,7 @@ namespace TestBot
         public void OnUserConnect(ClientInfo client)
         {
             Message m = new Message("Test Bot", MessageType.Message);
-            m.SetColor(Color.Blue);
+            m.SetColor(NColor.Blue);
             m.SetContent("Welcome " + client.Name);
             handler.TRequestClients().SendToAll(m, new List<ClientInfo>() { client });
         }
@@ -93,6 +93,6 @@ namespace TestBot
         public void OnUserDisconnect(ClientInfo client)
         {
 
-        } 
+        }
     }
 }

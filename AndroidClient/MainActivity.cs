@@ -51,7 +51,14 @@ namespace AndroidClient
 
         private void Servers_ItemLongClick(object sender, AdapterView.ItemLongClickEventArgs e)
         {
-            Toast.MakeText(this, items[e.Position], ToastLength.Short).Show();
+
+            Preferences.Set("servers", Preferences.Get("servers", "").Replace(items[e.Position] + "|", ""));
+
+            items.RemoveAt(e.Position);
+            Toast.MakeText(this, "Removed Server", ToastLength.Short).Show();
+
+            ArrayAdapter<string> adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, items);
+            Servers.Adapter = adapter;
         }
 
         private void Servers_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
