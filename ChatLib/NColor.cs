@@ -44,5 +44,13 @@ namespace ChatLib.Extras
                 return new NColor(255, 0, 0);
             }
         }
+
+        public static NColor Orange
+        {
+            get
+            {
+                return new NColor(255, 165, 0);
+            }
+        }
     }
 }

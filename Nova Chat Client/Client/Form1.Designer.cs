@@ -49,8 +49,15 @@ namespace Client
             this.menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearHistoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.fixClientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.commandsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.startAnotherInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.killAllInstancesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.startServerInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tableLayoutPanel1.SuspendLayout();
@@ -260,6 +267,8 @@ namespace Client
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuToolStripMenuItem,
+            this.commandsToolStripMenuItem,
+            this.debugToolStripMenuItem,
             this.aboutToolStripMenuItem1});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -273,6 +282,8 @@ namespace Client
             this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.clearHistoryToolStripMenuItem,
             this.settingsToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.fixClientToolStripMenuItem,
             this.toolStripMenuItem1,
             this.exitToolStripMenuItem});
             this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
@@ -293,6 +304,18 @@ namespace Client
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(174, 6);
+            // 
+            // fixClientToolStripMenuItem
+            // 
+            this.fixClientToolStripMenuItem.Name = "fixClientToolStripMenuItem";
+            this.fixClientToolStripMenuItem.Size = new System.Drawing.Size(177, 26);
+            this.fixClientToolStripMenuItem.Text = "Fix Client";
+            this.fixClientToolStripMenuItem.Click += new System.EventHandler(this.fixClientToolStripMenuItem_Click);
+            // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
@@ -304,6 +327,45 @@ namespace Client
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(177, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // commandsToolStripMenuItem
+            // 
+            this.commandsToolStripMenuItem.Name = "commandsToolStripMenuItem";
+            this.commandsToolStripMenuItem.Size = new System.Drawing.Size(98, 24);
+            this.commandsToolStripMenuItem.Text = "Commands";
+            this.commandsToolStripMenuItem.Click += new System.EventHandler(this.commandsToolStripMenuItem_Click);
+            // 
+            // debugToolStripMenuItem
+            // 
+            this.debugToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.startAnotherInstanceToolStripMenuItem,
+            this.killAllInstancesToolStripMenuItem,
+            this.startServerInstanceToolStripMenuItem});
+            this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
+            this.debugToolStripMenuItem.Size = new System.Drawing.Size(68, 24);
+            this.debugToolStripMenuItem.Text = "Debug";
+            this.debugToolStripMenuItem.Visible = false;
+            // 
+            // startAnotherInstanceToolStripMenuItem
+            // 
+            this.startAnotherInstanceToolStripMenuItem.Name = "startAnotherInstanceToolStripMenuItem";
+            this.startAnotherInstanceToolStripMenuItem.Size = new System.Drawing.Size(238, 26);
+            this.startAnotherInstanceToolStripMenuItem.Text = "Start Another Instance";
+            this.startAnotherInstanceToolStripMenuItem.Click += new System.EventHandler(this.startAnotherInstanceToolStripMenuItem_Click);
+            // 
+            // killAllInstancesToolStripMenuItem
+            // 
+            this.killAllInstancesToolStripMenuItem.Name = "killAllInstancesToolStripMenuItem";
+            this.killAllInstancesToolStripMenuItem.Size = new System.Drawing.Size(238, 26);
+            this.killAllInstancesToolStripMenuItem.Text = "Kill All Instances";
+            this.killAllInstancesToolStripMenuItem.Click += new System.EventHandler(this.killAllInstancesToolStripMenuItem_Click);
+            // 
+            // startServerInstanceToolStripMenuItem
+            // 
+            this.startServerInstanceToolStripMenuItem.Name = "startServerInstanceToolStripMenuItem";
+            this.startServerInstanceToolStripMenuItem.Size = new System.Drawing.Size(238, 26);
+            this.startServerInstanceToolStripMenuItem.Text = "Start Server Instance";
+            this.startServerInstanceToolStripMenuItem.Click += new System.EventHandler(this.startServerInstanceToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem1
             // 
@@ -370,5 +432,12 @@ namespace Client
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem1;
         private System.Windows.Forms.RichTextBox chatBox;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem fixClientToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem commandsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem debugToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem startAnotherInstanceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem startServerInstanceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem killAllInstancesToolStripMenuItem;
     }
 }

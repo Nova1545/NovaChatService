@@ -10,30 +10,53 @@ using System.Windows.Forms;
 using System.Media;
 using ChatLib;
 using ChatLib.Extras;
+using System.Reflection;
+using Yep_Development_Tools;
+using System.Collections.Generic;
 
 namespace Client
 {
     public partial class Tcp_Client : Form
 	{
+		About AboutBox = new About();
+		Help HelpWindow = new Help();
+		Settings SettingsWindow;
+
+		ObservableDictionary<string, object> settings;
+
 		TcpClient tcpClient;
-		About aboutBox = new About();
-		Settings settings;
         User user;
+		NColor TagColor;
+
 		Random rnd = new Random();
 		NotificationManager notifications = new NotificationManager();
-		NColor color;
 
-		public Tcp_Client()
-		{      
+		public bool debug { get; private set; }
+
+		public Tcp_Client(string[] args)
+		{
+			foreach (string argument in args)
+            {
+				if (argument == "/debug")
+                {
+					debug = true;
+                }
+            }
+
 			InitializeComponent();
 			print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.", Chat);
-			print("Press 'Delete' when focused in this box to clear it.", Chat);
-			color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-			settings = new Settings(this);
-			color = NColor.FromRGB(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+			print("Press 'Delete' when focused in this box to clear it, or use the 'Clear History' button in the menu.", Chat);
+			SettingsWindow = new Settings(this, settings);
+			TagColor = NColor.FromRGB(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+            this.settings.CollectionChanged += Settings_CollectionChanged;
 		}
 
-		private void SendMessage()
+        private void Settings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SendMessage()
 		{
 			try
 			{
@@ -42,12 +65,13 @@ namespace Client
 					string[] text = chatBox.Text.Split('"', '"');
 					try
 					{
-                        user.CreateWisper(text[3], color, text[1]);
-						print(nameBox.Text + ": " + "Message privately sent to " + text[1], Chat, NColorToColor(color));
+                        user.CreateWisper(text[3], TagColor, text[1]);
+						print(nameBox.Text + ": " + "Message privately sent to " + text[1], Chat, NColorToColor(TagColor));
 					}
-					catch
+					catch (Exception ex)
 					{
-						print("Couldnt run command", Chat, Color.Red);
+						print("Couldn't run command", Chat, Color.Red);
+						printToLog("Couldn't run command -> " + ex.Message, Color.Red);
 					}
 				}
                 else if (chatBox.Text.StartsWith("/color"))
@@ -55,11 +79,11 @@ namespace Client
                     string[] text = chatBox.Text.Replace("/color ", "").Split(' ');
                     if(text.Length > 1)
                     {
-                        color = NColor.FromRGB(int.Parse(text[0]), int.Parse(text[1]), int.Parse(text[2]));
+                        TagColor = NColor.FromRGB(int.Parse(text[0]), int.Parse(text[1]), int.Parse(text[2]));
                     }
                     else
                     {
-                        color = ColorToNColor(Color.FromName(text[0]));
+                        TagColor = ColorToNColor(Color.FromName(text[0]));
                     }
                 }
                 else if (chatBox.Text.StartsWith("/info"))
@@ -99,8 +123,8 @@ namespace Client
 				{
                     if (user != null)
                     {
-                        print(nameBox.Text + ": " + chatBox.Text, Chat, NColorToColor(color));
-                        user.CreateMessage(chatBox.Text, color);
+                        print(nameBox.Text + ": " + chatBox.Text, Chat, NColorToColor(TagColor));
+                        user.CreateMessage(chatBox.Text, TagColor);
                     }
 				}
 			}
@@ -129,7 +153,14 @@ namespace Client
 		{
 			if (IPBox.Text == "IP Address" || IPBox.Text.Length < 1)
 			{
-				IPBox.Text = "novastudios.tk";
+				if (debug)
+				{
+					IPBox.Text = Tools.GetLocalIPAddress();
+				}
+				else
+				{
+					IPBox.Text = "novastudios.tk";
+				}
 			}
 
 			Thread t = new Thread(delegate ()
@@ -176,6 +207,18 @@ namespace Client
 
 			t.IsBackground = true;
 			t.Start();
+		}
+
+		public bool IsConnected()
+        {
+			if (tcpClient != null)
+			{
+				if (tcpClient.Connected)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
         private void User_OnMesssageInformationReceivedCallback(ChatLib.Message message)
@@ -230,20 +273,15 @@ namespace Client
         private void User_OnMessageReceivedCallback(ChatLib.Message message)
         {
             print(message.Name + ": " + message.Content, Chat, NColorToColor(message.Color));
+			notifications.ShowNotification(message.Name, message.Content);
         }
 
-			if (this.WindowState == FormWindowState.Minimized)
-			{
-				notifications.ShowNotification(message.Content);
-			}
-		}
-
-        private Color NColorToColor(NColor color)
+        public Color NColorToColor(NColor color)
         {
             return Color.FromArgb(color.R, color.G, color.B);
         }
 
-        private NColor ColorToNColor(Color color)
+		public NColor ColorToNColor(Color color)
         {
             return NColor.FromRGB(color.R, color.G, color.B);
         }
@@ -252,47 +290,74 @@ namespace Client
 
 
         #region SetttingsHandlers
-        private void LoadSettings()
-		{
-			RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
 
-			if (key == null)
-			{
-				key = Registry.CurrentUser.CreateSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
-			}
-			else
-			{
-				try
-				{
-					toggleLogVisibility(bool.Parse(key.GetValue("ShowLog").ToString()));
-				}
-				catch (Exception ex)
-				{
-					(Application.OpenForms["Tcp_Client"] as Tcp_Client).printToLog("Something went wrong while reading settings! Please report this error to the creator with the following: " + ex.Message, Color.Red);
-				}
-			}
-
-			key.Dispose();
-		}
-
-		public void toggleLogVisibility(bool show)
+		public void SetLogVisibility(bool show)
 		{
 			if (!show)
 			{
 				Log.Visible = false;
 				label2.Visible = false;
 				tableLayoutPanel4.ColumnCount = 1;
-				settings.toggleLog.Tag = "false";
+				SettingsWindow.toggleLog.Tag = "false";
 			}
 			else
 			{
 				Log.Visible = true;
 				label2.Visible = true;
 				tableLayoutPanel4.ColumnCount = 2;
-				settings.toggleLog.Tag = "true";
+				SettingsWindow.toggleLog.Tag = "true";
 			}
 	}
 		#endregion
+
+		/*public Array RequestRooms()
+        {
+
+        }*/
+
+		public void ChangeRoom(string room)
+        {
+			user.CreateStatus(StatusType.ChangeRoom, room);
+		}
+
+		/*public string GetCurrentRoom(string room)
+		{
+			
+		}*/
+
+		public string ChangeTagColor(byte R, byte G, byte B)
+        {
+			if (R >= 0 && R <= 255 && R >= 0 && G <= 255 && R >= 0 && B <= 255)
+			{
+				this.TagColor = NColor.FromRGB(R, G, B);
+				printToLog("Changing tag color to (" + R.ToString() + ", " + G.ToString() + ", " + B.ToString() + ")", Color.Teal);
+				return "(" + R.ToString() + ", " + G.ToString() + ", " + B.ToString() + ")";
+			}
+			printToLog("Invalid Color", Color.Red);
+			return "Invalid Color";
+        }
+
+		public NColor GetTagColor()
+        {
+			return TagColor;
+		}
+
+		public string GetFormattedTagColor()
+		{
+			return "(" + TagColor.R.ToString() + ", " + TagColor.G.ToString() + ", " + TagColor.B.ToString() + ")";
+		}
+
+		public bool IsFocused()
+        {
+			if (this.Focused)
+            {
+				return true;
+            }
+			else
+            {
+				return false;
+            }
+        }
 
 		public void print(string text, RichTextBox output)
 		{
@@ -322,7 +387,7 @@ namespace Client
 
 		public void printToLog(string text)
 		{
-			Log.AppendText(text + "\n", NColorToColor(color));
+			Log.AppendText(text + "\n", NColorToColor(TagColor));
 			Log.ScrollToCaret();
 		}
 
@@ -415,7 +480,7 @@ namespace Client
 
 		private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			settings.ShowDialog();
+			SettingsWindow.ShowDialog();
 		}
 
 		private void IPBox_KeyDown(object sender, KeyEventArgs e)
@@ -480,7 +545,7 @@ namespace Client
                         return;
                     }
                     byte[] bytes = File.ReadAllBytes(openFileDialog1.FileName);
-                    user.CreateTransfer(bytes, info.Name, color);
+                    user.CreateTransfer(bytes, info.Name, TagColor);
                     print("File Sent!", Chat, Color.Green);
                 }
                 catch (Exception ex)
@@ -497,14 +562,62 @@ namespace Client
 
         private void Tcp_Client_Load(object sender, EventArgs e)
         {
-            LoadSettings();
+			if (debug)
+            {
+				debugToolStripMenuItem.Visible = true;
+            }
+
+			LoadSettings();
         }
+
+		private void LoadSettings()
+        {
+			RegOps.ReadSettings(settings);
+
+			if (settings.ContainsKey("ShowLog"))
+            {
+				if ((bool)settings["ShowLog"])
+                {
+					SetLogVisibility(true);
+                }
+				else
+                {
+					SetLogVisibility(false);
+                }
+            }
+		}
         #endregion
 
         private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-			aboutBox.ShowDialog();
+			AboutBox.ShowDialog();
 		}
+
+        private void fixClientToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			tcpClient.Dispose();
+			ChangeConnectionInputState(true);
+        }
+
+        private void commandsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			HelpWindow.ShowDialog();
+        }
+
+        private void startAnotherInstanceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			ProcessUtils.StartProcess(Assembly.GetExecutingAssembly().Location, "/debug");
+        }
+
+        private void startServerInstanceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			ProcessUtils.StartProcess(@"C:\Users\andyy\source\Nova Studios Projects\NovaChatService\Server\bin\Debug\Server.exe", startin: @"C:\Users\andyy\source\Nova Studios Projects\NovaChatService\Server\bin\Debug");
+		}
+
+        private void killAllInstancesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			ProcessUtils.KillAll(Process.GetCurrentProcess().ProcessName);
+        }
     }
 
     public static class RichTextBoxExtensions
