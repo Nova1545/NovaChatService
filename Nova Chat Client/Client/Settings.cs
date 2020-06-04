@@ -80,7 +80,7 @@ namespace Client
 
             if (result == DialogResult.Yes)
             {
-                RegOps.ResetSettings();
+                RegOps.ResetSettings(settings);
             }
         }
 
@@ -95,14 +95,14 @@ namespace Client
                     parent.SetLogVisibility(false);
                     toggleLog.Tag = "false";
                     toggleLog.Text = "Show Log";
-                    RegOps.WriteSetting("ShowLog", 0, RegistryValueKind.DWord);
+                    RegOps.WriteSetting("ShowLog", 0, RegistryValueKind.DWord, settings);
                 }
                 else
                 {
                     parent.SetLogVisibility(true);
                     toggleLog.Tag = "true";
                     toggleLog.Text = "Hide Log";
-                    RegOps.WriteSetting("ShowLog", 1, RegistryValueKind.DWord);
+                    RegOps.WriteSetting("ShowLog", 1, RegistryValueKind.DWord, settings);
                 }
             }
             else
@@ -110,7 +110,7 @@ namespace Client
                 parent.SetLogVisibility(true);
                 toggleLog.Tag = "true";
                 toggleLog.Text = "Hide Log";
-                RegOps.WriteSetting("ShowLog", 1, RegistryValueKind.DWord);
+                RegOps.WriteSetting("ShowLog", 1, RegistryValueKind.DWord, settings);
             }
         }
 
@@ -125,9 +125,12 @@ namespace Client
 
         private void ColorSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            NColor color = parent.ColorToNColor((Color)ColorSelector.SelectedItem);
-            parent.ChangeTagColor(color.R, color.G, color.B);
-            ColorSelectorDisplay.Text = parent.GetFormattedTagColor();
+            if (ColorSelector.SelectedItem != null)
+            {
+                NColor color = parent.ColorToNColor((Color)ColorSelector.SelectedItem);
+                parent.ChangeTagColor(color.R, color.G, color.B);
+                ColorSelectorDisplay.Text = parent.GetFormattedTagColor();
+            }
         }
 
         private void ColorSelectorDisplay_Click(object sender, EventArgs e)
@@ -137,14 +140,18 @@ namespace Client
             {
                 var color = parent.ChangeTagColor(colorDialog1.Color.R, colorDialog1.Color.G, colorDialog1.Color.B);
 
-                if (colorDialog1.Color.ToKnownColor() != 0)
+                foreach (Color c in ColorSelector.Items)
                 {
-                    ColorSelectorDisplay.Text = colorDialog1.Color.ToKnownColor().ToString();
+                    Console.WriteLine(c.ToKnownColor().ToString(), colorDialog1.Color.ToKnownColor().ToString());
+                    if (c.ToKnownColor() == colorDialog1.Color.ToKnownColor())
+                    {
+                        ColorSelector.SelectedItem = c;
+                        break;
+                    }
+                    ColorSelector.SelectedIndex = -1;
                 }
-                else
-                {
-                    ColorSelectorDisplay.Text = color;
-                }
+
+                ColorSelectorDisplay.Text = color;
             }
         }
 

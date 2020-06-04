@@ -7,7 +7,7 @@ namespace Client
 {
     public static class RegOps
     {
-        public static int WriteSetting(string setting, object value, RegistryValueKind type)
+        public static int WriteSetting(string setting, object value, RegistryValueKind type, ObservableDictionary<string, object> dict)
         {
             int returnCode;
 
@@ -32,10 +32,10 @@ namespace Client
             return returnCode;
         }
 
-        public static void ResetSettings()
+        public static void ResetSettings(ObservableDictionary<string, object> dict)
         {
-            WriteSetting("ShowLog", 1, RegistryValueKind.DWord);
-            WriteSetting("NotificationType", "Both", RegistryValueKind.String);
+            WriteSetting("ShowLog", 1, RegistryValueKind.DWord, dict);
+            WriteSetting("NotificationType", "Both", RegistryValueKind.String, dict);
         }
 
         public static int ReadSettings(ObservableDictionary<string, object> dict)
@@ -47,12 +47,19 @@ namespace Client
             if (key == null)
             {
                 key = Registry.CurrentUser.CreateSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
-                ResetSettings();
+                ResetSettings(dict);
             }
 
             try
             {
-                dict.Add("ShowLog", int.Parse(key.GetValue("ShowLog").ToString()) == 1);
+                if (key.GetValue("ShowLog") != null)
+                {
+                    dict.Add("ShowLog", int.Parse(key.GetValue("ShowLog").ToString()) == 1);
+                }
+                if (key.GetValue("ServerPath") != null)
+                {
+                    dict.Add("ServerPath", key.GetValue("ServerPath").ToString());
+                }
                 returnCode = 0;
             }
             catch

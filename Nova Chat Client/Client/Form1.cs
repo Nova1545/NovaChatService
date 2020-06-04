@@ -32,6 +32,7 @@ namespace Client
 		NotificationManager notifications = new NotificationManager();
 
 		public bool debug { get; private set; }
+		private string ServerPath;
 
 		public Tcp_Client(string[] args)
 		{
@@ -54,12 +55,12 @@ namespace Client
 		{
 			try
 			{
-				if (chatBox.Text.StartsWith("/wisper"))
+				if (chatBox.Text.ToLower().StartsWith("/whisper"))
 				{
 					string[] text = chatBox.Text.Split('"', '"');
 					try
 					{
-                        user.CreateWisper(text[3], TagColor, text[1]);
+                        user.CreateWhisper(text[3], TagColor, text[1]);
 						print(nameBox.Text + ": " + "Message privately sent to " + text[1], Chat, NColorToColor(TagColor));
 					}
 					catch (Exception ex)
@@ -185,7 +186,7 @@ namespace Client
                     user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
                     user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
                     user.OnMessageTransferReceivedCallback += User_OnMessageTransferReceivedCallback;
-                    user.OnMessageWisperReceivedCallback += User_OnMessageWisperReceivedCallback;
+                    user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
 					//user.OnMessageAnyReceivedCallback += User_OnMessageAnyReceivedCallback;
                     user.OnMesssageInformationReceivedCallback += User_OnMesssageInformationReceivedCallback;
 					user.OnErrorCallback += (e) => { print(e.Message, Log); };
@@ -220,7 +221,7 @@ namespace Client
             print(message.Name + ": " + message.Content, Chat);
         }
 
-        private void User_OnMessageWisperReceivedCallback(ChatLib.Message message)
+        private void User_OnMessageWhisperReceivedCallback(ChatLib.Message message)
         {
             print("Private Message From " + message.Name + ": " + message.Content, Chat, NColorToColor(message.Color));
 		}
@@ -280,7 +281,7 @@ namespace Client
             return NColor.FromRGB(color.R, color.G, color.B);
         }
 
-        #region Stuff I Dont Care About
+        #region Stuff I Don't Care About
 
 
         #region SetttingsHandlers
@@ -535,7 +536,7 @@ namespace Client
                     FileInfo info = new FileInfo(openFileDialog1.FileName);
                     if (info.Length > 10485760)
                     {
-                        MessageBox.Show("File larger than 10 megabytes");
+                        MessageBox.Show("File larger than 10 megabytes", "Upload Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
                     byte[] bytes = File.ReadAllBytes(openFileDialog1.FileName);
@@ -581,7 +582,12 @@ namespace Client
 					SetLogVisibility(false);
                 }
             }
-		}
+
+				if (settings.ContainsKey("ServerPath"))
+				{
+					ServerPath = settings["ServerPath"].ToString();
+				}
+			}
         #endregion
 
         private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -607,7 +613,14 @@ namespace Client
 
         private void startServerInstanceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			ProcessUtils.StartProcess(@"C:\Users\andyy\source\Nova Studios Projects\NovaChatService\Server\bin\Debug\Server.exe", startin: @"C:\Users\andyy\source\Nova Studios Projects\NovaChatService\Server\bin\Debug");
+			if (File.Exists(ServerPath))
+			{
+				ProcessUtils.StartProcess(ServerPath, startin: Directory.GetParent(ServerPath).FullName);
+			}
+			else
+            {
+				MessageBox.Show("Unable to locate server binary. Please set the file location.", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 		}
 
         private void killAllInstancesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -619,7 +632,22 @@ namespace Client
 		{
 			throw new NotImplementedException();
 		}
-	}
+
+        private void setPathToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			using (OpenFileDialog dialog = new OpenFileDialog())
+			{
+				dialog.InitialDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+				DialogResult dialogResult = dialog.ShowDialog();
+
+				if (dialogResult == DialogResult.OK)
+				{
+					ServerPath = dialog.FileName;
+					RegOps.WriteSetting("ServerPath", dialog.FileName, RegistryValueKind.String, settings);
+				}
+			}
+        }
+    }
 
     public static class RichTextBoxExtensions
 	{

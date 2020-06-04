@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Media;
 using System.Text;
@@ -28,7 +29,10 @@ namespace Client
 
         public void SetSoundLocation(string path)
         {
+            if (File.Exists(path))
+            {
 
+            }
         }
 
         public void SetNotififcationStyle(NotificationType style)

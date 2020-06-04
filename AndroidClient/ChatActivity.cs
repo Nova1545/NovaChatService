@@ -68,7 +68,7 @@ namespace AndroidClient
             }
         }
 
-        private void User_OnMessageWisperReceivedCallback(ChatLib.Message message)
+        private void User_OnMessageWhisperReceivedCallback(ChatLib.Message message)
         {
             RunOnUiThread(() => { 
                 var span = new SpannableString("Private message from " + message.Name + ": " + message.Content + "\n");
@@ -139,7 +139,7 @@ namespace AndroidClient
             user.Init();
             user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
             user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
-            user.OnMessageWisperReceivedCallback += User_OnMessageWisperReceivedCallback;
+            user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
 
             Messages = FindViewById<TextView>(Resource.Id.ChatList);
             SendBtn = FindViewById<Button>(Resource.Id.button1);

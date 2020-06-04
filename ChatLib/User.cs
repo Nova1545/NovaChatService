@@ -31,8 +31,8 @@ namespace ChatLib
         public delegate void OnMessageReceived(Message message);
         public event OnMessageReceived OnMessageReceivedCallback;
 
-        public delegate void OnMessageWisperReceived(Message message);
-        public event OnMessageWisperReceived OnMessageWisperReceivedCallback;
+        public delegate void OnMessageWhisperReceived(Message message);
+        public event OnMessageWhisperReceived OnMessageWhisperReceivedCallback;
 
         public delegate void OnMessageInitReceived(Message message);
         public event OnMessageInitReceived OnMessageInitReceivedCallback;
@@ -83,9 +83,9 @@ namespace ChatLib
             }
         }
 
-        public void CreateWisper(string content, NColor color, string endpoint)
+        public void CreateWhisper(string content, NColor color, string endpoint)
         {
-            m = new Message(Name, MessageType.Wisper, endpoint);
+            m = new Message(Name, MessageType.Whisper, endpoint);
             m.SetContent(content);
             m.SetColor(color);
             if (AutoSend)
@@ -168,8 +168,8 @@ namespace ChatLib
                         case MessageType.Transfer:
                             OnMessageTransferReceivedCallback?.Invoke(m);
                             break;
-                        case MessageType.Wisper:
-                            OnMessageWisperReceivedCallback?.Invoke(m);
+                        case MessageType.Whisper:
+                            OnMessageWhisperReceivedCallback?.Invoke(m);
                             break;
                         case MessageType.Initionalize:
                             OnMessageInitReceivedCallback?.Invoke(m);

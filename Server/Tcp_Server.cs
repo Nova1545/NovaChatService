@@ -129,13 +129,13 @@ namespace Server
             else
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("Automaticly setting ip to " + GetLocalIPAddress());
+                Console.WriteLine("Automatically setting IP to " + GetLocalIPAddress());
                 iPAddress = IPAddress.Parse(GetLocalIPAddress());
             }
             if(Rooms.Count == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Please add atleast one room to the server or set overrideDefault to false. Press enter to quit.");
+                Console.WriteLine("Please add at least one room to the server or set overrideDefault to false. Press enter to quit.");
                 Console.ReadLine();
                 return;
             }
@@ -206,14 +206,14 @@ namespace Server
                                 continue;
                             }
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Sucessfully loaded!");
+                            Console.WriteLine("Successfully loaded!");
                             Console.ForegroundColor = ConsoleColor.White;
                         }
                         catch (Exception e)
                         {
                             Console.ForegroundColor = ConsoleColor.DarkRed;
                             Console.WriteLine("Failed to load " + path);
-                            Console.WriteLine("Method Init Missing or Incorrect or other error has occured");
+                            Console.WriteLine("Method Init Missing or Incorrect or other error has occurred");
                             Console.WriteLine("(" + e.Message + ") thrown in " + e.TargetSite.Name + " at line " + GetLineNumber(e));
                             Console.ForegroundColor = ConsoleColor.White;
                             continue;
@@ -223,7 +223,7 @@ namespace Server
                     {
                         Console.ForegroundColor = ConsoleColor.DarkMagenta;
                         Console.WriteLine("Failed to load " + path);
-                        Console.WriteLine("File doesnt contain Bot Attribute/Code");
+                        Console.WriteLine("File doesn't contain Bot Attribute/Code");
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
@@ -251,6 +251,7 @@ namespace Server
             Console.WriteLine("Type quit to stop server or help for a list of commands");
             while (true)
             {
+                Console.Write("-> ");
                 string[] command = Console.ReadLine().Split(' ');
                 if(command[0] == "quit")
                 {
@@ -392,7 +393,7 @@ namespace Server
                 {
                     JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
                     h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("User with the name " + json.Name + " already exsists");
+                    h.SetContent("User with the name " + json.Name + " already exists");
                     JsonMessageHelpers.SetJsonMessage(stream, h);
                     stream.Close();
                     stream.Dispose();
@@ -427,7 +428,7 @@ namespace Server
                 {
                     Message h = new Message(message.Name, MessageType.Status);
                     h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("User with the name " + message.Name + " already exsists");
+                    h.SetContent("User with the name " + message.Name + " already exists");
                     MessageHelpers.SetMessage(stream, h);
                     stream.Close();
                     stream.Dispose();
@@ -485,7 +486,7 @@ namespace Server
             {
                 JsonMessage m = new JsonMessage("Server", MessageType.Status);
                 m.SetStatusType(StatusType.ErrorDisconnect);
-                m.SetContent("All avaible rooms are full");
+                m.SetContent("All available rooms are full");
                 JsonMessageHelpers.SetJsonMessage(stream, m);
                 return;
             }
@@ -712,7 +713,7 @@ namespace Server
             {
                 JsonMessage m = new JsonMessage("Server", MessageType.Status);
                 m.SetStatusType(StatusType.ErrorDisconnect);
-                m.SetContent("All avaible rooms are full");
+                m.SetContent("All available rooms are full");
                 JsonMessageHelpers.SetJsonMessage(stream, m);
                 return;
             }
