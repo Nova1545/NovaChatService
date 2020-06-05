@@ -7,12 +7,10 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Forms;
-using System.Media;
 using ChatLib;
 using ChatLib.Extras;
 using System.Reflection;
 using Yep_Development_Tools;
-using System.Collections.Generic;
 
 namespace Client
 {

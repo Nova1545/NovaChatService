@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Yep Development Tools</name>
+    </assembly>
+    <members>
+        <member name="T:Yep_Development_Tools.BSOD">
+            <summary>
+            Holds the methods needed to invoke a blue screen.
+            </summary>
+        </member>
+        <member name="M:Yep_Development_Tools.BSOD.Invoke">
+            <summary>
+            Immediately blue screens the computer. Use responsibly.
+            </summary>
+        </member>
+        <member name="T:Yep_Development_Tools.ProcessUtils">
+            <summary>
+            Methods for manipulating and querying processes.
+            </summary>
+        </member>
+        <member name="M:Yep_Development_Tools.ProcessUtils.GetForegroundProcess">
+            <summary>
+            Gets the Process object of the current process in focus.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Yep_Development_Tools.ProcessUtils.GetForegroundProcessName">
+            <summary>
+            Gets the name of the current process in focus.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Yep_Development_Tools.ProcessUtils.StartProcess(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            <para>Quickly start an external process.</para>
+            </summary>
+            <param name="path"></param>
+            <param name="args"></param>
+            <param name="startin"></param>
+            <param name="admin"></param>
+        </member>
+        <member name="M:Yep_Development_Tools.ProcessUtils.RestrictOneProcess">
+            <summary>
+            Automatically quits the program if there is already an instance of this process.
+            </summary>
+        </member>
+        <member name="M:Yep_Development_Tools.ProcessUtils.KillAll(System.String)">
+            <summary>
+            As the name suggests, kills all processes of the matching name.
+            </summary>
+            <param name="processName"></param>
+        </member>
+        <member name="T:Yep_Development_Tools.RegOps">
+            <summary>
+            <para>Contains methods for all your registry needs.</para>
+            <para>Uses P/Invoke to manipulate the registry since the Win32 library is too weak.</para>
+            </summary>
+        </member>
+        <member name="M:Yep_Development_Tools.RegOps.RegQueryValueEx(System.UIntPtr,System.String,System.Int32,System.IntPtr,System.IntPtr,System.Int32@)">
+            <summary>
+            <para>Create an int first and set it to 0 -> int size = 0;</para>
+            <para>Then create a pointer like this using the int variable -> IntPtr ptr = Marshal.AllocHGlobal(size);</para>
+            <para>Then call the function with the following parameters -> RegQueryValueEx(hkey, name, 0, IntPtr.Zero, ptr, ref size));</para>
+            <para>Finally, get the key's value (presumably a string) like this -> Marshal.PtrToStringUni(ptr, size / sizeof(char)).TrimEnd('\0');</para>
+            </summary>
+            <param name="hKey"></param>
+            <param name="lpValueName"></param>
+            <param name="lpReserved"></param>
+            <param name="type"></param>
+            <param name="lpData"></param>
+            <param name="lpcbData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Yep_Development_Tools.RegOps.ChangeKeyOwnership(System.UInt32,System.String,System.String,System.Security.Principal.WindowsBuiltInRole,System.Security.Principal.WindowsBuiltInRole)">
+            <summary>
+            <para>Changes the owner of the specified key.</para>
+            <para>Not yet implemented</para>
+            </summary>
+            <param name="rootKey"></param>
+            <param name="subKey"></param>
+            <param name="keyName"></param>
+            <param name="owner"></param>
+            <param name="group"></param>
+        </member>
+        <member name="M:Yep_Development_Tools.RegOps.ChangeKeyACL(System.UInt32,System.String,System.String)">
+            <summary>
+            <para>Changes the security permissions of the specified key.</para>
+            <para>Not yet implemented</para>
+            </summary>
+            <param name="rootKey"></param>
+            <param name="subKey"></param>
+            <param name="keyName"></param>
+        </member>
+        <member name="M:Yep_Development_Tools.RegOps.CreateKey">
+            <summary>
+            Creates a key at the specified path.
+            </summary>
+        </member>
+        <member name="M:Yep_Development_Tools.RegOps.DeleteKey(System.UInt32,System.String,System.String)">
+            <summary>
+            Opens the specified path and deletes the key or subkey.
+            </summary>
+            <param name="rootKey"></param>
+            <param name="path"></param>
+            <param name="key"></param>
+        </member>
+        <member name="M:Yep_Development_Tools.RegOps.ReadKey(System.UInt32,System.String,System.String,System.Int32)">
+            <summary>
+            <para>Opens the specified key, reads it, and returns the value as a string.</para>
+            <para>If the key's size is greater than 1024 bytes, then you need to specify a custom buffer size that will fit the size of the key. Otherwise, jumbled information will be returned to you.</para>
+            <para>Returns "Error" if there was an issue accessing the key</para>
+            </summary>
+            <param name="rootKey"></param>
+            <param name="subKey"></param>
+            <param name="keyName"></param>
+            <param name="size"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Yep_Development_Tools.ManagedRegOps">
+            <summary>
+            Simplifies the Win32 library's methods for manipulating the registry.
+            </summary>
+        </member>
+        <member name="M:Yep_Development_Tools.ManagedRegOps.ReadKey(System.String,System.String)">
+            <summary>
+            <para>Opens the specified key, reads it, and returns the value as a string.</para>
+            <para>Returns "Error" if there was an issue accessing the key</para>
+            </summary>
+            <param name="path"></param>
+            <param name="keyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Yep_Development_Tools.ManagedRegOps.CreateKey(System.String,System.String,System.Object,Microsoft.Win32.RegistryValueKind,Microsoft.Win32.RegistryHive)">
+            <summary>
+            Creates a key at the specified path.
+            </summary>
+        </member>
+        <member name="T:Yep_Development_Tools.ToastGenerator">
+            <summary>
+            Toast generation in Win32 apps, simplified.
+            </summary>
+        </member>
+        <member name="F:Yep_Development_Tools.ToastGenerator.toastNotification">
+            <summary>
+            The ToastNotification instance. Use this to subscribe to event handlers.
+            </summary>
+        </member>
+        <member name="M:Yep_Development_Tools.ToastGenerator.MakeToast(System.String,System.String,System.String)">
+            <summary>
+            <para>Sends a toast notification with the given title and body. The App Name is what the header will appear as in the action center.</para>
+            <para>Does not support images at the moment.</para>
+            <para>(Only works on Windows 8/10)</para>
+            </summary>
+            <param name="appName"></param>
+            <param name="title"></param>
+            <param name="body"></param>
+        </member>
+        <member name="T:Yep_Development_Tools.Tools">
+            <summary>
+            A series of helpful methods that removes the need for instantiating objects for certain tasks and allows for quick, clean code.
+            </summary>
+        </member>
+        <member name="M:Yep_Development_Tools.Tools.IsAdministrator">
+            <summary>
+            <para>Checks if the program has elevated privileges.</para>
+            <para>Returns true if the program is elevated, else returns false.</para>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Yep_Development_Tools.Tools.Print(System.Object)">
+            <summary>
+            If you're used to Python and other languages that use print(), or if you're just too lazy to type Console.WriteLine(), then you can use this.
+            </summary>
+            <param name="text"></param>
+        </member>
+        <member name="M:Yep_Development_Tools.Tools.print(System.Object)">
+            <summary>
+            If you're too lazy to capitalize the P in the already simplified print method, then use this. Does the same thing.
+            </summary>
+            <param name="text"></param>
+        </member>
+        <member name="M:Yep_Development_Tools.Tools.RandInt(System.Int32,System.Int32)">
+            <summary>
+            Returns a random integer between the minimum and maximum numbers, inclusive.
+            </summary>
+            <param name="min"></param>
+            <param name="max"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Yep_Development_Tools.Tools.DynamicText(System.String,System.String,System.Windows.Forms.Control,System.Drawing.Font)">
+            <summary>
+            Determines what text to display depending on the amount of space available in the given WinForm control.
+            </summary>
+            <param name="normal"></param>
+            <param name="truncated"></param>
+            <param name="control"></param>
+            <param name="font"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Yep_Development_Tools.Tools.GetLocalIPAddress">
+            <summary>
+            Returns the local IPv4 address of the currently connected network. If there are multiple, returns the one from the first adapter.
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

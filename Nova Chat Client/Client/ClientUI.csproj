@@ -57,9 +57,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Yep Development Tools">
-      <HintPath>..\..\..\..\APIs\Yep Development Tools.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <AppDesigner Include="Properties\" />
@@ -142,6 +139,10 @@
     <ProjectReference Include="..\..\ChatLib\ChatLib.csproj">
       <Project>{88ac8cec-e6ea-46fe-9e7e-17ac0c162064}</Project>
       <Name>ChatLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Yep Development Tools\Yep Development Tools.csproj">
+      <Project>{78B397AA-D2C0-4152-86C7-9542DE0606B8}</Project>
+      <Name>Yep Development Tools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
