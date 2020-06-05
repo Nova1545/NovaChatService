@@ -28,6 +28,9 @@ namespace Server
         static int WebPort = 8911;
         static int DesktopPort = 8910;
 
+        static bool WebActive = false;
+        static bool DesktopActive = false;
+
         static IPAddress iPAddress = null;
         static int TotalMessagesSent = 0;
         static DateTime startup;
@@ -129,13 +132,38 @@ namespace Server
             else
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("Automatically setting IP to " + GetLocalIPAddress());
+                Console.WriteLine("Automaticly setting ip to " + GetLocalIPAddress());
                 iPAddress = IPAddress.Parse(GetLocalIPAddress());
             }
-            if(Rooms.Count == 0)
+            try
+            {
+                if (!bool.TryParse(settings.SelectSingleNode("Config/GeneralSettings/WebPort").Attributes[0].InnerText, out WebActive))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Failed to read WebPort active attribute");
+                }
+                if (!bool.TryParse(settings.SelectSingleNode("Config/GeneralSettings/DesktopPort").Attributes[0].InnerText, out DesktopActive))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Failed to read WebPort active attribute");
+                }
+            }
+            catch
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Please add at least one room to the server or set overrideDefault to false. Press enter to quit.");
+                Console.WriteLine("Failed to read active states");
+            }
+            if (Rooms.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("[Server not started] Please add atleast one room to the server or set overrideDefault to false. Press enter to quit.");
+                Console.ReadLine();
+                return;
+            }
+            if(!DesktopActive && !WebActive)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("[Server not started] Please set atleast one server to active (Web or Desktop). Press enter to quit.");
                 Console.ReadLine();
                 return;
             }
@@ -206,14 +234,14 @@ namespace Server
                                 continue;
                             }
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Successfully loaded!");
+                            Console.WriteLine("Sucessfully loaded!");
                             Console.ForegroundColor = ConsoleColor.White;
                         }
                         catch (Exception e)
                         {
                             Console.ForegroundColor = ConsoleColor.DarkRed;
                             Console.WriteLine("Failed to load " + path);
-                            Console.WriteLine("Method Init Missing or Incorrect or other error has occurred");
+                            Console.WriteLine("Method Init Missing or Incorrect or other error has occured");
                             Console.WriteLine("(" + e.Message + ") thrown in " + e.TargetSite.Name + " at line " + GetLineNumber(e));
                             Console.ForegroundColor = ConsoleColor.White;
                             continue;
@@ -223,7 +251,7 @@ namespace Server
                     {
                         Console.ForegroundColor = ConsoleColor.DarkMagenta;
                         Console.WriteLine("Failed to load " + path);
-                        Console.WriteLine("File doesn't contain Bot Attribute/Code");
+                        Console.WriteLine("File doesnt contain Bot Attribute/Code");
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
@@ -240,18 +268,26 @@ namespace Server
             {
                 IsBackground = true
             };
-            web.Start();
 
             desktop = new Thread(() => ClientListener(ref DesktopState))
             {
                 IsBackground = true
             };
-            desktop.Start();
+
+            if (WebActive)
+            {
+                web.Start();
+            }
+
+            if (DesktopActive)
+            {
+                
+                desktop.Start();
+            }
 
             Console.WriteLine("Type quit to stop server or help for a list of commands");
             while (true)
             {
-                Console.Write("-> ");
                 string[] command = Console.ReadLine().Split(' ');
                 if(command[0] == "quit")
                 {
@@ -291,34 +327,44 @@ namespace Server
                             IsBackground = true
                         };
                         web.Start();
+                        Console.WriteLine("Web Restarted");
                     }
                     else if(command[1] == "desktop")
                     {
+                        DesktopState = ListenerState.Quiting;
+                        while (desktop.IsAlive) ;
+
                         DesktopState = ListenerState.Waiting;
                         desktop = new Thread(() => ClientListener(ref DesktopState))
                         {
                             IsBackground = true
                         };
                         desktop.Start();
+                        Console.WriteLine("Desktop Restarted");
                     }
                     else if(command[1] == "both")
                     {
-                        WebState = ListenerState.Waiting;
-                        DesktopState = ListenerState.Waiting;
-                        web.Abort();
-                        desktop.Abort();
+                        WebState = ListenerState.Quiting;
+                        while (web.IsAlive) ;
 
+                        WebState = ListenerState.Waiting;
                         web = new Thread(() => WebListener(ref WebState))
                         {
                             IsBackground = true
                         };
                         web.Start();
+                        Console.WriteLine("Web Restarted");
 
+                        DesktopState = ListenerState.Quiting;
+                        while (desktop.IsAlive) ;
+
+                        DesktopState = ListenerState.Waiting;
                         desktop = new Thread(() => ClientListener(ref DesktopState))
                         {
                             IsBackground = true
                         };
                         desktop.Start();
+                        Console.WriteLine("Desktop Restarted");
                     }
                 }
                 else if(command[0] == "help")
@@ -393,7 +439,7 @@ namespace Server
                 {
                     JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
                     h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("User with the name " + json.Name + " already exists");
+                    h.SetContent("User with the name " + json.Name + " already exsists");
                     JsonMessageHelpers.SetJsonMessage(stream, h);
                     stream.Close();
                     stream.Dispose();
@@ -410,6 +456,7 @@ namespace Server
             server.Start();
             while (true)
             {
+                state = ListenerState.Waiting;
                 TcpClient client = server.AcceptTcpClient();
 
                 NetworkStream stream = client.GetStream();
@@ -417,18 +464,34 @@ namespace Server
                 //SslStream ssl = new SslStream(client.GetStream(), false);
                 //ssl.AuthenticateAsServer(X509, false, true);
 
+                state = ListenerState.UsernameSub;
+                while (client.Available < 3)
+                {
+                    if (state == ListenerState.Quiting)
+                    {
+                        break;
+                    }
+                }
+                if (state == ListenerState.Quiting)
+                {
+                    server.Stop();
+                    break;
+                }
+
                 Message message = MessageHelpers.GetMessage(stream);
                 if (message.MessageType == MessageType.Initionalize && clients.Any(x => x.Value.Name == message.Name) == false)
                 {
                     ClientInfo c = new ClientInfo(message.Name, stream, ClientType.Desktop);
                     clients.Add(c.GUID, c);
                     ThreadPool.QueueUserWorkItem(HandleClientDesktopWorker, c);
+                    state = ListenerState.Connected;
                 }
                 else
                 {
+                    state = ListenerState.Disconnected;
                     Message h = new Message(message.Name, MessageType.Status);
                     h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("User with the name " + message.Name + " already exists");
+                    h.SetContent("User with the name " + message.Name + " already exsists");
                     MessageHelpers.SetMessage(stream, h);
                     stream.Close();
                     stream.Dispose();
@@ -486,7 +549,7 @@ namespace Server
             {
                 JsonMessage m = new JsonMessage("Server", MessageType.Status);
                 m.SetStatusType(StatusType.ErrorDisconnect);
-                m.SetContent("All available rooms are full");
+                m.SetContent("All avaible rooms are full");
                 JsonMessageHelpers.SetJsonMessage(stream, m);
                 return;
             }
@@ -713,7 +776,7 @@ namespace Server
             {
                 JsonMessage m = new JsonMessage("Server", MessageType.Status);
                 m.SetStatusType(StatusType.ErrorDisconnect);
-                m.SetContent("All available rooms are full");
+                m.SetContent("All avaible rooms are full");
                 JsonMessageHelpers.SetJsonMessage(stream, m);
                 return;
             }
