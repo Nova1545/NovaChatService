@@ -9,11 +9,12 @@
     <Room id="2" userLimit="10" maxBufferSize="30">Main 3</Room>
   </Rooms>
   <GeneralSettings>
-    <!-- Leave blank for automatic (Only automatic rn) -->
+    <!-- Leave blank for automatic -->
     <ServerIp></ServerIp>
     <!-- Need either WebPort, DesktopPort or both. Can be left blank to use the default ports -->
-    <WebPort>8911</WebPort>
-    <DesktopPort>8910</DesktopPort>
+    <!-- active tells whether or not to put that server online (ie. if you only want web clients to connect, set desktop active to false and webport active to true)-->
+    <WebPort active="false">8911</WebPort>
+    <DesktopPort active="true">8910</DesktopPort>
     <AdminPassword></AdminPassword> <!-- Leave blank for no admin (Not Implemented) -->
     <ServerPassword></ServerPassword> <!-- Only allows users with the password to join (Not Implemented) -->
   </GeneralSettings>
