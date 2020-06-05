@@ -13,7 +13,7 @@ namespace Client
         private Tcp_Client parent;
         private ObservableDictionary<string, object> settings;
 
-        public Settings(Tcp_Client parent, ObservableDictionary<string, object> settingsDictionary)
+        public Settings(Tcp_Client parent, ref ObservableDictionary<string, object> settingsDictionary)
         {
             InitializeComponent();
             this.parent = parent;
@@ -44,7 +44,7 @@ namespace Client
         {
             ColorSelectorDisplay.Text = parent.GetFormattedTagColor();
 
-            if (toggleLog.Tag.ToString() == "true")
+            if (bool.Parse(RegOps.GetSettingFromDict("ShowLog", settings).ToString()))
             {
                 toggleLog.Text = "Hide Log";
             }
@@ -80,7 +80,7 @@ namespace Client
 
             if (result == DialogResult.Yes)
             {
-                RegOps.ResetSettings(settings);
+                RegOps.ResetSettings(ref settings);
             }
         }
 
@@ -95,14 +95,14 @@ namespace Client
                     parent.SetLogVisibility(false);
                     toggleLog.Tag = "false";
                     toggleLog.Text = "Show Log";
-                    RegOps.WriteSetting("ShowLog", 0, RegistryValueKind.DWord, settings);
+                    RegOps.WriteSetting("ShowLog", 0, RegistryValueKind.DWord, ref settings);
                 }
                 else
                 {
                     parent.SetLogVisibility(true);
                     toggleLog.Tag = "true";
                     toggleLog.Text = "Hide Log";
-                    RegOps.WriteSetting("ShowLog", 1, RegistryValueKind.DWord, settings);
+                    RegOps.WriteSetting("ShowLog", 1, RegistryValueKind.DWord, ref settings);
                 }
             }
             else
@@ -110,7 +110,7 @@ namespace Client
                 parent.SetLogVisibility(true);
                 toggleLog.Tag = "true";
                 toggleLog.Text = "Hide Log";
-                RegOps.WriteSetting("ShowLog", 1, RegistryValueKind.DWord, settings);
+                RegOps.WriteSetting("ShowLog", 1, RegistryValueKind.DWord, ref settings);
             }
         }
 
@@ -166,7 +166,7 @@ namespace Client
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
-            
+            RegOps.WriteSetting("NotificationStyle", "Both", RegistryValueKind.String, ref settings);
         }
 
         private void radioButton4_CheckedChanged(object sender, EventArgs e)

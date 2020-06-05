@@ -29,7 +29,7 @@ namespace Client
 		NColor TagColor;
 
 		Random rnd = new Random();
-		NotificationManager notifications = new NotificationManager();
+		NotificationManager notifications;
 
 		public bool debug { get; private set; }
 		private string ServerPath;
@@ -47,7 +47,9 @@ namespace Client
 			InitializeComponent();
 			print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.", Chat);
 			print("Press 'Delete' when focused in this box to clear it, or use the 'Clear History' button in the menu.", Chat);
-			SettingsWindow = new Settings(this, settings);
+
+			SettingsWindow = new Settings(this, ref settings);
+			notifications = new NotificationManager(ref settings);
 			TagColor = NColor.FromRGB(rnd.Next(256), rnd.Next(256), rnd.Next(256));
 		}
 
@@ -567,7 +569,7 @@ namespace Client
 
 		private void LoadSettings()
         {
-			RegOps.ReadSettings(settings);
+			RegOps.ReadSettings(ref settings);
 
 			this.settings.CollectionChanged += Settings_CollectionChanged;
 
@@ -630,7 +632,10 @@ namespace Client
 
 		private void Settings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
-			throw new NotImplementedException();
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+            {
+				notifications.SetNotificationStyle((NotificationManager.NotificationType)RegOps.GetSettingFromDict("NotificationStyle", settings));
+            }
 		}
 
         private void setPathToolStripMenuItem_Click(object sender, EventArgs e)
@@ -643,7 +648,7 @@ namespace Client
 				if (dialogResult == DialogResult.OK)
 				{
 					ServerPath = dialog.FileName;
-					RegOps.WriteSetting("ServerPath", dialog.FileName, RegistryValueKind.String, settings);
+					RegOps.WriteSetting("ServerPath", dialog.FileName, RegistryValueKind.String, ref settings);
 				}
 			}
         }

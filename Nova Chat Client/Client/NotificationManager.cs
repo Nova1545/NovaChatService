@@ -12,6 +12,12 @@ namespace Client
 {
     class NotificationManager
     {
+
+        public NotificationManager(ref ObservableDictionary<string, object> settingsDictionary)
+        {
+
+        }
+
         public enum NotificationType
         {
             Disabled,
@@ -35,7 +41,12 @@ namespace Client
             }
         }
 
-        public void SetNotififcationStyle(NotificationType style)
+        public void SetNotificationStyle(NotificationType style)
+        {
+            SelectedStyle = style;
+        }
+
+        public void UpdateNotificationStyle(NotificationType style)
         {
             SelectedStyle = style;
         }

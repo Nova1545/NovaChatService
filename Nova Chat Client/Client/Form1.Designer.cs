@@ -58,9 +58,9 @@ namespace Client
             this.startAnotherInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.killAllInstancesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startServerInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.setPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -295,38 +295,38 @@ namespace Client
             // clearHistoryToolStripMenuItem
             // 
             this.clearHistoryToolStripMenuItem.Name = "clearHistoryToolStripMenuItem";
-            this.clearHistoryToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.clearHistoryToolStripMenuItem.Size = new System.Drawing.Size(177, 26);
             this.clearHistoryToolStripMenuItem.Text = "Clear History";
             this.clearHistoryToolStripMenuItem.Click += new System.EventHandler(this.clearHistoryToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(177, 26);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(221, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(174, 6);
             // 
             // fixClientToolStripMenuItem
             // 
             this.fixClientToolStripMenuItem.Name = "fixClientToolStripMenuItem";
-            this.fixClientToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.fixClientToolStripMenuItem.Size = new System.Drawing.Size(177, 26);
             this.fixClientToolStripMenuItem.Text = "Fix Client";
             this.fixClientToolStripMenuItem.Click += new System.EventHandler(this.fixClientToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(221, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(174, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(177, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -371,6 +371,13 @@ namespace Client
             this.startServerInstanceToolStripMenuItem.Text = "Start Server Instance";
             this.startServerInstanceToolStripMenuItem.Click += new System.EventHandler(this.startServerInstanceToolStripMenuItem_Click);
             // 
+            // setPathToolStripMenuItem
+            // 
+            this.setPathToolStripMenuItem.Name = "setPathToolStripMenuItem";
+            this.setPathToolStripMenuItem.Size = new System.Drawing.Size(145, 26);
+            this.setPathToolStripMenuItem.Text = "Set Path";
+            this.setPathToolStripMenuItem.Click += new System.EventHandler(this.setPathToolStripMenuItem_Click);
+            // 
             // aboutToolStripMenuItem1
             // 
             this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
@@ -383,13 +390,6 @@ namespace Client
             this.openFileDialog1.Filter = "Images|*.jpg;*.png;*.bmp";
             this.openFileDialog1.InitialDirectory = "C:\\Users\\aiden\\OneDrive\\Pictures";
             this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
-            // 
-            // setPathToolStripMenuItem
-            // 
-            this.setPathToolStripMenuItem.Name = "setPathToolStripMenuItem";
-            this.setPathToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
-            this.setPathToolStripMenuItem.Text = "Set Path";
-            this.setPathToolStripMenuItem.Click += new System.EventHandler(this.setPathToolStripMenuItem_Click);
             // 
             // Tcp_Client
             // 

@@ -7,7 +7,7 @@ namespace Client
 {
     public static class RegOps
     {
-        public static int WriteSetting(string setting, object value, RegistryValueKind type, ObservableDictionary<string, object> dict)
+        public static int WriteSetting(string setting, object value, RegistryValueKind type, ref ObservableDictionary<string, object> dict)
         {
             int returnCode;
 
@@ -21,6 +21,7 @@ namespace Client
             try
             {
                 key.SetValue(setting, value, type);
+                AddSettingToDict(setting, value, ref dict);
                 returnCode = 0;
             }
             catch
@@ -32,13 +33,37 @@ namespace Client
             return returnCode;
         }
 
-        public static void ResetSettings(ObservableDictionary<string, object> dict)
+        public static void ResetSettings(ref ObservableDictionary<string, object> dict)
         {
-            WriteSetting("ShowLog", 1, RegistryValueKind.DWord, dict);
-            WriteSetting("NotificationType", "Both", RegistryValueKind.String, dict);
+            WriteSetting("ShowLog", 1, RegistryValueKind.DWord, ref dict);
+            WriteSetting("NotificationType", "Both", RegistryValueKind.String, ref dict);
         }
 
-        public static int ReadSettings(ObservableDictionary<string, object> dict)
+        public static object GetSettingFromDict(string key, ObservableDictionary<string, object> dict)
+        {
+            if (dict.ContainsKey(key))
+            {
+                return dict[key];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static void AddSettingToDict(string key, object value, ref ObservableDictionary<string, object> dict)
+        {
+            if (dict.ContainsKey(key))
+            {
+                dict[key] = value;
+            }
+            else
+            {
+                dict.Add(key, value);
+            }
+        }
+
+        public static int ReadSettings(ref ObservableDictionary<string, object> dict)
         {
             int returnCode;
 
@@ -47,7 +72,7 @@ namespace Client
             if (key == null)
             {
                 key = Registry.CurrentUser.CreateSubKey("Software\\NovaStudios\\NovaChatClient\\Settings", true);
-                ResetSettings(dict);
+                ResetSettings(ref dict);
             }
 
             try
