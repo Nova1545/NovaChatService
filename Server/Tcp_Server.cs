@@ -549,7 +549,7 @@ namespace Server
             {
                 JsonMessage m = new JsonMessage("Server", MessageType.Status);
                 m.SetStatusType(StatusType.ErrorDisconnect);
-                m.SetContent("All avaible rooms are full");
+                m.SetContent("All available rooms are full");
                 JsonMessageHelpers.SetJsonMessage(stream, m);
                 return;
             }
