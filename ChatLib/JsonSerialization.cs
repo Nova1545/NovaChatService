@@ -140,7 +140,7 @@ namespace ChatLib.Json
             return js;
         }
 
-        public static string Serialize(this Dictionary<string, Room> rooms)
+        public static string SerializeRooms(this Dictionary<string, Room> rooms)
         {
             StringBuilder sb = new StringBuilder();
             StringWriter sw = new StringWriter(sb);
@@ -160,7 +160,7 @@ namespace ChatLib.Json
                     writer.WriteValue(room.Value.Name);
 
                     writer.WritePropertyName("ID");
-                    writer.WriteValue(room.Value.ID);
+                    writer.WriteValue(room.Value.ID.ToString());
 
                     writer.WriteEndObject();
                 }
@@ -193,6 +193,31 @@ namespace ChatLib.Json
                 writer.WriteEndArray();
             }
             return sb.ToString();
+        }
+
+        public static Dictionary<string, Room> DeserializeRooms(this string json)
+        {
+            JsonTextReader reader = new JsonTextReader(new StringReader(json));
+            Dictionary<string, Room> Rooms = new Dictionary<string, Room>();
+
+            string name = "";
+            int id = 0;
+
+            reader.Read();
+            reader.Read();
+            while (reader.Read())
+            {
+                if(reader.Value != null)
+                {
+                    name = reader.ReadAsString();
+                    reader.Read();
+                    id = (int)reader.ReadAsInt32();
+
+                    Room r = new Room(name, id);
+                    Rooms[r.GUID] = r;
+                }
+            }
+            return Rooms;
         }
     }
 }
