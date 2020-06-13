@@ -18,6 +18,7 @@ namespace Client
         Settings SettingsWindow;
 
         ObservableDictionary<string, object> settings = new ObservableDictionary<string, object>();
+        public string[] Rooms { get; private set; }
 
         TcpClient tcpClient;
         User user;
@@ -191,6 +192,10 @@ namespace Client
 
         private void User_OnMesssageInformationReceivedCallback(ChatLib.Message message)
         {
+            if (message.InfomationType == InfomationType.Rooms)
+            {
+                Rooms = message.Content.Split();
+            }
             print(message.Name + ": " + message.Content, Chat);
         }
 

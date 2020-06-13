@@ -44,6 +44,13 @@ namespace Client
         {
             ColorSelectorDisplay.Text = parent.GetFormattedTagColor();
 
+            RoomSelector.Items.Clear();
+
+            if (parent.IsConnected())
+            {
+                RoomSelector.Items.Add(parent.Rooms);
+            }
+
             if (bool.Parse(RegOps.GetSettingFromDict("ShowLog", settings).ToString()))
             {
                 toggleLog.Text = "Hide Log";

@@ -7,61 +7,6 @@ namespace Client
 {
     partial class Tcp_Client
     {
-        #region Print Methods
-
-        public void print(string text, RichTextBox output)
-        {
-            if (output.InvokeRequired)
-            {
-                output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n")));
-                output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
-                return;
-            }
-
-            output.AppendText(text + "\n");
-            output.ScrollToCaret();
-        }
-
-        public void print(string text, RichTextBox output, Color color)
-        {
-            if (output.InvokeRequired)
-            {
-                output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n", color)));
-                output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
-                return;
-            }
-
-            output.AppendText(text + "\n", color);
-            output.ScrollToCaret();
-        }
-
-        public void printToLog(string text)
-        {
-            Log.AppendText(text + "\n", NColorToColor(TagColor));
-            Log.ScrollToCaret();
-        }
-
-        public void printToLog(string text, Color color)
-        {
-            Log.AppendText(text + "\n", color);
-            Log.ScrollToCaret();
-        }
-
-        #endregion
-
-        private void ChangeConnectionInputState(bool state)
-        {
-            IPBox.Invoke(new MethodInvoker(() => IPBox.Enabled = state));
-            nameBox.Invoke(new MethodInvoker(() => nameBox.Enabled = state));
-            if (state)
-            {
-                connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Connect"; }));
-            }
-            else
-            {
-                connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Disconnect"; }));
-            }
-        }
 
         private void FixClient()
         {
@@ -110,8 +55,63 @@ namespace Client
             return TagColor;
         }
 
+        #region Print Methods
+
+        public void print(string text, RichTextBox output)
+        {
+            if (output.InvokeRequired)
+            {
+                output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n")));
+                output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
+                return;
+            }
+
+            output.AppendText(text + "\n");
+            output.ScrollToCaret();
+        }
+
+        public void print(string text, RichTextBox output, Color color)
+        {
+            if (output.InvokeRequired)
+            {
+                output.Invoke(new MethodInvoker(() => output.AppendText(text + "\n", color)));
+                output.Invoke(new MethodInvoker(() => output.ScrollToCaret()));
+                return;
+            }
+
+            output.AppendText(text + "\n", color);
+            output.ScrollToCaret();
+        }
+
+        public void printToLog(string text)
+        {
+            Log.AppendText(text + "\n", NColorToColor(TagColor));
+            Log.ScrollToCaret();
+        }
+
+        public void printToLog(string text, Color color)
+        {
+            Log.AppendText(text + "\n", color);
+            Log.ScrollToCaret();
+        }
+
+        #endregion
+
         #region UI Update Handlers
 
+        private void ChangeConnectionInputState(bool state)
+        {
+            IPBox.Invoke(new MethodInvoker(() => IPBox.Enabled = state));
+            nameBox.Invoke(new MethodInvoker(() => nameBox.Enabled = state));
+            if (state)
+            {
+                connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Connect"; }));
+            }
+            else
+            {
+                connectButton.Invoke(new MethodInvoker(() => { connectButton.Text = "Disconnect"; }));
+            }
+        }
         public void SetLogVisibility(bool show)
         {
             if (!show)
@@ -146,20 +146,10 @@ namespace Client
             return "Invalid Color";
         }
 
-        /*public Array RequestRooms()
-        {
-
-        }*/
-
         public void ChangeRoom(string room)
         {
             user.CreateStatus(StatusType.ChangeRoom, room);
         }
-
-        /*public string GetCurrentRoom(string room)
-		{
-			
-		}*/
 
         #endregion
     }

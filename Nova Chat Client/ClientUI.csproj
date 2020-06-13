@@ -74,12 +74,14 @@
     </Compile>
     <Compile Include="EventHandlers.cs">
       <DependentUpon>Client.cs</DependentUpon>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Client.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ClientMethods.cs">
       <DependentUpon>Client.cs</DependentUpon>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Client.Designer.cs">
       <DependentUpon>Client.cs</DependentUpon>
@@ -147,7 +149,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ChatLib\ChatLib.csproj">
+    <ProjectReference Include="..\ChatLib\ChatLib.csproj">
       <Project>{88ac8cec-e6ea-46fe-9e7e-17ac0c162064}</Project>
       <Name>ChatLib</Name>
     </ProjectReference>

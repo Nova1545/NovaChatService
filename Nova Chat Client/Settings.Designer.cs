@@ -528,8 +528,6 @@
             this.RoomSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.RoomSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.RoomSelector.FormattingEnabled = true;
-            this.RoomSelector.Items.AddRange(new object[] {
-            "Main 1"});
             this.RoomSelector.Location = new System.Drawing.Point(128, 3);
             this.RoomSelector.Name = "RoomSelector";
             this.RoomSelector.Size = new System.Drawing.Size(119, 24);
