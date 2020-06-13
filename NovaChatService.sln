@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1145
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatLib", "ChatLib\ChatLib.csproj", "{88AC8CEC-E6EA-46FE-9E7E-17AC0C162064}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidClient", "AndroidClient\AndroidClient.csproj", "{3BC0AC7E-3B3B-4D3F-9CC0-B2BDECC460A6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientUI", "Nova Chat Client\ClientUI.csproj", "{3F517993-7730-44A9-AE88-5449135A4796}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SslTesting", "SslTesting\SslTesting.csproj", "{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -209,6 +211,26 @@ Global
 		{3F517993-7730-44A9-AE88-5449135A4796}.Release|x64.Build.0 = Release|Any CPU
 		{3F517993-7730-44A9-AE88-5449135A4796}.Release|x86.ActiveCfg = Release|Any CPU
 		{3F517993-7730-44A9-AE88-5449135A4796}.Release|x86.Build.0 = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|ARM.Build.0 = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Debug|x86.Build.0 = Debug|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|ARM.ActiveCfg = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|ARM.Build.0 = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|ARM64.Build.0 = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|x64.Build.0 = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC6E7A6A-0877-4DAC-A7B6-78E12F90E548}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -57,7 +57,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Yep Development Tools, Version=1.0.0.0, Culture=neutral, PublicKeyToken=37624252e37930df, processorArchitecture=MSIL">
+    <Reference Include="Yep Development Tools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\External References\Yep Development Tools\Yep Development Tools.dll</HintPath>
     </Reference>

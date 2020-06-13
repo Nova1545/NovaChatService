@@ -55,7 +55,7 @@ namespace ChatLib.Extras
 
         public override string ToString()
         {
-            string i = $"Name: {Name} ID: {ID} UserLimit: {UserLimit} MaxBufferSize: {MaxBufferSize} Users: \n";
+            string i = $"[GUID: {GUID}] Name: {Name} ID: {ID} UserLimit: {UserLimit} MaxBufferSize: {MaxBufferSize} Users: \n";
             foreach (KeyValuePair<string, ClientInfo> client in Clients)
             {
                 i += client.ToString() + "\n";

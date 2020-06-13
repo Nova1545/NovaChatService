@@ -15,6 +15,10 @@ using System.Reflection;
 using Microsoft.CSharp.RuntimeBinder;
 using System.Diagnostics;
 using System.Xml;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Authentication;
+using System.Net.WebSockets;
 
 namespace Server
 {
@@ -40,14 +44,19 @@ namespace Server
 
         enum ListenerState { Waiting, Accepting, Connected, Disconnected, Handshaking, UsernameSub, Quiting };
 
+        static X509Certificate2 X509 = null;
+
         static void Main(string[] args)
         {
+            X509 = new X509Certificate2(@"C:\Users\aiden\OneDrive\Desktop\sslforfree\certificateChat.pfx", "");
+
             clients = new Dictionary<string, ClientInfo>();
             Rooms = new Dictionary<string, Room>();
 
             Room m = new Room("Main", 0);
             Rooms[m.GUID] = m;
             m = new Room("Extra", 1);
+            Rooms[m.GUID] = m;
 
             #region Config loading code
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -285,6 +294,9 @@ namespace Server
                 desktop.Start();
             }
 
+            string json = Rooms.SerializeRooms();
+            Rooms = json.DeserializeRooms();
+
             Console.WriteLine("Type quit to stop server or help for a list of commands");
             while (true)
             {
@@ -312,6 +324,15 @@ namespace Server
                         Console.WriteLine("Desktop: ");
                         Console.WriteLine("State -> " + DesktopState.ToString());
                         Console.WriteLine("Status -> " + desktop.ThreadState.ToString());
+                    }
+
+                    if(command[1] == "rooms")
+                    {
+                        Console.WriteLine("Rooms:");
+                        foreach (KeyValuePair<string, Room> room in Rooms)
+                        {
+                            Console.WriteLine(room.Value.ToString());
+                        }
                     }
                 }
                 else if(command[0] == "restart")
@@ -391,8 +412,8 @@ namespace Server
                 TcpClient client = server.AcceptTcpClient();
                 state = ListenerState.Accepting;
 
-                //SslStream ssl = new SslStream(client.GetStream(), false);
-                //ssl.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
+                //SslStream stream = new SslStream(client.GetStream(), true);
+                //stream.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
 
                 while (client.Available < 3)
                 {
@@ -556,7 +577,7 @@ namespace Server
 
             Message rooms = new Message("Server", MessageType.Request);
             rooms.SetRequestType(RequestType.Rooms);
-            rooms.SetContent(Rooms.Serialize());
+            rooms.SetContent(Rooms.SerializeRooms());
             MessageHelpers.SetMessage(stream, rooms);
 
             // Send The Server Message Buffer
@@ -789,7 +810,7 @@ namespace Server
 
             JsonMessage rooms = new JsonMessage("Server", MessageType.Request);
             rooms.SetRequestType(RequestType.Rooms);
-            rooms.SetContent(Rooms.Serialize());
+            rooms.SetContent(Rooms.SerializeRooms());
 
             JsonMessageHelpers.SetJsonMessage(stream, rooms);
 
