@@ -39,7 +39,7 @@ namespace SslTesting
                 }
 
                 //JsonMessageHelpers.HandleHandshake(client.GetStream(), client.Available);
-                HandleHandshake(stream, client.Available);
+                HandleHandshake(stream);
                 Run(stream, client);
             }
         }
@@ -52,7 +52,7 @@ namespace SslTesting
                 {
                     continue;
                 }
-                JsonMessage message = GetJsonMessage(stream, client.Available);
+                JsonMessage message = GetJsonMessage(stream);
                 Console.WriteLine(message.Content);
                 message.SetName("Server");
                 message.SetColor(NColor.FromRGB(0, 255, 245));
@@ -60,13 +60,13 @@ namespace SslTesting
             }
         }
 
-        public static void HandleHandshake(SslStream stream, int length)
+        public static void HandleHandshake(SslStream stream)
         {
             byte[] buffer = new byte[1024];
 
             int total = 0;
             MemoryStream ms = new MemoryStream();
-            while (total < length)
+            while (true)
             {
                 int read = stream.Read(buffer, 0, buffer.Length);
                 total += read;
@@ -111,28 +111,33 @@ namespace SslTesting
             stream.Flush();
         }
 
-        public static JsonMessage GetJsonMessage(SslStream stream, int length)
+        public static JsonMessage GetJsonMessage(SslStream stream)
         {
             byte[] buffer = new byte[1024];
 
-            Console.WriteLine(length);
             int total = 0;
             MemoryStream ms = new MemoryStream();
-            while (total < length)
+            while (true)
             {
                 int read;
                 read = stream.Read(buffer, 0, buffer.Length);
                 total += read;
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine(total);
                 ms.Write(buffer, 0, read);
+                try
+                {
+                    string data = Decode(ms.ToArray());
+                    if (data.IndexOf("\r\n\r\n") != -1)
+                    {
+                        break;
+                    }
+                }
+                catch { }
             }
+            return JsonSerialization.Deserialize(Decode(ms.ToArray()));
+        }
 
-            Console.ForegroundColor = ConsoleColor.White;
-
-            byte[] bytes = ms.ToArray();
-            Console.WriteLine(bytes.Length);
-
+        public static string Decode(byte[] bytes)
+        {
             bool fin = (bytes[0] & 0b10000000) != 0,
                         mask = (bytes[1] & 0b10000000) != 0; // must be true, "All messages from the client to the server have this bit set"
 
@@ -168,8 +173,7 @@ namespace SslTesting
                 for (int i = 0; i < msglen; ++i)
                     decoded[i] = (byte)(bytes[offset + i] ^ masks[i % 4]);
 
-                string json = Encoding.UTF8.GetString(decoded);
-                return JsonSerialization.Deserialize(json);
+                return Encoding.UTF8.GetString(decoded);
             }
             else
             {

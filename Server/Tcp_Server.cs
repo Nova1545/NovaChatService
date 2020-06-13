@@ -48,8 +48,6 @@ namespace Server
 
         static void Main(string[] args)
         {
-            X509 = new X509Certificate2(@"C:\Users\aiden\OneDrive\Desktop\sslforfree\certificateChat.pfx", "");
-
             clients = new Dictionary<string, ClientInfo>();
             Rooms = new Dictionary<string, Room>();
 
@@ -162,6 +160,27 @@ namespace Server
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Failed to read active states");
             }
+            string sslPath = settings.SelectSingleNode("Config/GeneralSettings/PfxCertificate").InnerText;
+            if(sslPath != "")
+            {
+                try
+                {
+                    X509 = new X509Certificate2(sslPath, settings.SelectSingleNode("Config/GeneralSettings/PfxCertificate").Attributes[0].InnerText);
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("Loaded Pfx Certificate, starting ssl");
+                }
+                catch
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Failed to load Pfx Certificate, reverting to non-ssl");
+                }
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("No Pfx Certificate provided, reverting to non-ssl");
+            }
+
             if (Rooms.Count == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -431,7 +450,7 @@ namespace Server
 
                 //JsonMessageHelpers.HandleHandshake(client.GetStream(), client.Available);
                 NetworkStream stream = client.GetStream();
-                JsonMessageHelpers.HandleHandshake(stream, client.Available);
+                JsonMessageHelpers.HandleHandshake(stream);
 
                 state = ListenerState.UsernameSub;
                 while (client.Available < 3)
@@ -447,7 +466,7 @@ namespace Server
                     break;
                 }
 
-                JsonMessage json = JsonMessageHelpers.GetJsonMessage(stream, client.Available);
+                JsonMessage json = JsonMessageHelpers.GetJsonMessage(stream);
 
                 if (json.MessageType == MessageType.Initionalize && clients.Any(x => x.Value.Name == json.Name) == false)
                 {
@@ -825,7 +844,7 @@ namespace Server
                         continue;
                     }
 
-                    JsonMessage m = JsonMessageHelpers.GetJsonMessage(stream, client.Available);
+                    JsonMessage m = JsonMessageHelpers.GetJsonMessage(stream);
                     foreach (dynamic b in Bots)
                     {
                         m = b.OnJsonMessage(c, m);

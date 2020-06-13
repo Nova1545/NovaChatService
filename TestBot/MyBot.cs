@@ -21,7 +21,7 @@ namespace TestBot
         {
             this.handler = handler;
             command = new CommandHandler("/", ' ');
-            command.CreateCommand("hello", Hello);
+            command.CreateCommand("send", Hello);
         }
 
         public Message OnMessage(ClientInfo sender, Message message)
@@ -38,9 +38,8 @@ namespace TestBot
 
         public void Hello(string[] parameters, ClientInfo sender)
         {
-            Message m = new Message("Server", MessageType.Message);
-            m.SetContent("Hello " + sender.Name);
-            handler.TRequestClients().SendToAll(m, new List<ClientInfo>());
+            ClientInfo endpoint = handler.TRequestClients().First(x => x.Value.Name == parameters[1]).Value;
+            
         }
 
         public void OnUserChangeRoom(ClientInfo client, Room oldRoom, Room newRoom)
