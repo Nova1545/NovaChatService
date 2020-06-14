@@ -17,6 +17,8 @@ namespace ChatLib
         public string Name { get; private set; }
         public bool AutoSend { get; private set; }
         public NetworkStream Stream { get; private set; }
+        public SslStream SStream { get; private set; }
+        public bool IsSecure { get; private set; }
 
         // Message Received Callbacks
         public delegate void OnMessageAnyReceived(Message message);
@@ -54,14 +56,32 @@ namespace ChatLib
             AutoSend = autoSend;
             Stream = stream;
             Active = true;
+            IsSecure = false;
             ThreadPool.QueueUserWorkItem(Listen, Stream);
+        }
+
+        public User(string name, SslStream sstream, bool autoSend = true)
+        {
+            Name = name;
+            AutoSend = autoSend;
+            SStream = sstream;
+            Active = true;
+            IsSecure = true;
+            ThreadPool.QueueUserWorkItem(Listen, SStream);
         }
 
         public bool Send()
         {
             if (m != null)
             {
-                MessageHelpers.SetMessage(Stream, m);
+                if (IsSecure)
+                {
+                    MessageHelpers.SetMessage(SStream, m);
+                }
+                else
+                {
+                    MessageHelpers.SetMessage(Stream, m);
+                }
                 m = null;
                 return true;
             }
@@ -78,7 +98,14 @@ namespace ChatLib
             m.SetColor(color);
             if (AutoSend)
             {
-                MessageHelpers.SetMessage(Stream, m);
+                if (IsSecure)
+                {
+                    MessageHelpers.SetMessage(SStream, m);
+                }
+                else
+                {
+                    MessageHelpers.SetMessage(Stream, m);
+                }
                 m = null;
             }
         }
@@ -90,7 +117,14 @@ namespace ChatLib
             m.SetColor(color);
             if (AutoSend)
             {
-                MessageHelpers.SetMessage(Stream, m);
+                if (IsSecure)
+                {
+                    MessageHelpers.SetMessage(SStream, m);
+                }
+                else
+                {
+                    MessageHelpers.SetMessage(Stream, m);
+                }
                 m = null;
             }
         }
@@ -103,7 +137,14 @@ namespace ChatLib
             m.SetColor(color);
             if (AutoSend)
             {
-                MessageHelpers.SetMessage(Stream, m);
+                if (IsSecure)
+                {
+                    MessageHelpers.SetMessage(SStream, m);
+                }
+                else
+                {
+                    MessageHelpers.SetMessage(Stream, m);
+                }
                 m = null;
             }
         }
@@ -115,14 +156,28 @@ namespace ChatLib
             m.SetContent(content);
             if (AutoSend)
             {
-                MessageHelpers.SetMessage(Stream, m);
+                if (IsSecure)
+                {
+                    MessageHelpers.SetMessage(SStream, m);
+                }
+                else
+                {
+                    MessageHelpers.SetMessage(Stream, m);
+                }
                 m = null;
             }
         }
 
         public void ForwardMessage(Message m)
         {
-            MessageHelpers.SetMessage(Stream, m);
+            if (IsSecure)
+            {
+                MessageHelpers.SetMessage(SStream, m);
+            }
+            else
+            {
+                MessageHelpers.SetMessage(Stream, m);
+            }
         }
 
         public void CreateInformation(InfomationType infomationType)
@@ -131,54 +186,110 @@ namespace ChatLib
             m.SetInformationType(infomationType);
             if (AutoSend)
             {
-                MessageHelpers.SetMessage(Stream, m);
+                if (IsSecure)
+                {
+                    MessageHelpers.SetMessage(SStream, m);
+                }
+                else
+                {
+                    MessageHelpers.SetMessage(Stream, m);
+                }
                 m = null;
             }
         }
 
         public void Init()
         {
-            MessageHelpers.SetMessage(Stream, new Message(Name, MessageType.Initionalize));
+            if (IsSecure)
+            {
+                MessageHelpers.SetMessage(SStream, new Message(Name, MessageType.Initionalize));
+            }
+            else
+            {
+                MessageHelpers.SetMessage(Stream, new Message(Name, MessageType.Initionalize));
+            }
         }
 
         public void Close()
         {
             Active = false;
-            Stream.Close();
-            Stream.Dispose();
+            if (IsSecure)
+            {
+                SStream.Close();
+                SStream.Dispose();
+            }
+            else
+            {
+                Stream.Close();
+                Stream.Dispose();
+            }
         }
 
         private void Listen(object stream)
         {
             try
             {
-                NetworkStream nStream = (NetworkStream)stream;
-                while (Active)
+                if (IsSecure)
                 {
-                    Message m = MessageHelpers.GetMessage(nStream);
-                    Console.WriteLine(m.MessageType);
-                    switch (m.MessageType)
+                    while (Active)
                     {
-                        case MessageType.Message:
-                            OnMessageReceivedCallback?.Invoke(m);
-                            break;
-                        case MessageType.Status:
-                            OnMessageStatusReceivedCallback?.Invoke(m);
-                            break;
-                        case MessageType.Transfer:
-                            OnMessageTransferReceivedCallback?.Invoke(m);
-                            break;
-                        case MessageType.Whisper:
-                            OnMessageWhisperReceivedCallback?.Invoke(m);
-                            break;
-                        case MessageType.Initionalize:
-                            OnMessageInitReceivedCallback?.Invoke(m);
-                            break;
-                        case MessageType.Infomation:
-                            OnMesssageInformationReceivedCallback?.Invoke(m);
-                            break;
+                        SslStream nStream = (SslStream)stream;
+                        Message m = MessageHelpers.GetMessage(nStream);
+                        Console.WriteLine(m.MessageType);
+                        switch (m.MessageType)
+                        {
+                            case MessageType.Message:
+                                OnMessageReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Status:
+                                OnMessageStatusReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Transfer:
+                                OnMessageTransferReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Whisper:
+                                OnMessageWhisperReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Initionalize:
+                                OnMessageInitReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Infomation:
+                                OnMesssageInformationReceivedCallback?.Invoke(m);
+                                break;
+                        }
+                        OnMessageAnyReceivedCallback?.Invoke(m);
                     }
-                    OnMessageAnyReceivedCallback?.Invoke(m);
+                }
+                else
+                {
+                    NetworkStream nStream = (NetworkStream)stream;
+                    while (Active)
+                    {
+                        Message m = MessageHelpers.GetMessage(nStream);
+                        Console.WriteLine(m.MessageType);
+                        switch (m.MessageType)
+                        {
+                            case MessageType.Message:
+                                OnMessageReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Status:
+                                OnMessageStatusReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Transfer:
+                                OnMessageTransferReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Whisper:
+                                OnMessageWhisperReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Initionalize:
+                                OnMessageInitReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Infomation:
+                                OnMesssageInformationReceivedCallback?.Invoke(m);
+                                break;
+                        }
+                        OnMessageAnyReceivedCallback?.Invoke(m);
+                    }
                 }
             }
             catch (Exception e)

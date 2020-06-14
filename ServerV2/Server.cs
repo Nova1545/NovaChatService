@@ -46,6 +46,7 @@ namespace ServerV2
             BanList = new List<IPAddress>();
 
             LoadConfig();
+            Console.WriteLine(X509.SubjectName.Name.Replace("CN=", ""));
 
             if (WebActive)
             {
@@ -139,72 +140,34 @@ namespace ServerV2
             TcpClient client = WebServer.EndAcceptTcpClient(ar);
             WebServer.BeginAcceptTcpClient(new AsyncCallback(OnWebAccept), WebServer);
 
-            IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
-            if (BanList.Contains(addr))
+            try
             {
-                client.GetStream().Close();
-                return;
-            }
-
-            if (X509 == null)
-            {
-                NetworkStream stream = client.GetStream();
-                JsonMessageHelpers.HandleHandshake(stream);
-
-                JsonMessage json = JsonMessageHelpers.GetJsonMessage(stream);
-
-                if (json.Content != sPassword)
+                IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                if (BanList.Contains(addr))
                 {
-                    JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
-                    h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("Incorrect Password");
-                    JsonMessageHelpers.SetJsonMessage(stream, h);
-                    stream.Close();
-                    stream.Dispose();
-                    client.Close();
-                    client.Dispose();
+                    client.GetStream().Close();
                     return;
                 }
 
-                if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                if (X509 == null)
                 {
-                    ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
-                    Clients.Add(c.GUID, c);
-                    ThreadPool.QueueUserWorkItem(WebWorker, c);
-                }
-                else
-                {
-                    JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
-                    h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("User with the name " + json.Name + " already exsists");
-                    JsonMessageHelpers.SetJsonMessage(stream, h);
-                    stream.Close();
-                    stream.Dispose();
-                    client.Close();
-                    client.Dispose();
-                }
-            }
-            else
-            {
-                SslStream stream = new SslStream(client.GetStream());
-                stream.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
+                    NetworkStream stream = client.GetStream();
+                    JsonMessageHelpers.HandleHandshake(stream);
 
-                JsonMessageHelpers.HandleHandshake(stream);
+                    JsonMessage json = JsonMessageHelpers.GetJsonMessage(stream);
 
-                JsonMessage json = JsonMessageHelpers.GetJsonMessage(stream);
-                if (json.Content != sPassword)
-                {
-                    JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
-                    h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("Incorrect Password");
-                    JsonMessageHelpers.SetJsonMessage(stream, h);
-                    stream.Close();
-                    stream.Dispose();
-                    client.Close();
-                    client.Dispose();
-                }
-                else
-                {
+                    if (json.Content != sPassword)
+                    {
+                        JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
+                        h.SetStatusType(StatusType.ErrorDisconnect);
+                        h.SetContent("Incorrect Password");
+                        JsonMessageHelpers.SetJsonMessage(stream, h);
+                        stream.Close();
+                        stream.Dispose();
+                        client.Close();
+                        client.Dispose();
+                        return;
+                    }
 
                     if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
                     {
@@ -224,6 +187,52 @@ namespace ServerV2
                         client.Dispose();
                     }
                 }
+                else
+                {
+                    SslStream stream = new SslStream(client.GetStream());
+                    stream.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
+
+                    JsonMessageHelpers.HandleHandshake(stream);
+
+                    JsonMessage json = JsonMessageHelpers.GetJsonMessage(stream);
+                    if (json.Content != sPassword)
+                    {
+                        JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
+                        h.SetStatusType(StatusType.ErrorDisconnect);
+                        h.SetContent("Incorrect Password");
+                        JsonMessageHelpers.SetJsonMessage(stream, h);
+                        stream.Close();
+                        stream.Dispose();
+                        client.Close();
+                        client.Dispose();
+                    }
+                    else
+                    {
+
+                        if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                        {
+                            ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
+                            Clients.Add(c.GUID, c);
+                            ThreadPool.QueueUserWorkItem(WebWorker, c);
+                        }
+                        else
+                        {
+                            JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
+                            h.SetStatusType(StatusType.ErrorDisconnect);
+                            h.SetContent("User with the name " + json.Name + " already exsists");
+                            JsonMessageHelpers.SetJsonMessage(stream, h);
+                            stream.Close();
+                            stream.Dispose();
+                            client.Close();
+                            client.Dispose();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                client.GetStream().Close();
+                return;
             }
         }
 
@@ -233,86 +242,114 @@ namespace ServerV2
             TcpClient client = DesktopServer.EndAcceptTcpClient(ar);
             DesktopServer.BeginAcceptTcpClient(new AsyncCallback(OnDesktopAccept), DesktopServer);
 
-            IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
-            if (BanList.Contains(addr))
+            try
             {
+
+                IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                if (BanList.Contains(addr))
+                {
+                    client.GetStream().Close();
+                    return;
+                }
+
+                if (X509 == null)
+                {
+                    NetworkStream stream = client.GetStream();
+
+                    Message secure = new Message("Server", MessageType.Initionalize);
+                    secure.SetContent("");
+                    MessageHelpers.SetMessage(stream, secure);
+
+                    Message json = MessageHelpers.GetMessage(stream);
+                    if (json.Content != sPassword)
+                    {
+                        Message h = new Message(json.Name, MessageType.Status);
+                        h.SetStatusType(StatusType.ErrorDisconnect);
+                        h.SetContent("Incorrect Password");
+                        MessageHelpers.SetMessage(stream, h);
+                        stream.Close();
+                        stream.Dispose();
+                        client.Close();
+                        client.Dispose();
+                        return;
+                    }
+
+                    if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                    {
+                        ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
+                        Clients.Add(c.GUID, c);
+                        ThreadPool.QueueUserWorkItem(DesktopWorker, c.GUID);
+                    }
+                    else
+                    {
+                        Message h = new Message(json.Name, MessageType.Status);
+                        h.SetStatusType(StatusType.ErrorDisconnect);
+                        h.SetContent("User with the name " + json.Name + " already exsists");
+                        MessageHelpers.SetMessage(stream, h);
+                        stream.Close();
+                        stream.Dispose();
+                        client.Close();
+                        client.Dispose();
+                    }
+                }
+                else
+                {
+                    //Message secure = new Message("Server", MessageType.Initionalize);
+                    //secure.SetContent(X509.SubjectName.Name.Replace("CN=", ""));
+                    //MessageHelpers.SetMessage(client.GetStream(), secure);
+                    //Console.WriteLine("Sent secure status");
+
+                    SslStream stream = new SslStream(client.GetStream());
+                    stream.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
+
+                    Message json = MessageHelpers.GetMessage(stream);
+                    if (json.Content != sPassword)
+                    {
+                        Message h = new Message(json.Name, MessageType.Status);
+                        h.SetStatusType(StatusType.ErrorDisconnect);
+                        h.SetContent("Incorrect Password");
+                        MessageHelpers.SetMessage(stream, h);
+                        stream.Close();
+                        stream.Dispose();
+                        client.Close();
+                        client.Dispose();
+                        return;
+                    }
+
+                    if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                    {
+                        ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
+                        Clients.Add(c.GUID, c);
+                        ThreadPool.QueueUserWorkItem(DesktopWorker, c.GUID);
+                        Console.WriteLine("Starting worker");
+                    }
+                    else
+                    {
+                        Message h = new Message(json.Name, MessageType.Status);
+                        h.SetStatusType(StatusType.ErrorDisconnect);
+                        h.SetContent("User with the name " + json.Name + " already exsists");
+                        MessageHelpers.SetMessage(stream, h);
+                        stream.Close();
+                        stream.Dispose();
+                        client.Close();
+                        client.Dispose();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + " in " + e.TargetSite + " at line " + GetLineNumber(e).ToString());
                 client.GetStream().Close();
                 return;
             }
+        }
 
-            if (X509 == null)
-            {
-                NetworkStream stream = client.GetStream();
-
-                Message json = MessageHelpers.GetMessage(stream);
-                if (json.Content != sPassword)
-                {
-                    Message h = new Message(json.Name, MessageType.Status);
-                    h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("Incorrect Password");
-                    MessageHelpers.SetMessage(stream, h);
-                    stream.Close();
-                    stream.Dispose();
-                    client.Close();
-                    client.Dispose();
-                    return;
-                }
-
-                if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
-                {
-                    ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
-                    Clients.Add(c.GUID, c);
-                    ThreadPool.QueueUserWorkItem(DesktopWorker, c.GUID);
-                }
-                else
-                {
-                    Message h = new Message(json.Name, MessageType.Status);
-                    h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("User with the name " + json.Name + " already exsists");
-                    MessageHelpers.SetMessage(stream, h);
-                    stream.Close();
-                    stream.Dispose();
-                    client.Close();
-                    client.Dispose();
-                }
-            }
-            else
-            {
-                SslStream stream = new SslStream(client.GetStream());
-                stream.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
-
-                Message json = MessageHelpers.GetMessage(stream);
-                if (json.Content != sPassword)
-                {
-                    Message h = new Message(json.Name, MessageType.Status);
-                    h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("Incorrect Password");
-                    MessageHelpers.SetMessage(stream, h);
-                    stream.Close();
-                    stream.Dispose();
-                    client.Close();
-                    client.Dispose();
-                    return;
-                }
-
-                if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
-                {
-                    ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
-                    Clients.Add(c.GUID, c);
-                    ThreadPool.QueueUserWorkItem(DesktopWorker, c.GUID);
-                }
-                else
-                {
-                    Message h = new Message(json.Name, MessageType.Status);
-                    h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("User with the name " + json.Name + " already exsists");
-                    MessageHelpers.SetMessage(stream, h);
-                    stream.Close();
-                    stream.Dispose();
-                    client.Close();
-                    client.Dispose();
-                }
-            }
+        // Line Getter
+        static int GetLineNumber(Exception e)
+        {
+            var st = new StackTrace(e, true);
+            var frame = st.GetFrame(0);
+            return frame.GetFileLineNumber();
         }
 
         // Workers to handle incoming/outgoing data
@@ -329,7 +366,7 @@ namespace ServerV2
 
             JsonMessage connect = new JsonMessage(client.Name, MessageType.Status);
             connect.SetStatusType(StatusType.Connected);
-            SendJsonMessage(client, connect);
+            SendToAll(client, connect);
 
             if (!r.AddUser(client))
             {
@@ -375,6 +412,9 @@ namespace ServerV2
                 try
                 {
                     JsonMessage m = client.IsSecure ? JsonMessageHelpers.GetJsonMessage(client.SStream) : JsonMessageHelpers.GetJsonMessage(client.Stream);
+
+                    m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
+
 
                     if (m.Name != client.Name)
                     {
@@ -500,7 +540,7 @@ namespace ServerV2
 
             Message connect = new Message(client.Name, MessageType.Status);
             connect.SetStatusType(StatusType.Connected);
-            SendMessage(client, connect);
+            SendToAll(client, connect);
 
             if (!r.AddUser(client))
             {
@@ -546,6 +586,8 @@ namespace ServerV2
                 try
                 {
                     JsonMessage m = client.IsSecure ? JsonMessageHelpers.GetJsonMessage(client.SStream) : JsonMessageHelpers.GetJsonMessage(client.Stream);
+
+                    m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
 
                     if (m.Name != client.Name)
                     {

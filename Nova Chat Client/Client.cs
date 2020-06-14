@@ -5,7 +5,9 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
 using Yep_Development_Tools;
@@ -162,12 +164,20 @@ namespace Client
                     print("Connecting... ", Log);
                     tcpClient = new TcpClient(IPBox.Text, 8910);
 
-                    //SslStream ssl = new SslStream(tcpClient.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
-                    //ssl.AuthenticateAsClient("novastudios.tk");
-
-                    // Send name
-                    user = new User(nameBox.Text, tcpClient.GetStream());
-                    user.Init();
+                    //ChatLib.Message secure = MessageHelpers.GetMessage(tcpClient.GetStream());
+                    //if(secure.Content != "")
+                    //{
+                        print("Connecting... Secure!", Log);
+                        SslStream ssl = new SslStream(tcpClient.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
+                        ssl.AuthenticateAsClient("ftp.novastudios.tk");
+                        user = new User(nameBox.Text, ssl);
+                        user.Init();
+                    /*}
+                    else
+                    {
+                        user = new User(nameBox.Text, tcpClient.GetStream());
+                        user.Init();
+                    }*/
 
                     // Setup Callbacks
                     user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
@@ -249,6 +259,17 @@ namespace Client
         {
             print(message.Name + ": " + message.Content, Chat, NColorToColor(message.Color));
             notifications.ShowNotification(message.Name, message.Content);
+        }
+
+        public static bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            if (sslPolicyErrors == SslPolicyErrors.None)
+                return true;
+
+            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+
+            // Do not allow this client to communicate with unauthenticated servers.
+            return false;
         }
     }
 }

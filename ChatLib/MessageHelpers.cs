@@ -16,22 +16,15 @@ namespace ChatLib.Extras
             int dataLen = BitConverter.ToInt32(len, 0);
             byte[] bytes = new byte[dataLen];
             byte[] buffer = new byte[1024];
-            if (dataLen > 1024)
+            MemoryStream ms = new MemoryStream();
+            int total = 0;
+            while(total < dataLen)
             {
-                MemoryStream ms = new MemoryStream();
-                int total = 0;
-                while(total < dataLen)
-                {
-                    int readcount = stream.Read(buffer, 0, buffer.Length);
-                    total += readcount;
-                    ms.Write(buffer, 0, readcount);
-                }
-                bytes = ms.ToArray();
+                int readcount = stream.Read(buffer, 0, buffer.Length);
+                total += readcount;
+                ms.Write(buffer, 0, readcount);
             }
-            else
-            {
-                stream.Read(bytes, 0, bytes.Length);
-            }
+            bytes = ms.ToArray();
             return (Message)new BinaryFormatter().Deserialize(new MemoryStream(bytes));
         }
 
@@ -54,7 +47,7 @@ namespace ChatLib.Extras
             MemoryStream ms = new MemoryStream();
             new BinaryFormatter().Serialize(ms, message);
             byte[] dataBytes = ms.ToArray();
-            byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
+            byte[] dataLen = BitConverter.GetBytes(dataBytes.Length);
             try
             {
                 stream.Write(dataLen, 0, 4);
@@ -70,22 +63,15 @@ namespace ChatLib.Extras
             int dataLen = BitConverter.ToInt32(len, 0);
             byte[] bytes = new byte[dataLen];
             byte[] buffer = new byte[1024];
-            if (dataLen > 1024)
+            MemoryStream ms = new MemoryStream();
+            int total = 0;
+            while (total < dataLen)
             {
-                MemoryStream ms = new MemoryStream();
-                int total = 0;
-                while (total < dataLen)
-                {
-                    int readcount = stream.Read(buffer, 0, buffer.Length);
-                    total += readcount;
-                    ms.Write(buffer, 0, readcount);
-                }
-                bytes = ms.ToArray();
+                int readcount = stream.Read(buffer, 0, buffer.Length);
+                total += readcount;
+                ms.Write(buffer, 0, readcount);
             }
-            else
-            {
-                stream.Read(bytes, 0, bytes.Length);
-            }
+            bytes = ms.ToArray();
             return (Message)new BinaryFormatter().Deserialize(new MemoryStream(bytes));
         }
 
@@ -94,7 +80,11 @@ namespace ChatLib.Extras
             MemoryStream ms = new MemoryStream();
             new BinaryFormatter().Serialize(ms, message);
             byte[] dataBytes = ms.ToArray();
-            byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
+            foreach (byte b in ms.ToArray())
+            {
+                Console.Write(b + "-");
+            }
+            byte[] dataLen = BitConverter.GetBytes(dataBytes.Length);
             try
             {
                 stream.Write(dataLen, 0, 4);
