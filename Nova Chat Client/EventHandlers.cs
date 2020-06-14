@@ -1,10 +1,12 @@
-﻿using ChatLib.DataStates;
+﻿using ChatLib;
+using ChatLib.DataStates;
 using ChatLib.Extras;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
@@ -27,6 +29,27 @@ namespace Client
 
         #endregion
 
+        private void crashServerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Thread t = new Thread(delegate ()
+            {
+                try
+                {
+                    print("Attempting to crash server... ", Log);
+                    tcpClient = new TcpClient(IPBox.Text, 8910);
+
+                    user = new User("Crash", tcpClient.GetStream());
+                    user.Init();
+                }
+                catch (Exception ex)
+                {
+                    print(ex.Message, Log, Color.Red);
+                }
+            });
+
+            t.IsBackground = true;
+            t.Start();
+        }
 
         private void chatBox_KeyDown(object sender, KeyEventArgs e)
         {
@@ -265,7 +288,7 @@ namespace Client
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
             {
-                notifications.SetNotificationStyle((NotificationManager.NotificationType)RegOps.GetSettingFromDict("NotificationStyle", settings));
+                //notifications.SetNotificationStyle((NotificationManager.NotificationType)RegOps.GetSettingFromDict("NotificationStyle", settings));
             }
         }
 

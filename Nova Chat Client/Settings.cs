@@ -46,9 +46,18 @@ namespace Client
 
             RoomSelector.Items.Clear();
 
-            if (parent.IsConnected())
+            try
             {
-                RoomSelector.Items.Add(parent.Rooms);
+
+                if (parent.IsConnected())
+                {
+                    RoomSelector.Items.Add(parent.Rooms);
+                }
+
+            }
+            catch
+            {
+
             }
 
             if (bool.Parse(RegOps.GetSettingFromDict("ShowLog", settings).ToString()))
