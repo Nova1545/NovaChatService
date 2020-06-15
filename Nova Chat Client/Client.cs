@@ -43,7 +43,7 @@ namespace Client
                     debug = true;
                 }
             }
-
+d
             InitializeComponent();
             print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.\n" +
                 "Press 'Delete' when focused in this box to clear it, or use the 'Clear History' button in the menu.", Chat);
