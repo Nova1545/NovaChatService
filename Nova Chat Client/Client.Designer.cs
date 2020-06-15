@@ -60,8 +60,9 @@ namespace Client
             this.killAllInstancesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startServerInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.crashServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.sendToastToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -351,7 +352,8 @@ namespace Client
             this.startAnotherInstanceToolStripMenuItem,
             this.killAllInstancesToolStripMenuItem,
             this.startServerInstanceToolStripMenuItem,
-            this.crashServerToolStripMenuItem});
+            this.crashServerToolStripMenuItem,
+            this.sendToastToolStripMenuItem});
             this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
             this.debugToolStripMenuItem.Size = new System.Drawing.Size(68, 24);
             this.debugToolStripMenuItem.Text = "Debug";
@@ -387,18 +389,25 @@ namespace Client
             this.setPathToolStripMenuItem.Text = "Set Path";
             this.setPathToolStripMenuItem.Click += new System.EventHandler(this.setPathToolStripMenuItem_Click);
             // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.Filter = "Images|*.jpg;*.png;*.bmp";
-            this.openFileDialog1.InitialDirectory = "C:\\Users\\aiden\\OneDrive\\Pictures";
-            this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
-            // 
             // crashServerToolStripMenuItem
             // 
             this.crashServerToolStripMenuItem.Name = "crashServerToolStripMenuItem";
             this.crashServerToolStripMenuItem.Size = new System.Drawing.Size(238, 26);
             this.crashServerToolStripMenuItem.Text = "Crash Server";
             this.crashServerToolStripMenuItem.Click += new System.EventHandler(this.crashServerToolStripMenuItem_Click);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.Filter = "Images|*.jpg;*.png;*.bmp";
+            this.openFileDialog1.InitialDirectory = "C:\\Users\\aiden\\OneDrive\\Pictures";
+            this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
+            // 
+            // sendToastToolStripMenuItem
+            // 
+            this.sendToastToolStripMenuItem.Name = "sendToastToolStripMenuItem";
+            this.sendToastToolStripMenuItem.Size = new System.Drawing.Size(238, 26);
+            this.sendToastToolStripMenuItem.Text = "Send Toast";
+            this.sendToastToolStripMenuItem.Click += new System.EventHandler(this.sendToastToolStripMenuItem_Click);
             // 
             // Tcp_Client
             // 
@@ -461,5 +470,6 @@ namespace Client
         private System.Windows.Forms.ToolStripMenuItem killAllInstancesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setPathToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem crashServerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sendToastToolStripMenuItem;
     }
 }

@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Client
 {
-	/// <summary>
-	/// Provides a dictionary for use with data binding.
-	/// </summary>
-	/// <typeparam name="TKey">Specifies the type of the keys in this collection.</typeparam>
-	/// <typeparam name="TValue">Specifies the type of the values in this collection.</typeparam>
-	[DebuggerDisplay("Count={Count}")]
+    /// <summary>
+    /// Provides a dictionary for use with data binding.
+    /// </summary>
+    /// <typeparam name="TKey">Specifies the type of the keys in this collection.</typeparam>
+    /// <typeparam name="TValue">Specifies the type of the values in this collection.</typeparam>
+    [DebuggerDisplay("Count={Count}")]
 	public class ObservableDictionary<TKey, TValue> :
 		ICollection<KeyValuePair<TKey, TValue>>, IDictionary<TKey, TValue>,
 		INotifyCollectionChanged, INotifyPropertyChanged

@@ -4,13 +4,12 @@ using ChatLib.Extras;
 using System;
 using System.Drawing;
 using System.IO;
-using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
-using Yep_Development_Tools;
+using static Client.EmbeddedYepDevelopmentTools;
 
 namespace Client
 {
@@ -139,7 +138,7 @@ namespace Client
             {
                 if (debug)
                 {
-                    IPBox.Text = Tools.GetLocalIPAddress();
+                    IPBox.Text = GetLocalIPAddress();
                 }
                 else
                 {
@@ -270,6 +269,11 @@ namespace Client
 
             // Do not allow this client to communicate with unauthenticated servers.
             return false;
+        }
+
+        private void sendToastToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            notifications.ShowNotification("System", "This is a test notification");
         }
     }
 }

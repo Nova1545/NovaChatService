@@ -57,9 +57,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Yep Development Tools, Version=1.0.0.0, Culture=neutral, PublicKeyToken=37624252e37930df, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External References\Yep Development Tools\Yep Development Tools.dll</HintPath>
+    <Reference Include="ToastLib">
+      <HintPath>..\External References\ToastLib.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +71,7 @@
     <Compile Include="About.Designer.cs">
       <DependentUpon>About.cs</DependentUpon>
     </Compile>
+    <Compile Include="EmbeddedYepDevelopmentTools.cs" />
     <Compile Include="EventHandlers.cs">
       <DependentUpon>Client.cs</DependentUpon>
       <SubType>Form</SubType>

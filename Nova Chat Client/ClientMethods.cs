@@ -1,6 +1,10 @@
 ﻿using ChatLib.DataStates;
 using ChatLib.Extras;
+using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.Net;
+using System.Net.Sockets;
 using System.Windows.Forms;
 
 namespace Client

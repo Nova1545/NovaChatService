@@ -10,7 +10,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
-using Yep_Development_Tools;
+using static Client.EmbeddedYepDevelopmentTools;
 
 namespace Client
 {
@@ -264,14 +264,14 @@ namespace Client
 
         private void startAnotherInstanceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ProcessUtils.StartProcess(Assembly.GetExecutingAssembly().Location, "/debug");
+            StartProcess(Assembly.GetExecutingAssembly().Location, "/debug");
         }
 
         private void startServerInstanceToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (File.Exists(ServerPath))
             {
-                ProcessUtils.StartProcess(ServerPath, startin: Directory.GetParent(ServerPath).FullName);
+                StartProcess(ServerPath, startin: Directory.GetParent(ServerPath).FullName);
             }
             else
             {
@@ -281,7 +281,7 @@ namespace Client
 
         private void killAllInstancesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ProcessUtils.KillAll(Process.GetCurrentProcess().ProcessName);
+            KillAll(Process.GetCurrentProcess().ProcessName);
         }
 
         private void Settings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
