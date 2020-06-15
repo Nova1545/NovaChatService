@@ -180,14 +180,6 @@
             </summary>
             <param name="text"></param>
         </member>
-        <member name="M:Yep_Development_Tools.Tools.RandInt(System.Int32,System.Int32)">
-            <summary>
-            Returns a random integer between the minimum and maximum numbers, inclusive.
-            </summary>
-            <param name="min"></param>
-            <param name="max"></param>
-            <returns></returns>
-        </member>
         <member name="M:Yep_Development_Tools.Tools.DynamicText(System.String,System.String,System.Windows.Forms.Control,System.Drawing.Font)">
             <summary>
             Determines what text to display depending on the amount of space available in the given WinForm control.
