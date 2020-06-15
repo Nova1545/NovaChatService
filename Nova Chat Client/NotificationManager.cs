@@ -27,7 +27,7 @@ namespace Client
         }
 
         SoundPlayer player;
-        //ToastGenerator generator = new ToastGenerator();
+        ToastGenerator generator = new ToastGenerator();
         public NotificationType SelectedStyle { get; private set; }
         private string SoundLocation = "";
 
@@ -75,11 +75,11 @@ namespace Client
                     break;
 
                 case NotificationType.ToastOnly:
-                    //generator.MakeToast(appName, sender, message);
+                    generator.MakeToast(appName, sender, message);
                     break;
 
                 case NotificationType.Both:
-                    //generator.MakeToast(appName, sender, message);
+                    generator.MakeToast(appName, sender, message);
 
                     player = new SoundPlayer();
 
