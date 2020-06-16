@@ -2,6 +2,7 @@
 using ChatLib.DataStates;
 using ChatLib.Extras;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Net.Security;
@@ -43,7 +44,6 @@ namespace Client
                     debug = true;
                 }
             }
-d
             InitializeComponent();
             print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.\n" +
                 "Press 'Delete' when focused in this box to clear it, or use the 'Clear History' button in the menu.", Chat);
@@ -163,20 +163,20 @@ d
                     print("Connecting... ", Log);
                     tcpClient = new TcpClient(IPBox.Text, 8910);
 
-                    //ChatLib.Message secure = MessageHelpers.GetMessage(tcpClient.GetStream());
-                    //if(secure.Content != "")
-                    //{
-                        print("Connecting... Secure!", Log);
+                    ChatLib.Message secure = MessageHelpers.GetMessage(tcpClient.GetStream());
+                    if(secure.Content != "")
+                    {
                         SslStream ssl = new SslStream(tcpClient.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
-                        ssl.AuthenticateAsClient("ftp.novastudios.tk");
+                        ssl.AuthenticateAsClient(secure.Content);
+
                         user = new User(nameBox.Text, ssl);
                         user.Init();
-                    /*}
+                    }
                     else
                     {
                         user = new User(nameBox.Text, tcpClient.GetStream());
                         user.Init();
-                    }*/
+                    }
 
                     // Setup Callbacks
                     user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
@@ -185,7 +185,7 @@ d
                     user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
                     //user.OnMessageAnyReceivedCallback += User_OnMessageAnyReceivedCallback;
                     user.OnMesssageInformationReceivedCallback += User_OnMesssageInformationReceivedCallback;
-                    user.OnErrorCallback += (e) => { print(e.Message, Log); };
+                    user.OnErrorCallback += (e) => { print(e.Message + " " + e.TargetSite + " " + GetLineNumber(e), Log); };
 
                     ChangeConnectionInputState(false);
                     print("Successfully connected to " + IPBox.Text, Log, Color.LimeGreen);
@@ -198,6 +198,13 @@ d
 
             t.IsBackground = true;
             t.Start();
+        }
+
+        static int GetLineNumber(Exception e)
+        {
+            var st = new StackTrace(e, true);
+            var frame = st.GetFrame(0);
+            return frame.GetFileLineNumber();
         }
 
         private void User_OnMesssageInformationReceivedCallback(ChatLib.Message message)

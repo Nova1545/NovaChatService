@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -58,13 +59,31 @@ namespace ChatLib.Extras
 
         public static Message GetMessage(SslStream stream)
         {
-            byte[] len = new byte[4];
-            stream.Read(len, 0, 4);
-            int dataLen = BitConverter.ToInt32(len, 0);
-            byte[] bytes = new byte[dataLen];
-            byte[] buffer = new byte[1024];
             MemoryStream ms = new MemoryStream();
+            byte[] len = new byte[4];
+            byte[] buffer = new byte[1];
             int total = 0;
+            while (total < 4)
+            {
+                int readcount = stream.Read(buffer, 0, 1);
+                total += readcount;
+                ms.Write(buffer, 0, readcount);
+            }
+
+            len = ms.ToArray();
+
+            foreach (byte b in len)
+            {
+                Console.Write(b + "-");
+            }
+            Console.WriteLine();
+
+            int dataLen = BitConverter.ToInt32(len, 0);
+            Console.WriteLine(dataLen);
+            byte[] bytes = new byte[dataLen];
+            buffer = new byte[1024];
+            ms = new MemoryStream();
+            total = 0;
             while (total < dataLen)
             {
                 int readcount = stream.Read(buffer, 0, buffer.Length);
@@ -80,11 +99,12 @@ namespace ChatLib.Extras
             MemoryStream ms = new MemoryStream();
             new BinaryFormatter().Serialize(ms, message);
             byte[] dataBytes = ms.ToArray();
-            foreach (byte b in ms.ToArray())
+            byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
+            foreach (byte b in dataLen)
             {
                 Console.Write(b + "-");
             }
-            byte[] dataLen = BitConverter.GetBytes(dataBytes.Length);
+            Console.WriteLine();
             try
             {
                 stream.Write(dataLen, 0, 4);

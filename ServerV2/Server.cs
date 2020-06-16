@@ -278,7 +278,7 @@ namespace ServerV2
                     {
                         ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
                         Clients.Add(c.GUID, c);
-                        ThreadPool.QueueUserWorkItem(DesktopWorker, c.GUID);
+                        ThreadPool.QueueUserWorkItem(DesktopWorker, c);
                     }
                     else
                     {
@@ -294,10 +294,9 @@ namespace ServerV2
                 }
                 else
                 {
-                    //Message secure = new Message("Server", MessageType.Initionalize);
-                    //secure.SetContent(X509.SubjectName.Name.Replace("CN=", ""));
-                    //MessageHelpers.SetMessage(client.GetStream(), secure);
-                    //Console.WriteLine("Sent secure status");
+                    Message secure = new Message("Server", MessageType.Initionalize);
+                    secure.SetContent(X509.SubjectName.Name.Replace("CN=", ""));
+                    MessageHelpers.SetMessage(client.GetStream(), secure);
 
                     SslStream stream = new SslStream(client.GetStream());
                     stream.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
@@ -320,7 +319,7 @@ namespace ServerV2
                     {
                         ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
                         Clients.Add(c.GUID, c);
-                        ThreadPool.QueueUserWorkItem(DesktopWorker, c.GUID);
+                        ThreadPool.QueueUserWorkItem(DesktopWorker, c);
                         Console.WriteLine("Starting worker");
                     }
                     else
@@ -585,7 +584,7 @@ namespace ServerV2
             {
                 try
                 {
-                    JsonMessage m = client.IsSecure ? JsonMessageHelpers.GetJsonMessage(client.SStream) : JsonMessageHelpers.GetJsonMessage(client.Stream);
+                    Message m = client.IsSecure ? MessageHelpers.GetMessage(client.SStream) : MessageHelpers.GetMessage(client.Stream);
 
                     m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
 
@@ -596,7 +595,7 @@ namespace ServerV2
 
                     if (m.MessageType == MessageType.Message)
                     {
-                        r.AddMesssage(m.ToMessage());
+                        r.AddMesssage(m);
                     }
                     if (m.MessageType == MessageType.Status)
                     {

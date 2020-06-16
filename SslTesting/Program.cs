@@ -4,6 +4,7 @@ using ChatLib.Extras;
 using ChatLib.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -42,8 +43,9 @@ namespace SslTesting
             TcpClient client = server.AcceptTcpClient();
             Console.WriteLine("Clinet!");
 
-            SslStream stream = new SslStream(client.GetStream(), true);
+            SslStream stream = new SslStream(client.GetStream(), false);
             stream.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
+            //NetworkStream stream = client.GetStream();
 
             Message m = GetMessage(stream);
             Console.WriteLine(m.Name + " " + m.MessageType);
@@ -52,32 +54,36 @@ namespace SslTesting
             m.SetContent("Hello!");
             SetMessage(stream, m);
 
-            client.Close();
             Console.ReadLine();
+            client.Close();
         }
 
         public static Message GetMessage(SslStream stream)
         {
+            MemoryStream ms = new MemoryStream();
             byte[] len = new byte[4];
-            stream.Read(len, 0, 4);
+            int total = 0;
+            while (total < 4)
+            {
+                int readcount = stream.Read(len, 0, len.Length);
+                total += readcount;
+                Console.WriteLine(total);
+            }
+
             int dataLen = BitConverter.ToInt32(len, 0);
             Console.WriteLine("Got " + dataLen);
             byte[] bytes = new byte[dataLen];
             byte[] buffer = new byte[1024];
-            MemoryStream ms = new MemoryStream();
-            int total = 0;
+            ms = new MemoryStream();
+            total = 0;
             while (total < dataLen)
             {
                 int readcount = stream.Read(buffer, 0, buffer.Length);
                 total += readcount;
-                Console.WriteLine(total);
                 ms.Write(buffer, 0, readcount);
             }
+
             bytes = ms.ToArray();
-            foreach (byte b in ms.ToArray())
-            {
-                Console.Write(b + "-");
-            }
             try
             {
                 return (Message)new BinaryFormatter().Deserialize(new MemoryStream(bytes));
@@ -94,7 +100,6 @@ namespace SslTesting
             new BinaryFormatter().Serialize(ms, message);
             byte[] dataBytes = ms.ToArray();
             byte[] dataLen = BitConverter.GetBytes(dataBytes.Length);
-            Console.WriteLine("Sent " + dataBytes.Length);
             try
             {
                 stream.Write(dataLen, 0, 4);

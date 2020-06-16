@@ -34,6 +34,7 @@ namespace ChatLib
             MessageType = messageType;
             EndPoint = endPoint;
             GUID = Guid.NewGuid().ToString();
+            Content = "";
         }
 
         public void SetName(string name) => Name = name;

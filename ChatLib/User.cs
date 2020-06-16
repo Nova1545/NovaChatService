@@ -9,6 +9,7 @@ using ChatLib.DataStates;
 using System.Drawing;
 using System.Net.Security;
 using ChatLib;
+using System.Security.Cryptography;
 
 namespace ChatLib
 {
@@ -198,15 +199,33 @@ namespace ChatLib
             }
         }
 
-        public void Init()
+        public void Init(string password = "")
         {
             if (IsSecure)
             {
-                MessageHelpers.SetMessage(SStream, new Message(Name, MessageType.Initionalize));
+                Message m = new Message(Name, MessageType.Initionalize);
+                SHA256 sha = SHA256.Create();
+                byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < hash.Length; i++)
+                {
+                    builder.Append(hash[i].ToString("x2"));
+                }
+                m.SetContent(builder.ToString());
+                MessageHelpers.SetMessage(SStream, m);
             }
             else
             {
-                MessageHelpers.SetMessage(Stream, new Message(Name, MessageType.Initionalize));
+                Message m = new Message(Name, MessageType.Initionalize);
+                SHA256 sha = SHA256.Create();
+                byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < hash.Length; i++)
+                {
+                    builder.Append(hash[i].ToString("x2"));
+                }
+                m.SetContent(builder.ToString());
+                MessageHelpers.SetMessage(Stream, m);
             }
         }
 
