@@ -48,7 +48,7 @@ namespace ChatLib.Extras
 
         public override string ToString()
         {
-            return $"Name: {Name} ClientType: {ClientType} ConnectTime: {ConnectTime.ToString()} RoomId: {RoomId}";
+            return $"Name: {Name} ClientType: {ClientType} ConnectTime (UTC): {ConnectTime.ToString()} RoomId: {RoomId}";
         }
     }
 }

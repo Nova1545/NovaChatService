@@ -58,40 +58,22 @@ namespace ChatLib.Extras
         }
 
         public static Message GetMessage(SslStream stream)
-        {
-            MemoryStream ms = new MemoryStream();
+        { 
             byte[] len = new byte[4];
-            byte[] buffer = new byte[1];
             int total = 0;
             while (total < 4)
             {
-                int readcount = stream.Read(buffer, 0, 1);
-                total += readcount;
-                ms.Write(buffer, 0, readcount);
+                int read = stream.Read(len, 0, 4 - total);
+                total += read;
             }
-
-            len = ms.ToArray();
-
-            foreach (byte b in len)
-            {
-                Console.Write(b + "-");
-            }
-            Console.WriteLine();
-
-            int dataLen = BitConverter.ToInt32(len, 0);
-            Console.WriteLine(dataLen);
-            byte[] bytes = new byte[dataLen];
-            buffer = new byte[1024];
-            ms = new MemoryStream();
             total = 0;
-            while (total < dataLen)
+            byte[] data = new byte[BitConverter.ToInt32(len, 0)];
+            while (total < BitConverter.ToInt32(len, 0))
             {
-                int readcount = stream.Read(buffer, 0, buffer.Length);
-                total += readcount;
-                ms.Write(buffer, 0, readcount);
+                total += stream.Read(data, 0, BitConverter.ToInt32(len, 0));
             }
-            bytes = ms.ToArray();
-            return (Message)new BinaryFormatter().Deserialize(new MemoryStream(bytes));
+
+            return (Message)new BinaryFormatter().Deserialize(new MemoryStream(data));
         }
 
         public static void SetMessage(SslStream stream, Message message)
@@ -100,11 +82,6 @@ namespace ChatLib.Extras
             new BinaryFormatter().Serialize(ms, message);
             byte[] dataBytes = ms.ToArray();
             byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
-            foreach (byte b in dataLen)
-            {
-                Console.Write(b + "-");
-            }
-            Console.WriteLine();
             try
             {
                 stream.Write(dataLen, 0, 4);

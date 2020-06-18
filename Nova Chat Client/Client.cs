@@ -164,13 +164,31 @@ namespace Client
                     tcpClient = new TcpClient(IPBox.Text, 8910);
 
                     ChatLib.Message secure = MessageHelpers.GetMessage(tcpClient.GetStream());
+                    string password = "";
+                    if(secure.Name == "locked")
+                    {
+                        using(TextInput input = new TextInput())
+                        {
+                            if(input.ShowDialog() == DialogResult.OK)
+                            {
+                                password = input.Password;
+                            }
+                            else
+                            {
+                                user.CreateStatus(StatusType.Disconnecting);
+                                ChangeConnectionInputState(true);
+                                return;
+                            }
+                        }
+                    }
+
                     if(secure.Content != "")
                     {
                         SslStream ssl = new SslStream(tcpClient.GetStream(), false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
                         ssl.AuthenticateAsClient(secure.Content);
 
                         user = new User(nameBox.Text, ssl);
-                        user.Init();
+                        user.Init(password);
                     }
                     else
                     {

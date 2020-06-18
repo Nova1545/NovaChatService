@@ -35,6 +35,7 @@ namespace ServerV2
         static int DesktopPort = 8910;
         static bool WebActive = false;
         static bool DesktopActive = false;
+        static bool HasPassword = false;
         static IPAddress IPAddress = null;
         static X509Certificate2 X509 = null;
         static string sPassword = "";
@@ -46,31 +47,44 @@ namespace ServerV2
             BanList = new List<IPAddress>();
 
             LoadConfig();
-            Console.WriteLine(X509.SubjectName.Name.Replace("CN=", ""));
 
             if (WebActive)
             {
                 TcpListener WebServer = new TcpListener(IPAddress, WebPort);
                 WebServer.Start();
-                WebServer.BeginAcceptTcpClient(new AsyncCallback(OnWebAccept), WebServer);
+                WebServer.BeginAcceptTcpClient(OnWebAccept, WebServer);
             }
 
             if (DesktopActive)
             {
                 TcpListener DesktopServer = new TcpListener(IPAddress, DesktopPort);
                 DesktopServer.Start();
-                DesktopServer.BeginAcceptTcpClient(new AsyncCallback(OnDesktopAccept), DesktopServer);
+                DesktopServer.BeginAcceptTcpClient(OnDesktopAccept, DesktopServer);
             }
 
             bool run = true;
             while (run)
             {
-                string[] command = Console.ReadLine().Split(' ');
+                string[] command = Console.ReadLine().Split('|');
                 if (command[0] == "rooms")
                 {
                     foreach (KeyValuePair<string, Room> room in Rooms)
                     {
-                        Console.WriteLine(room.ToString());
+                        Console.WriteLine(room.Value.ToString());
+                    }
+                }
+                else if(command[0] == "clients")
+                {
+                    foreach (KeyValuePair<string, ClientInfo> client in Clients)
+                    {
+                        Console.WriteLine(client.Value.ToString());
+                    }
+                }
+                else if(command[0] == "bans")
+                {
+                    foreach (IPAddress address in BanList)
+                    {
+                        Console.WriteLine(address.ToString());
                     }
                 }
                 else if(command[0] == "ban")
@@ -80,9 +94,7 @@ namespace ServerV2
                         ClientInfo client = Clients.Where(x => x.Value.Name == command[1]).First().Value;
                         Room r = Rooms.Where(x => x.Value.ID == client.RoomId).First().Value;
                         BanList.Add(client.ClientAddress);
-
                         File.AppendAllText("banned.txt", client.ClientAddress.ToString());
-
                         Message error = new Message("error", MessageType.Status);
                         error.SetStatusType(StatusType.ErrorDisconnect);
                         error.SetContent("You have been banned from this server");
@@ -92,34 +104,36 @@ namespace ServerV2
                             Clients.Remove(client.GUID);
                         }
 
-                        if (client.IsSecure)
+                        if(client.ClientType == ClientType.Web)
                         {
-                            if (client.SStream != null)
-                            {
-                                if (client.ClientType == ClientType.Web)
-                                {
-                                    JsonMessageHelpers.SetJsonMessage(client.SStream, error.ToJsonMessage());
-                                }
-                                else
-                                {
-                                    MessageHelpers.SetMessage(client.SStream, error);
-                                }
-                                client.SStream.Close();
-                            }
+                            SendJsonMessage(client, error.ToJsonMessage());
                         }
                         else
                         {
-                            if (client.Stream != null)
+                            SendMessage(client, error);
+                        }
+
+                        ClientInfo[] bannedClients = Clients.Where(x => x.Value.ClientAddress == client.ClientAddress).Select(x => x.Value).ToArray();
+                        foreach (ClientInfo clients in bannedClients)
+                        {
+                            r = Rooms.Where(x => x.Value.ID == client.RoomId).First().Value;
+                            File.AppendAllText("banned.txt", client.ClientAddress.ToString());
+                            error = new Message("error", MessageType.Status);
+                            error.SetStatusType(StatusType.ErrorDisconnect);
+                            error.SetContent("You have been remove from this server because someone on your ip has been banned");
+                            if (Clients.ContainsKey(client.GUID))
                             {
-                                if (client.ClientType == ClientType.Web)
-                                {
-                                    JsonMessageHelpers.SetJsonMessage(client.Stream, error.ToJsonMessage());
-                                }
-                                else
-                                {
-                                    MessageHelpers.SetMessage(client.Stream, error);
-                                }
-                                client.Stream.Close();
+                                r.RemoveUser(client);
+                                Clients.Remove(client.GUID);
+                            }
+
+                            if (client.ClientType == ClientType.Web)
+                            {
+                                SendJsonMessage(client, error.ToJsonMessage());
+                            }
+                            else
+                            {
+                                SendMessage(client, error);
                             }
                         }
                     }
@@ -128,6 +142,23 @@ namespace ServerV2
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Unknown user: " + command[1]);
                         Console.ForegroundColor = ConsoleColor.White;
+                    }
+                }
+                else if(command[0] == "unban")
+                {
+                    if (BanList.Contains(IPAddress.Parse(command[1])))
+                    {
+                        BanList.Remove(IPAddress.Parse(command[1]));
+                        string file = "";
+                        foreach (string line in File.ReadAllLines("banned.txt"))
+                        {
+                            if (line == command[1])
+                            {
+                                continue;
+                            }
+                            file += line + "\n";
+                        }
+                        File.WriteAllText("banned.txt", file);
                     }
                 }
             }
@@ -240,11 +271,10 @@ namespace ServerV2
         {
             TcpListener DesktopServer = (TcpListener)ar.AsyncState;
             TcpClient client = DesktopServer.EndAcceptTcpClient(ar);
-            DesktopServer.BeginAcceptTcpClient(new AsyncCallback(OnDesktopAccept), DesktopServer);
+            DesktopServer.BeginAcceptTcpClient(OnDesktopAccept, DesktopServer);
 
             try
             {
-
                 IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
                 if (BanList.Contains(addr))
                 {
@@ -254,84 +284,84 @@ namespace ServerV2
 
                 if (X509 == null)
                 {
-                    NetworkStream stream = client.GetStream();
-
-                    Message secure = new Message("Server", MessageType.Initionalize);
+                    Message secure = new Message(HasPassword? "locked" : "unlocked", MessageType.Initionalize);
                     secure.SetContent("");
-                    MessageHelpers.SetMessage(stream, secure);
+                    MessageHelpers.SetMessage(client.GetStream(), secure);
 
-                    Message json = MessageHelpers.GetMessage(stream);
-                    if (json.Content != sPassword)
+                    SslStream stream = new SslStream(client.GetStream(), false);
+                    stream.AuthenticateAsServer(X509, false, true);
+
+                    Message m = MessageHelpers.GetMessage(stream);
+                    if(m.MessageType == MessageType.Initionalize)
                     {
-                        Message h = new Message(json.Name, MessageType.Status);
-                        h.SetStatusType(StatusType.ErrorDisconnect);
-                        h.SetContent("Incorrect Password");
-                        MessageHelpers.SetMessage(stream, h);
-                        stream.Close();
-                        stream.Dispose();
-                        client.Close();
-                        client.Dispose();
+                        m = new Message("Server", MessageType.Status);
+                        m.SetStatusType(StatusType.ErrorDisconnect);
+                        MessageHelpers.SetMessage(stream, m);
                         return;
                     }
-
-                    if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                    if (m.Content != sPassword)
                     {
-                        ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
-                        Clients.Add(c.GUID, c);
-                        ThreadPool.QueueUserWorkItem(DesktopWorker, c);
+                        m = new Message("Server", MessageType.Status);
+                        m.SetStatusType(StatusType.ErrorDisconnect);
+                        m.SetContent("Incorrect Password");
+                        MessageHelpers.SetMessage(stream, m);
                     }
                     else
                     {
-                        Message h = new Message(json.Name, MessageType.Status);
-                        h.SetStatusType(StatusType.ErrorDisconnect);
-                        h.SetContent("User with the name " + json.Name + " already exsists");
-                        MessageHelpers.SetMessage(stream, h);
-                        stream.Close();
-                        stream.Dispose();
-                        client.Close();
-                        client.Dispose();
+                        if (Clients.Any(x => x.Value.Name == m.Name))
+                        {
+                            m = new Message("Server", MessageType.Status);
+                            m.SetStatusType(StatusType.ErrorDisconnect);
+                            m.SetContent($"User with name {m.Name} alread exsites");
+                            MessageHelpers.SetMessage(stream, m);
+                        }
+                        else
+                        {
+                            ClientInfo c = new ClientInfo(m.Name, stream, ClientType.Desktop, addr);
+                            Clients.Add(c.GUID, c);
+                            ThreadPool.QueueUserWorkItem(DesktopWorker, c);
+                        }
                     }
                 }
                 else
                 {
-                    Message secure = new Message("Server", MessageType.Initionalize);
+                    Message secure = new Message(HasPassword ? "locked" : "unlocked", MessageType.Initionalize);
                     secure.SetContent(X509.SubjectName.Name.Replace("CN=", ""));
                     MessageHelpers.SetMessage(client.GetStream(), secure);
 
-                    SslStream stream = new SslStream(client.GetStream());
-                    stream.AuthenticateAsServer(X509, false, SslProtocols.Default, true);
+                    SslStream stream = new SslStream(client.GetStream(), false);
+                    stream.AuthenticateAsServer(X509, false, true);
 
-                    Message json = MessageHelpers.GetMessage(stream);
-                    if (json.Content != sPassword)
+                    Message m = MessageHelpers.GetMessage(stream);
+                    if (m.MessageType == MessageType.Initionalize)
                     {
-                        Message h = new Message(json.Name, MessageType.Status);
-                        h.SetStatusType(StatusType.ErrorDisconnect);
-                        h.SetContent("Incorrect Password");
-                        MessageHelpers.SetMessage(stream, h);
-                        stream.Close();
-                        stream.Dispose();
-                        client.Close();
-                        client.Dispose();
+                        m = new Message("Server", MessageType.Status);
+                        m.SetStatusType(StatusType.ErrorDisconnect);
+                        MessageHelpers.SetMessage(stream, m);
                         return;
                     }
-
-                    if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                    if (m.Content != sPassword)
                     {
-                        ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
-                        Clients.Add(c.GUID, c);
-                        ThreadPool.QueueUserWorkItem(DesktopWorker, c);
-                        Console.WriteLine("Starting worker");
+                        m = new Message("Server", MessageType.Status);
+                        m.SetStatusType(StatusType.ErrorDisconnect);
+                        m.SetContent("Incorrect Password");
+                        MessageHelpers.SetMessage(stream, m);
                     }
                     else
                     {
-                        Message h = new Message(json.Name, MessageType.Status);
-                        h.SetStatusType(StatusType.ErrorDisconnect);
-                        h.SetContent("User with the name " + json.Name + " already exsists");
-                        MessageHelpers.SetMessage(stream, h);
-                        stream.Close();
-                        stream.Dispose();
-                        client.Close();
-                        client.Dispose();
+                        if (Clients.Any(x => x.Value.Name == m.Name))
+                        {
+                            m = new Message("Server", MessageType.Status);
+                            m.SetStatusType(StatusType.ErrorDisconnect);
+                            m.SetContent($"User with name {m.Name} alread exsites");
+                            MessageHelpers.SetMessage(stream, m);
+                        }
+                        else
+                        {
+                            ClientInfo c = new ClientInfo(m.Name, stream, ClientType.Desktop, addr);
+                            Clients.Add(c.GUID, c);
+                            ThreadPool.QueueUserWorkItem(DesktopWorker, c);
+                        }
                     }
                 }
             }
@@ -537,6 +567,7 @@ namespace ServerV2
             rooms.SetRequestType(RequestType.Rooms);
             SendMessage(client, rooms);
 
+            Console.WriteLine("Telling others");
             Message connect = new Message(client.Name, MessageType.Status);
             connect.SetStatusType(StatusType.Connected);
             SendToAll(client, connect);
@@ -880,6 +911,7 @@ namespace ServerV2
             sPassword = builder.ToString();
             if (unhash != "")
             {
+                HasPassword = true;
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("Password Set");
             }

@@ -16,6 +16,8 @@ using ChatLib.Extras;
 using ChatLib;
 using Android.Text;
 using Android.Text.Style;
+using Message = ChatLib.Message;
+using System.Net.Security;
 
 namespace AndroidClient
 {
@@ -135,8 +137,23 @@ namespace AndroidClient
             client = new TcpClient(address, port);
             Toast.MakeText(this, "Connected", ToastLength.Short).Show();
 
-            user = new User(username, client.GetStream());
-            user.Init();
+            NetworkStream stream = client.GetStream();
+
+            Message secure = MessageHelpers.GetMessage(stream);
+            if(secure.Content != "")
+            {
+                SslStream ssl = new SslStream(stream);
+                ssl.AuthenticateAsClient(secure.Content);
+
+                user = new User(username, ssl);
+                user.Init();
+            }
+            else
+            {
+                user = new User(username, stream);
+                user.Init();
+            }
+
             user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
             user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
             user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
