@@ -9,4 +9,6 @@
     public enum InfomationType { ConnectedUsers, ServerUptime, ConnectTime, MessagesSent, Rooms }
 
     public enum RequestType { Rooms, Users }
+
+    public enum MessageState { Fine, Terminate }
 }

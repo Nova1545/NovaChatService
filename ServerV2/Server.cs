@@ -40,6 +40,10 @@ namespace ServerV2
         static X509Certificate2 X509 = null;
         static string sPassword = "";
 
+        public delegate MessageState OnMessageSent(Message message, ClientInfo sender);
+        public event OnMessageSent OnMessageSentCall;
+
+
         static void Main(string[] args)
         {
             Clients = new Dictionary<string, ClientInfo>();
@@ -286,10 +290,8 @@ namespace ServerV2
                 {
                     Message secure = new Message(HasPassword? "locked" : "unlocked", MessageType.Initionalize);
                     secure.SetContent("");
-                    MessageHelpers.SetMessage(client.GetStream(), secure);
-
-                    SslStream stream = new SslStream(client.GetStream(), false);
-                    stream.AuthenticateAsServer(X509, false, true);
+                    NetworkStream stream = client.GetStream();
+                    MessageHelpers.SetMessage(stream, secure);
 
                     Message m = MessageHelpers.GetMessage(stream);
                     if(m.MessageType == MessageType.Initionalize)
