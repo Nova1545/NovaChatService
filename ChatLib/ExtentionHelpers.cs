@@ -1,4 +1,5 @@
-﻿using ChatLib.Extras;
+﻿using ChatLib.DataStates;
+using ChatLib.Extras;
 using ChatLib.Json;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace ChatLib.Extentions
         {
             foreach (KeyValuePair<string, ClientInfo> client in values)
             {
-                if(client.Value.ClientType == DataStates.ClientType.Web)
+                if(client.Value.ClientType == ClientType.Web)
                 {
                     JsonMessageHelpers.SetJsonMessage(client.Value.Stream, message.ToJsonMessage());
                 }
@@ -35,13 +36,65 @@ namespace ChatLib.Extentions
                 {
                     continue;
                 }
-                if (client.Value.ClientType != DataStates.ClientType.Web)
+                if (client.Value.ClientType == ClientType.Web)
                 {
                     JsonMessageHelpers.SetJsonMessage(client.Value.Stream, message);
                 }
                 else
                 {
                     MessageHelpers.SetMessage(client.Value.Stream, message.ToMessage());
+                }
+            }
+        }
+
+        public static void Send(this ClientInfo client, Message m)
+        {
+            if(client.ClientType == ClientType.Web)
+            {
+                if (client.IsSecure)
+                {
+                    JsonMessageHelpers.SetJsonMessage(client.SStream, m.ToJsonMessage());
+                }
+                else
+                {
+                    JsonMessageHelpers.SetJsonMessage(client.Stream, m.ToJsonMessage());
+                }
+            }
+            else
+            {
+                if (client.IsSecure)
+                {
+                    MessageHelpers.SetMessage(client.SStream, m);
+                }
+                else
+                {
+                    MessageHelpers.SetMessage(client.Stream, m);
+                }
+            }
+        }
+
+        public static void Send(this ClientInfo client, JsonMessage m)
+        {
+            if (client.ClientType == ClientType.Web)
+            {
+                if (client.IsSecure)
+                {
+                    JsonMessageHelpers.SetJsonMessage(client.SStream, m);
+                }
+                else
+                {
+                    JsonMessageHelpers.SetJsonMessage(client.Stream, m);
+                }
+            }
+            else
+            {
+                if (client.IsSecure)
+                {
+                    MessageHelpers.SetMessage(client.SStream, m.ToMessage());
+                }
+                else
+                {
+                    MessageHelpers.SetMessage(client.Stream, m.ToMessage());
                 }
             }
         }

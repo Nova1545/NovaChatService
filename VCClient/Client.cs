@@ -11,7 +11,7 @@ using NAudio.Wave;
 
 namespace VCClient
 {
-    class Program
+    class Client
     {
         static UdpClient client = new UdpClient();
         static BufferedWaveProvider buffer = new BufferedWaveProvider(new WaveFormat(44100, 2));
@@ -49,6 +49,7 @@ namespace VCClient
         private static void Source_DataAvailable(object sender, WaveInEventArgs e)
         {
             //s.Send(e.Buffer);
+            Console.WriteLine("Sending");
             client.Send(e.Buffer, e.BytesRecorded);
         }
 
@@ -57,12 +58,12 @@ namespace VCClient
             IPEndPoint ep = (IPEndPoint)ar.AsyncState;
 
             byte[] data = client.EndReceive(ar, ref ep);
+            client.BeginReceive(new AsyncCallback(Recevie), ep);
 
             buffer.AddSamples(data, 0, data.Length);
-
-            client.BeginReceive(new AsyncCallback(Recevie), ep);
         }
     }
+
     public struct UdpState
     {
         public UdpClient u;

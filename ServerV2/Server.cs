@@ -29,6 +29,7 @@ namespace ServerV2
         static Dictionary<string, ClientInfo> Clients;
         static Dictionary<string, Room> Rooms;
         static List<IPAddress> BanList;
+        static BotHandler BotHandler;
 
         static int WebPort = 8911;
         static int DefaultRoomID = 0;
@@ -41,8 +42,19 @@ namespace ServerV2
         static string sPassword = "";
 
         public delegate MessageState OnMessageSent(Message message, ClientInfo sender);
-        public event OnMessageSent OnMessageSentCall;
+        public static event OnMessageSent OnMessageSentCallback;
 
+        public delegate MessageState OnJsonMessageSent(JsonMessage message, ClientInfo sender);
+        public static event OnJsonMessageSent OnJsonMessageSentCallback;
+
+        public delegate void OnUserChangeRoom(ClientInfo sender, Room oldRoom, Room newRoom);
+        public static event OnUserChangeRoom OnUserChangeRoomCallback;
+
+        public delegate void OnUserConnect(ClientInfo client);
+        public static event OnUserConnect OnUserConnectCallback;
+
+        public delegate void OnUserDisconnected(ClientInfo client);
+        public static event OnUserDisconnected OnUserDisconnectCallback;
 
         static void Main(string[] args)
         {
@@ -51,6 +63,7 @@ namespace ServerV2
             BanList = new List<IPAddress>();
 
             LoadConfig();
+            LoadBots();
 
             if (WebActive)
             {
@@ -335,7 +348,7 @@ namespace ServerV2
                     stream.AuthenticateAsServer(X509, false, true);
 
                     Message m = MessageHelpers.GetMessage(stream);
-                    if (m.MessageType == MessageType.Initionalize)
+                    if (m.MessageType != MessageType.Initionalize)
                     {
                         m = new Message("Server", MessageType.Status);
                         m.SetStatusType(StatusType.ErrorDisconnect);
@@ -399,6 +412,8 @@ namespace ServerV2
             connect.SetStatusType(StatusType.Connected);
             SendToAll(client, connect);
 
+            OnUserConnectCallback?.Invoke(client);
+
             if (!r.AddUser(client))
             {
                 try
@@ -443,9 +458,14 @@ namespace ServerV2
                 try
                 {
                     JsonMessage m = client.IsSecure ? JsonMessageHelpers.GetJsonMessage(client.SStream) : JsonMessageHelpers.GetJsonMessage(client.Stream);
-
                     m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
 
+                    // Send to bots for proccesing
+                    var results = OnJsonMessageSentCallback?.GetInvocationList().Select(x => x.DynamicInvoke(m, client)).ToArray();
+                    if(results.Any(x => (MessageState)x == MessageState.Terminate))
+                    {
+                        continue;
+                    }
 
                     if (m.Name != client.Name)
                     {
@@ -467,6 +487,7 @@ namespace ServerV2
                                     r = Rooms.Where(x => x.Value.ID == Result).First().Value;
                                     if (!r.IsFull)
                                     {
+                                        OnUserChangeRoomCallback?.Invoke(client, old, r);
                                         old.RemoveUser(client);
                                         r.AddUser(client);
                                         client.SetRoomID(r.ID);
@@ -510,7 +531,7 @@ namespace ServerV2
                                 json.SetStatusType(StatusType.Disconnected);
 
                                 SendToAll(client, json, true);
-
+                                OnUserDisconnectCallback?.Invoke(client);
                                 break;
                             default:
                                 break;
@@ -527,6 +548,7 @@ namespace ServerV2
                 }
                 catch (Exception e)
                 {
+                    OnUserDisconnectCallback?.Invoke(client);
                     JsonMessage error = new JsonMessage("error", MessageType.Status);
                     error.SetStatusType(StatusType.ErrorDisconnect);
                     error.SetContent(e.Message);
@@ -569,10 +591,10 @@ namespace ServerV2
             rooms.SetRequestType(RequestType.Rooms);
             SendMessage(client, rooms);
 
-            Console.WriteLine("Telling others");
             Message connect = new Message(client.Name, MessageType.Status);
             connect.SetStatusType(StatusType.Connected);
             SendToAll(client, connect);
+            OnUserConnectCallback?.Invoke(client);
 
             if (!r.AddUser(client))
             {
@@ -618,8 +640,14 @@ namespace ServerV2
                 try
                 {
                     Message m = client.IsSecure ? MessageHelpers.GetMessage(client.SStream) : MessageHelpers.GetMessage(client.Stream);
-
                     m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
+
+                    // Send to bots for proccesing
+                    var results = OnMessageSentCallback?.GetInvocationList().Select(x => x.DynamicInvoke(m, client)).ToArray();
+                    if (results.Any(x => (MessageState)x == MessageState.Terminate))
+                    {
+                        continue;
+                    }
 
                     if (m.Name != client.Name)
                     {
@@ -637,9 +665,11 @@ namespace ServerV2
                             case StatusType.ChangeRoom:
                                 if (int.TryParse(m.Content, out int Result))
                                 {
+                                    Room old = r;
                                     r = Rooms.Where(x => x.Value.ID == Result).First().Value;
                                     if (!r.IsFull)
                                     {
+                                        OnUserChangeRoomCallback?.Invoke(client, old, r);
                                         r.AddUser(client);
                                         client.SetRoomID(r.ID);
                                         Message message = new Message("Server", MessageType.Message);
@@ -682,7 +712,7 @@ namespace ServerV2
                                 json.SetStatusType(StatusType.Disconnected);
 
                                 SendToAll(client, json, true);
-
+                                OnUserDisconnectCallback?.Invoke(client);
                                 break;
                             default:
                                 break;
@@ -699,6 +729,7 @@ namespace ServerV2
                 }
                 catch (Exception e)
                 {
+                    OnUserDisconnectCallback?.Invoke(client);
                     Message error = new Message("error", MessageType.Status);
                     error.SetStatusType(StatusType.ErrorDisconnect);
                     error.SetContent(e.Message);
@@ -932,6 +963,100 @@ namespace ServerV2
                 Console.WriteLine("Banned Not Loaded");
             }
 
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Complete!");
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        // Server Bot loading
+        static void LoadBots()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Loading Bots...");
+
+            BotHandler = new BotHandler();
+            BotHandler.OnReqestClients += () => { return Clients; };
+            BotHandler.OnUpdateClient += (c) => { Clients[c.GUID] = c; };
+            BotHandler.OnUpdateRoom += (r) => { Rooms[r.GUID] = r; };
+            BotHandler.OnRequestRooms += () => { return Rooms; }; 
+
+            foreach (string dll in Directory.GetDirectories(@"Bots"))
+            {
+                string path = Directory.GetParent(dll).FullName;
+                path = path + @"\" + new DirectoryInfo(dll).Name + @"\" + new DirectoryInfo(dll).Name + ".dll";
+                if (!File.Exists(path)) { continue; }
+
+                if (!File.Exists(path.Replace(".dll", ".pdb")))
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("No .pdb file found for \n" + path);
+                    Console.WriteLine("Exact location of error is impossible to determine");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                Assembly DLL = Assembly.LoadFrom(path);
+                Type[] types = DLL.GetExportedTypes();
+                foreach (Type type in types)
+                {
+                    Bot bot = (Bot)Attribute.GetCustomAttribute(type, typeof(Bot));
+                    if (bot != null)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine($"{bot.Name} By {bot.Creator}");
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.WriteLine(bot.Desc);
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine($"Version: {bot.Version}");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        dynamic c = Activator.CreateInstance(type, BotHandler);
+                        try
+                        {
+                            try
+                            {
+                                OnJsonMessageSentCallback += (m, s) => { return c.OnJsonMessage(m, s); };
+                                OnMessageSentCallback += (m, s) => { return c.OnMessage(m, s); };
+                                OnUserChangeRoomCallback += (cl, o, r) => { c.OnUserChangeRoom(cl, o, r); };
+                                OnUserConnectCallback += (cl) => { c.OnUserConnect(cl); };
+                                OnUserDisconnectCallback += (cl) => { c.OnUserDisconnect(cl); };
+                            }
+                            catch (RuntimeBinderException e)
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                                Console.WriteLine("Failed to load " + path);
+                                Console.WriteLine("(" + e.Message + ") thrown in " + e.TargetSite.Name + " at line " + GetLineNumber(e));
+                                Console.ForegroundColor = ConsoleColor.White;
+                                continue;
+                            }
+                            catch (Exception e)
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                                Console.WriteLine("Failed to load " + path);
+                                Console.WriteLine("(" + e.Message + ") thrown in " + e.TargetSite.Name + " at line " + GetLineNumber(e));
+                                Console.ForegroundColor = ConsoleColor.White;
+                                continue;
+                            }
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("Sucessfully loaded!");
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.WriteLine("Failed to load " + path);
+                            Console.WriteLine("Method Init Missing or Incorrect or other error has occured");
+                            Console.WriteLine("(" + e.Message + ") thrown in " + e.TargetSite.Name + " at line " + GetLineNumber(e));
+                            Console.ForegroundColor = ConsoleColor.White;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        Console.WriteLine("Failed to load " + path);
+                        Console.WriteLine("File doesnt contain Bot Attribute/Code");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                }
+            }
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Complete!");
             Console.ForegroundColor = ConsoleColor.White;

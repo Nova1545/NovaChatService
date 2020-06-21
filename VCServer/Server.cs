@@ -9,7 +9,7 @@ using NAudio.Wave;
 
 namespace VCServer
 {
-    class Program
+    class Server
     {
         static List<IPEndPoint> Clients = new List<IPEndPoint>();
 
@@ -51,19 +51,36 @@ namespace VCServer
         {
             IPEndPoint ep = (IPEndPoint)ar.AsyncState;
             byte[] data = server.EndReceive(ar, ref ep);
+            Console.WriteLine("Receving " + data.Length + " Port " + ep.Port);
+
+            IPEndPoint remote = new IPEndPoint(IPAddress.Any, 11000);
+            server.BeginReceive(new AsyncCallback(Receive), remote);
 
             if (!Clients.Contains(ep))
             {
                 Clients.Add(ep);
             }
+            SendToAll(data);
+        }
+
+        static async void SendToAll(byte[] data)
+        {
+            List<Task> tasks = new List<Task>();
             foreach (IPEndPoint endPoint in Clients)
             {
-                server.Send(data, data.Length, endPoint);
-                //server.BeginSend(data, data.Length, endPoint, new AsyncCallback(Send), null);
+                tasks.Add(server.SendAsync(data, data.Length, endPoint));
             }
+            try
+            {
+                while (tasks.Any())
+                {
+                    tasks.Remove(await Task.WhenAny());
+                }
+            }
+            catch
+            {
 
-            IPEndPoint remote = new IPEndPoint(IPAddress.Any, 11000);
-            server.BeginReceive(new AsyncCallback(Receive), remote);
+            }
         }
 
         static void Send(IAsyncResult ar)
