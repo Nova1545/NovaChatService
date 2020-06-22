@@ -196,7 +196,7 @@ namespace Client
                     else
                     {
                         user = new User(nameBox.Text, tcpClient.GetStream());
-                        user.Init();
+                        user.Init(password);
                     }
 
                     // Setup Callbacks

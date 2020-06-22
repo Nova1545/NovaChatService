@@ -23,16 +23,16 @@ namespace BotTemplate
             this.command = new CommandHandler("/", ' ');
         }
 
-        public Message OnMessage(ClientInfo sender, Message message)
-        {    
-            
-            return message;
+        public MessageState OnMessage(ClientInfo sender, Message message)
+        {
+
+            return MessageState.Fine;
         }
 
-        public JsonMessage OnJsonMessage(ClientInfo sender, JsonMessage message)
-        {     
-            
-            return message;
+        public MessageState OnJsonMessage(ClientInfo sender, JsonMessage message)
+        {
+
+            return MessageState.Fine; // Tells the server that this message can be sent to other users, otherwise doesnt send the message
         }
 
         public void OnUserChangeRoom(ClientInfo client, Room oldRoom, Room newRoom)

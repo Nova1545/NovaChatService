@@ -24,16 +24,16 @@ namespace TestBot
             command.CreateCommand("send", Hello);
         }
 
-        public Message OnMessage(ClientInfo sender, Message message)
+        public MessageState OnMessage(ClientInfo sender, Message message)
         {
             command.ProcessMessage(message, sender);
-            return message;
+            return MessageState.Fine;
         }
 
-        public JsonMessage OnJsonMessage(ClientInfo sender, JsonMessage message)
+        public MessageState OnJsonMessage(ClientInfo sender, JsonMessage message)
         {
             command.ProcessJsonMessage(message, sender);
-            return message;
+            return MessageState.Fine;
         }
 
         public void Hello(string[] parameters, ClientInfo sender)
