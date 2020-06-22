@@ -238,11 +238,6 @@ namespace Client
 			return ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).GetEnumerator();
 		}
 
-        public static explicit operator ObservableDictionary<TKey, TValue>(Dictionary<string, Room> v)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
     }
 }

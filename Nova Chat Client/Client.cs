@@ -23,7 +23,7 @@ namespace Client
         Settings SettingsWindow;
 
         ObservableDictionary<string, object> settings = new ObservableDictionary<string, object>();
-        ObservableDictionary<string, Room> Rooms = new ObservableDictionary<string, Room>();
+        public ObservableDictionary<string, Room> Rooms { get; private set; }
 
         TcpClient tcpClient;
         User user;
@@ -52,7 +52,7 @@ namespace Client
                 "Press 'Delete' when focused in this box to clear it, or use the 'Clear History' button in the menu.", Chat);
 
             notifications = new NotificationManager(ref settings);
-            SettingsWindow = new Settings(this, ref settings, notifications, Rooms);
+            SettingsWindow = new Settings(this, ref settings, notifications);
             TagColor = NColor.FromRGB(rnd.Next(256), rnd.Next(256), rnd.Next(256));
         }
 
@@ -159,6 +159,7 @@ namespace Client
                         {
                             user.CreateStatus(StatusType.Disconnecting);
                             ChangeConnectionInputState(true);
+                            FixClient();
                             return;
                         }
                     }
@@ -226,11 +227,7 @@ namespace Client
         {
             if (message.RequestType == RequestType.Rooms)
             {
-                Rooms = (ObservableDictionary<string, Room>)JsonSerialization.DeserializeRooms(message.Content);
-                foreach (object item in Rooms)
-                {
-                    Console.WriteLine(item.ToString());
-                }
+                Rooms = new ObservableDictionary<string, Room>(JsonSerialization.DeserializeRooms(message.Content));
             }
         }
 

@@ -307,7 +307,7 @@ namespace ServerV2
                     MessageHelpers.SetMessage(stream, secure);
 
                     Message m = MessageHelpers.GetMessage(stream);
-                    if(m.MessageType == MessageType.Initialize)
+                    if(m.MessageType != MessageType.Initialize)
                     {
                         m = new Message("Server", MessageType.Status);
                         m.SetStatusType(StatusType.ErrorDisconnect);
@@ -327,7 +327,7 @@ namespace ServerV2
                         {
                             m = new Message("Server", MessageType.Status);
                             m.SetStatusType(StatusType.ErrorDisconnect);
-                            m.SetContent($"User with name {m.Name} alread exsites");
+                            m.SetContent($"User with name {m.Name} already exists");
                             MessageHelpers.SetMessage(stream, m);
                         }
                         else
@@ -348,7 +348,7 @@ namespace ServerV2
                     stream.AuthenticateAsServer(X509, false, true);
 
                     Message m = MessageHelpers.GetMessage(stream);
-                    if (m.MessageType != MessageType.Initionalize)
+                    if (m.MessageType != MessageType.Initialize)
                     {
                         m = new Message("Server", MessageType.Status);
                         m.SetStatusType(StatusType.ErrorDisconnect);
@@ -368,7 +368,7 @@ namespace ServerV2
                         {
                             m = new Message("Server", MessageType.Status);
                             m.SetStatusType(StatusType.ErrorDisconnect);
-                            m.SetContent($"User with name {m.Name} alread exsites");
+                            m.SetContent($"User with name {m.Name} already exists");
                             MessageHelpers.SetMessage(stream, m);
                         }
                         else

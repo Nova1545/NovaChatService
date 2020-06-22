@@ -1,6 +1,7 @@
 ﻿using ChatLib.Extras;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -14,15 +15,13 @@ namespace Client
         private Tcp_Client parent;
         private ObservableDictionary<string, object> settings;
         private NotificationManager notifications;
-        private ObservableDictionary<string, Room> rooms;
 
-        public Settings(Tcp_Client parent, ref ObservableDictionary<string, object> settingsDictionary, NotificationManager notifications, ObservableDictionary<string, Room> rooms)
+        public Settings(Tcp_Client parent, ref ObservableDictionary<string, object> settingsDictionary, NotificationManager notifications)
         {
             InitializeComponent();
             this.parent = parent;
             this.settings = settingsDictionary;
             this.notifications = notifications;
-            this.rooms = rooms;
 
             Task.Run(() =>
             {
@@ -50,10 +49,14 @@ namespace Client
             ColorSelectorDisplay.Text = parent.GetFormattedTagColor();
 
             RoomSelector.Items.Clear();
+            //RoomSelectorDisplay.Text = parent.CurrentRoom;
 
             if (parent.IsConnected())
             {
-                
+                foreach (KeyValuePair<string, Room> room in parent.Rooms)
+                {
+                    RoomSelector.Items.Add(room.Value.Name.ToString());
+                }
             }
 
             if (bool.Parse(RegOps.GetSettingFromDict("ShowLog", settings).ToString()))
@@ -67,14 +70,10 @@ namespace Client
 
             if (parent.IsConnected())
             {
-                ColorSelector.Enabled = true;
-                ColorSelectorDisplay.Enabled = true;
                 RoomSelector.Enabled = true;
             }
             else
             {
-                ColorSelector.Enabled = false;
-                ColorSelectorDisplay.Enabled = false;
                 RoomSelector.Enabled = false;
             }
 
@@ -174,7 +173,7 @@ namespace Client
 
         private void RoomSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            parent.ChangeRoom(RoomSelector.Text);
+            parent.ChangeRoom(RoomSelector.SelectedItem.ToString());
         }
 
         #endregion
