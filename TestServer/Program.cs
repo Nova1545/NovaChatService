@@ -41,7 +41,7 @@ namespace TestServer
 
             if (X509 != null)
             {
-                Message secure = new Message("Server", MessageType.Initionalize);
+                Message secure = new Message("Server", MessageType.Initialize);
                 secure.SetContent(X509.SubjectName.Name.Replace("CN=", ""));
                 MessageHelpers.SetMessage(client.GetStream(), secure);
 
@@ -54,7 +54,7 @@ namespace TestServer
             else
             {
                 NetworkStream stream = client.GetStream();
-                Message secure = new Message("Server", MessageType.Initionalize);
+                Message secure = new Message("Server", MessageType.Initialize);
                 secure.SetContent("");
                 MessageHelpers.SetMessage(stream, secure);
 

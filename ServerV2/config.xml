@@ -19,9 +19,9 @@
     <WebPort active="true">8911</WebPort>
     <DesktopPort active="true">8910</DesktopPort>
     <AdminPassword></AdminPassword> <!-- Leave blank for no admin (Not Implemented) -->
-    <ServerPassword>Test</ServerPassword> <!-- Only allows users with the password to join -->
+    <ServerPassword></ServerPassword> <!-- Only allows users with the password to join -->
     
     <!-- Leave blank to disable ssl, note, if using our web interface you require ssl. -->
-    <PfxCertificate password="">certificate.pfxe</PfxCertificate>
+    <PfxCertificate password=""></PfxCertificate>
   </GeneralSettings>
 </Config>

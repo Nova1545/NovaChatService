@@ -1,6 +1,6 @@
 ﻿namespace ChatLib.DataStates
 {
-    public enum MessageType { Message, Initionalize, Status, Whisper, Transfer, Infomation, Request }
+    public enum MessageType { Message, Initialize, Status, Whisper, Transfer, Infomation, Request }
 
     public enum StatusType { Connected, Disconnected, ErrorDisconnect, Disconnecting, ChangeRoom }
 

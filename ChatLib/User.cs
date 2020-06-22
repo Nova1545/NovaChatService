@@ -40,6 +40,9 @@ namespace ChatLib
         public delegate void OnMessageInitReceived(Message message);
         public event OnMessageInitReceived OnMessageInitReceivedCallback;
 
+        public delegate void OnMessageRequestReceived(Message message);
+        public event OnMessageRequestReceived OnMessageRequestReceivedCallback;
+
         public delegate void OnMesssageInformationReceived(Message message);
         public event OnMesssageInformationReceived OnMesssageInformationReceivedCallback;
 
@@ -203,7 +206,7 @@ namespace ChatLib
         {
             if (IsSecure)
             {
-                Message m = new Message(Name, MessageType.Initionalize);
+                Message m = new Message(Name, MessageType.Initialize);
                 SHA256 sha = SHA256.Create();
                 byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
                 StringBuilder builder = new StringBuilder();
@@ -216,7 +219,7 @@ namespace ChatLib
             }
             else
             {
-                Message m = new Message(Name, MessageType.Initionalize);
+                Message m = new Message(Name, MessageType.Initialize);
                 SHA256 sha = SHA256.Create();
                 byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
                 StringBuilder builder = new StringBuilder();
@@ -269,8 +272,11 @@ namespace ChatLib
                             case MessageType.Whisper:
                                 OnMessageWhisperReceivedCallback?.Invoke(m);
                                 break;
-                            case MessageType.Initionalize:
+                            case MessageType.Initialize:
                                 OnMessageInitReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Request:
+                                OnMessageRequestReceivedCallback?.Invoke(m);
                                 break;
                             case MessageType.Infomation:
                                 OnMesssageInformationReceivedCallback?.Invoke(m);
@@ -299,8 +305,11 @@ namespace ChatLib
                             case MessageType.Whisper:
                                 OnMessageWhisperReceivedCallback?.Invoke(m);
                                 break;
-                            case MessageType.Initionalize:
+                            case MessageType.Initialize:
                                 OnMessageInitReceivedCallback?.Invoke(m);
+                                break;
+                            case MessageType.Request:
+                                OnMessageRequestReceivedCallback?.Invoke(m);
                                 break;
                             case MessageType.Infomation:
                                 OnMesssageInformationReceivedCallback?.Invoke(m);

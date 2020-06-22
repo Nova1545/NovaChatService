@@ -1,15 +1,16 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Media;
 using ToastLib;
 
 namespace Client
 {
-    class NotificationManager
+    public class NotificationManager
     {
 
         public NotificationManager(ref ObservableDictionary<string, object> settingsDictionary)
         {
-
+            
         }
 
         public enum NotificationType
@@ -22,7 +23,7 @@ namespace Client
 
         SoundPlayer player;
         ToastGenerator generator = new ToastGenerator();
-        public NotificationType SelectedStyle { get; private set; }
+        public NotificationType SelectedStyle { get; set; }
         private string SoundLocation = "";
 
         string appName = "Nova Chat";
@@ -35,37 +36,36 @@ namespace Client
             }
         }
 
-        public void SetNotificationStyle(NotificationType style)
+        public void PlaySound()
         {
-            SelectedStyle = style;
-        }
+            player = new SoundPlayer();
 
-        public void UpdateNotificationStyle(NotificationType style)
-        {
-            SelectedStyle = style;
+            if (SoundLocation.Length <= 0)
+            {
+                player.Stream = Properties.Resources.Notification;
+            }
+            else
+            {
+                player.SoundLocation = SoundLocation;
+            }
+
+            try
+            {
+                player.Play();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            player.Dispose();
         }
 
         public void ShowNotification(string sender, string message)
         {
-            SelectedStyle = NotificationType.Both;
-
             switch (SelectedStyle)
             {
                 case NotificationType.SoundOnly:
-                    player = new SoundPlayer();
-
-                    if (SoundLocation.Length <= 0)
-                    {
-                        player.Stream = Properties.Resources.Notification;
-                    }
-                    else
-                    {
-                        player.SoundLocation = SoundLocation;
-                    }
-
-                    player.Play();
-                    player.Dispose();
-
+                    PlaySound();
                     break;
 
                 case NotificationType.ToastOnly:
@@ -74,20 +74,7 @@ namespace Client
 
                 case NotificationType.Both:
                     generator.MakeToast(appName, sender, message);
-
-                    player = new SoundPlayer();
-
-                    if (SoundLocation.Length <= 0)
-                    {
-                        player.Stream = Properties.Resources.Notification;
-                    }
-                    else
-                    {
-                        player.SoundLocation = SoundLocation;
-                    }
-
-                    player.Play();
-                    player.Dispose();
+                    PlaySound();
                     break;
 
                 default:

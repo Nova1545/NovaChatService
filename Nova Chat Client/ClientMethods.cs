@@ -18,6 +18,7 @@ namespace Client
             {
                 tcpClient.Dispose();
                 ChangeConnectionInputState(true);
+                print("Client Fixed!", Log);
             }
             catch
             {

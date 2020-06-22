@@ -531,7 +531,7 @@ namespace Server
                     state = ListenerState.Disconnected;
                     Message h = new Message(message.Name, MessageType.Status);
                     h.SetStatusType(StatusType.ErrorDisconnect);
-                    h.SetContent("User with the name " + message.Name + " already exsists");
+                    h.SetContent("User with the name " + message.Name + " already exists");
                     MessageHelpers.SetMessage(stream, h);
                     stream.Close();
                     stream.Dispose();

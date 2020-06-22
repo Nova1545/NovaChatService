@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Client.NotificationManager;
 
 namespace Client
 {
@@ -12,12 +13,16 @@ namespace Client
     {
         private Tcp_Client parent;
         private ObservableDictionary<string, object> settings;
+        private NotificationManager notifications;
+        private ObservableDictionary<string, Room> rooms;
 
-        public Settings(Tcp_Client parent, ref ObservableDictionary<string, object> settingsDictionary)
+        public Settings(Tcp_Client parent, ref ObservableDictionary<string, object> settingsDictionary, NotificationManager notifications, ObservableDictionary<string, Room> rooms)
         {
             InitializeComponent();
             this.parent = parent;
             this.settings = settingsDictionary;
+            this.notifications = notifications;
+            this.rooms = rooms;
 
             Task.Run(() =>
             {
@@ -46,18 +51,9 @@ namespace Client
 
             RoomSelector.Items.Clear();
 
-            try
+            if (parent.IsConnected())
             {
-
-                if (parent.IsConnected())
-                {
-                    RoomSelector.Items.Add(parent.Rooms);
-                }
-
-            }
-            catch
-            {
-
+                
             }
 
             if (bool.Parse(RegOps.GetSettingFromDict("ShowLog", settings).ToString()))
@@ -80,6 +76,11 @@ namespace Client
                 ColorSelector.Enabled = false;
                 ColorSelectorDisplay.Enabled = false;
                 RoomSelector.Enabled = false;
+            }
+
+            if (settings.ContainsKey("NotificationStyle"))
+            {
+                notifications.SelectedStyle = (NotificationType)settings["NotificationStyle"];
             }
         }
 

@@ -82,6 +82,27 @@ namespace Client
                 {
                     dict.Add("ServerPath", key.GetValue("ServerPath").ToString());
                 }
+                if (key.GetValue("NotificationType") != null)
+                {
+                    switch (key.GetValue("NotificationType"))
+                    {
+                        case "Disabled":
+                            dict.Add("NotificationType", NotificationManager.NotificationType.Disabled);
+                            break;
+                        case "ToastOnly":
+                            dict.Add("NotificationType", NotificationManager.NotificationType.ToastOnly);
+                            break;
+                        case "SoundOnly":
+                            dict.Add("NotificationType", NotificationManager.NotificationType.SoundOnly);
+                            break;
+                        case "Both":
+                            dict.Add("NotificationType", NotificationManager.NotificationType.Both);
+                            break;
+                        default:
+                            dict.Add("NotificationType", NotificationManager.NotificationType.Both);
+                            break;
+                    }
+                }
                 returnCode = 0;
             }
             catch

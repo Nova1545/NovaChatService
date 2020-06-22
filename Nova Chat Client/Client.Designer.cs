@@ -61,8 +61,8 @@ namespace Client
             this.startServerInstanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.crashServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.sendToastToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -396,18 +396,18 @@ namespace Client
             this.crashServerToolStripMenuItem.Text = "Crash Server";
             this.crashServerToolStripMenuItem.Click += new System.EventHandler(this.crashServerToolStripMenuItem_Click);
             // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.Filter = "Images|*.jpg;*.png;*.bmp";
-            this.openFileDialog1.InitialDirectory = "C:\\Users\\aiden\\OneDrive\\Pictures";
-            this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
-            // 
             // sendToastToolStripMenuItem
             // 
             this.sendToastToolStripMenuItem.Name = "sendToastToolStripMenuItem";
             this.sendToastToolStripMenuItem.Size = new System.Drawing.Size(238, 26);
             this.sendToastToolStripMenuItem.Text = "Send Toast";
             this.sendToastToolStripMenuItem.Click += new System.EventHandler(this.sendToastToolStripMenuItem_Click);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.Filter = "Images|*.jpg;*.png;*.bmp";
+            this.openFileDialog1.InitialDirectory = "C:\\Users\\aiden\\OneDrive\\Pictures";
+            this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
             // 
             // Tcp_Client
             // 

@@ -74,6 +74,9 @@
     <Compile Include="About.Designer.cs">
       <DependentUpon>About.cs</DependentUpon>
     </Compile>
+    <Compile Include="ChatView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="EmbeddedYepDevelopmentTools.cs" />
     <Compile Include="EventHandlers.cs">
       <DependentUpon>Client.cs</DependentUpon>

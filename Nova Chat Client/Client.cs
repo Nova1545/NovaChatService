@@ -1,7 +1,9 @@
 ﻿using ChatLib;
 using ChatLib.DataStates;
 using ChatLib.Extras;
+using ChatLib.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -21,7 +23,7 @@ namespace Client
         Settings SettingsWindow;
 
         ObservableDictionary<string, object> settings = new ObservableDictionary<string, object>();
-        public string[] Rooms { get; private set; }
+        ObservableDictionary<string, Room> Rooms = new ObservableDictionary<string, Room>();
 
         TcpClient tcpClient;
         User user;
@@ -45,11 +47,12 @@ namespace Client
                 }
             }
             InitializeComponent();
+
             print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.\n" +
                 "Press 'Delete' when focused in this box to clear it, or use the 'Clear History' button in the menu.", Chat);
 
-            SettingsWindow = new Settings(this, ref settings);
             notifications = new NotificationManager(ref settings);
+            SettingsWindow = new Settings(this, ref settings, notifications, Rooms);
             TagColor = NColor.FromRGB(rnd.Next(256), rnd.Next(256), rnd.Next(256));
         }
 
@@ -202,6 +205,7 @@ namespace Client
                     user.OnMessageTransferReceivedCallback += User_OnMessageTransferReceivedCallback;
                     user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
                     //user.OnMessageAnyReceivedCallback += User_OnMessageAnyReceivedCallback;
+                    user.OnMessageRequestReceivedCallback += User_OnMessageRequestReceivedCallback;
                     user.OnMesssageInformationReceivedCallback += User_OnMesssageInformationReceivedCallback;
                     user.OnErrorCallback += (e) => { print(e.Message + " " + e.TargetSite + " " + GetLineNumber(e), Log); };
 
@@ -218,6 +222,18 @@ namespace Client
             t.Start();
         }
 
+        private void User_OnMessageRequestReceivedCallback(ChatLib.Message message)
+        {
+            if (message.RequestType == RequestType.Rooms)
+            {
+                Rooms = (ObservableDictionary<string, Room>)JsonSerialization.DeserializeRooms(message.Content);
+                foreach (object item in Rooms)
+                {
+                    Console.WriteLine(item.ToString());
+                }
+            }
+        }
+
         static int GetLineNumber(Exception e)
         {
             var st = new StackTrace(e, true);
@@ -227,10 +243,6 @@ namespace Client
 
         private void User_OnMesssageInformationReceivedCallback(ChatLib.Message message)
         {
-            if (message.InfomationType == InfomationType.Rooms)
-            {
-                Rooms = message.Content.Split();
-            }
             print(message.Name + ": " + message.Content, Chat);
         }
 

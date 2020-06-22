@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using ChatLib.Extras;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -236,6 +238,11 @@ namespace Client
 			return ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).GetEnumerator();
 		}
 
-		#endregion
-	}
+        public static explicit operator ObservableDictionary<TKey, TValue>(Dictionary<string, Room> v)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
 }

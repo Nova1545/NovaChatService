@@ -204,7 +204,7 @@ namespace ServerV2
                         return;
                     }
 
-                    if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                    if (json.MessageType == MessageType.Initialize && Clients.Any(x => x.Value.Name == json.Name) == false)
                     {
                         ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
                         Clients.Add(c.GUID, c);
@@ -214,7 +214,7 @@ namespace ServerV2
                     {
                         JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
                         h.SetStatusType(StatusType.ErrorDisconnect);
-                        h.SetContent("User with the name " + json.Name + " already exsists");
+                        h.SetContent("User with the name " + json.Name + " already exists");
                         JsonMessageHelpers.SetJsonMessage(stream, h);
                         stream.Close();
                         stream.Dispose();
@@ -244,7 +244,7 @@ namespace ServerV2
                     else
                     {
 
-                        if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                        if (json.MessageType == MessageType.Initialize && Clients.Any(x => x.Value.Name == json.Name) == false)
                         {
                             ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
                             Clients.Add(c.GUID, c);
@@ -254,7 +254,7 @@ namespace ServerV2
                         {
                             JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
                             h.SetStatusType(StatusType.ErrorDisconnect);
-                            h.SetContent("User with the name " + json.Name + " already exsists");
+                            h.SetContent("User with the name " + json.Name + " already exists");
                             JsonMessageHelpers.SetJsonMessage(stream, h);
                             stream.Close();
                             stream.Dispose();
@@ -288,13 +288,13 @@ namespace ServerV2
 
                 if (X509 == null)
                 {
-                    Message secure = new Message(HasPassword? "locked" : "unlocked", MessageType.Initionalize);
+                    Message secure = new Message(HasPassword? "locked" : "unlocked", MessageType.Initialize);
                     secure.SetContent("");
                     NetworkStream stream = client.GetStream();
                     MessageHelpers.SetMessage(stream, secure);
 
                     Message m = MessageHelpers.GetMessage(stream);
-                    if(m.MessageType == MessageType.Initionalize)
+                    if(m.MessageType == MessageType.Initialize)
                     {
                         m = new Message("Server", MessageType.Status);
                         m.SetStatusType(StatusType.ErrorDisconnect);
@@ -327,7 +327,7 @@ namespace ServerV2
                 }
                 else
                 {
-                    Message secure = new Message(HasPassword ? "locked" : "unlocked", MessageType.Initionalize);
+                    Message secure = new Message(HasPassword ? "locked" : "unlocked", MessageType.Initialize);
                     secure.SetContent(X509.SubjectName.Name.Replace("CN=", ""));
                     MessageHelpers.SetMessage(client.GetStream(), secure);
 
@@ -335,7 +335,7 @@ namespace ServerV2
                     stream.AuthenticateAsServer(X509, false, true);
 
                     Message m = MessageHelpers.GetMessage(stream);
-                    if (m.MessageType == MessageType.Initionalize)
+                    if (m.MessageType != MessageType.Initialize)
                     {
                         m = new Message("Server", MessageType.Status);
                         m.SetStatusType(StatusType.ErrorDisconnect);
@@ -845,7 +845,7 @@ namespace ServerV2
             else
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("Automaticly setting ip to " + GetLocalIPAddress());
+                Console.WriteLine("Automatically setting ip to " + GetLocalIPAddress());
                 IPAddress = IPAddress.Parse(GetLocalIPAddress());
             }
             try
