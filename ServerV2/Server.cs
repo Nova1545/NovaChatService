@@ -214,25 +214,26 @@ namespace ServerV2
                         stream.Dispose();
                         client.Close();
                         client.Dispose();
-                        return;
-                    }
-
-                    if (json.MessageType == MessageType.Initialize && Clients.Any(x => x.Value.Name == json.Name) == false)
-                    {
-                        ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
-                        Clients.Add(c.GUID, c);
-                        ThreadPool.QueueUserWorkItem(WebWorker, c);
                     }
                     else
                     {
-                        JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
-                        h.SetStatusType(StatusType.ErrorDisconnect);
-                        h.SetContent("User with the name " + json.Name + " already exists");
-                        JsonMessageHelpers.SetJsonMessage(stream, h);
-                        stream.Close();
-                        stream.Dispose();
-                        client.Close();
-                        client.Dispose();
+                        if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                        {
+                            ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
+                            Clients.Add(c.GUID, c);
+                            ThreadPool.QueueUserWorkItem(WebWorker, c);
+                        }
+                        else
+                        {
+                            JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
+                            h.SetStatusType(StatusType.ErrorDisconnect);
+                            h.SetContent("User with the name " + json.Name + " already exsists");
+                            JsonMessageHelpers.SetJsonMessage(stream, h);
+                            stream.Close();
+                            stream.Dispose();
+                            client.Close();
+                            client.Dispose();
+                        }
                     }
                 }
                 else
@@ -257,7 +258,7 @@ namespace ServerV2
                     else
                     {
 
-                        if (json.MessageType == MessageType.Initialize && Clients.Any(x => x.Value.Name == json.Name) == false)
+                        if (json.MessageType == MessageType.Initionalize && Clients.Any(x => x.Value.Name == json.Name) == false)
                         {
                             ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
                             Clients.Add(c.GUID, c);
@@ -267,7 +268,7 @@ namespace ServerV2
                         {
                             JsonMessage h = new JsonMessage(json.Name, MessageType.Status);
                             h.SetStatusType(StatusType.ErrorDisconnect);
-                            h.SetContent("User with the name " + json.Name + " already exists");
+                            h.SetContent("User with the name " + json.Name + " already exsists");
                             JsonMessageHelpers.SetJsonMessage(stream, h);
                             stream.Close();
                             stream.Dispose();
@@ -301,13 +302,13 @@ namespace ServerV2
 
                 if (X509 == null)
                 {
-                    Message secure = new Message(HasPassword? "locked" : "unlocked", MessageType.Initialize);
+                    Message secure = new Message(HasPassword? "locked" : "unlocked", MessageType.Initionalize);
                     secure.SetContent("");
                     NetworkStream stream = client.GetStream();
                     MessageHelpers.SetMessage(stream, secure);
 
                     Message m = MessageHelpers.GetMessage(stream);
-                    if(m.MessageType != MessageType.Initialize)
+                    if(m.MessageType != MessageType.Initionalize)
                     {
                         m = new Message("Server", MessageType.Status);
                         m.SetStatusType(StatusType.ErrorDisconnect);
@@ -327,7 +328,7 @@ namespace ServerV2
                         {
                             m = new Message("Server", MessageType.Status);
                             m.SetStatusType(StatusType.ErrorDisconnect);
-                            m.SetContent($"User with name {m.Name} already exists");
+                            m.SetContent($"User with name {m.Name} alread exsites");
                             MessageHelpers.SetMessage(stream, m);
                         }
                         else
@@ -340,7 +341,7 @@ namespace ServerV2
                 }
                 else
                 {
-                    Message secure = new Message(HasPassword ? "locked" : "unlocked", MessageType.Initialize);
+                    Message secure = new Message(HasPassword ? "locked" : "unlocked", MessageType.Initionalize);
                     secure.SetContent(X509.SubjectName.Name.Replace("CN=", ""));
                     MessageHelpers.SetMessage(client.GetStream(), secure);
 
@@ -348,7 +349,7 @@ namespace ServerV2
                     stream.AuthenticateAsServer(X509, false, true);
 
                     Message m = MessageHelpers.GetMessage(stream);
-                    if (m.MessageType != MessageType.Initialize)
+                    if (m.MessageType != MessageType.Initionalize)
                     {
                         m = new Message("Server", MessageType.Status);
                         m.SetStatusType(StatusType.ErrorDisconnect);
@@ -368,7 +369,7 @@ namespace ServerV2
                         {
                             m = new Message("Server", MessageType.Status);
                             m.SetStatusType(StatusType.ErrorDisconnect);
-                            m.SetContent($"User with name {m.Name} already exists");
+                            m.SetContent($"User with name {m.Name} alread exsites");
                             MessageHelpers.SetMessage(stream, m);
                         }
                         else
@@ -542,6 +543,10 @@ namespace ServerV2
                     {
                         SendToAll(client, m, true);
                         continue;
+                    }
+                    else if(m.MessageType == MessageType.Infomation)
+                    {
+                        SendJsonMessage(client, InformationHandler(m.InfomationType, "").ToJsonMessage());
                     }
 
                     SendToAll(client, m);
@@ -724,6 +729,10 @@ namespace ServerV2
                         SendToAll(client, m, true);
                         continue;
                     }
+                    else if (m.MessageType == MessageType.Infomation)
+                    {
+                        SendMessage(client, InformationHandler(m.InfomationType, ""));
+                    }
 
                     SendToAll(client, m);
                 }
@@ -876,7 +885,7 @@ namespace ServerV2
             else
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("Automatically setting ip to " + GetLocalIPAddress());
+                Console.WriteLine("Automaticly setting ip to " + GetLocalIPAddress());
                 IPAddress = IPAddress.Parse(GetLocalIPAddress());
             }
             try
@@ -1208,6 +1217,59 @@ namespace ServerV2
             while (tasks.Any())
             {
                 tasks.Remove(await Task.WhenAny(tasks));
+            }
+        }
+
+        public static Message InformationHandler(InfomationType type, string name)
+        {
+            if (type == InfomationType.ConnectedUsers)
+            {
+                Message m = new Message("Server", MessageType.Infomation);
+                m.SetColor(NColor.FromRGB(127, 255, 212));
+                m.SetContent(Clients.Count.ToString() + " Connected Clients");
+                return m;
+            }
+            else if (type == InfomationType.ConnectTime)
+            {
+                TimeSpan connectedTime = DateTime.UtcNow - Clients[name].ConnectTime;
+                Message m = new Message("Server", MessageType.Infomation);
+                m.SetColor(NColor.FromRGB(127, 255, 212));
+                m.SetContent("You have been connected for " + connectedTime.ToString());
+                return m;
+            }
+            //else if (type == InfomationType.MessagesSent)
+            //{
+            //    Message m = new Message("Server", MessageType.Infomation);
+            //    m.SetColor(ColorToNColor(Color.Aquamarine));
+            //    m.SetContent(TotalMessagesSent.ToString() + " Messages Sent");
+            //    return m;
+            //}
+            //else if (type == InfomationType.ServerUptime)
+            //{
+            //    TimeSpan connectedTime = DateTime.UtcNow - startup;
+            //    Message m = new Message("Server", MessageType.Infomation);
+            //    m.SetColor(ColorToNColor(Color.Aquamarine));
+            //    m.SetContent("The server has been online for " + connectedTime.ToString());
+            //    return m;
+            //}
+            else if (type == InfomationType.Rooms)
+            {
+                Message m = new Message("Server", MessageType.Infomation);
+                m.SetColor(NColor.FromRGB(127, 255, 212));
+                string content = "\n";
+                foreach (KeyValuePair<string, Room> room in Rooms)
+                {
+                    content += $"{room.Value.Name} ({room.Value.ID})\n";
+                }
+                m.SetContent(content + "use the /changeroom followed by an id or a name to change room");
+                return m;
+            }
+            else
+            {
+                Message m = new Message("Server", MessageType.Infomation);
+                m.SetColor(NColor.FromRGB(127, 255, 212));
+                m.SetContent("Unknown");
+                return m;
             }
         }
     }
