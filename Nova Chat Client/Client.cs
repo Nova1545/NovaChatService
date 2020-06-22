@@ -307,7 +307,7 @@ namespace Client
 
         private void sendToastToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            notifications.ShowNotification("System", "This is a test notification");
+            notifications.ShowNotification("System", "This is a test notification", true);
         }
     }
 }

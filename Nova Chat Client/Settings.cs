@@ -55,7 +55,7 @@ namespace Client
             {
                 foreach (KeyValuePair<string, Room> room in parent.Rooms)
                 {
-                    RoomSelector.Items.Add(room.Value.Name.ToString());
+                    RoomSelector.Items.Add(room.Value.Name);
                 }
             }
 
@@ -173,7 +173,14 @@ namespace Client
 
         private void RoomSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            parent.ChangeRoom(RoomSelector.SelectedItem.ToString());
+            foreach (KeyValuePair<string, Room> room in parent.Rooms)
+            {
+                if (RoomSelector.Text == room.Value.Name)
+                {
+                    parent.ChangeRoom(room.Value.ID.ToString());
+                    break;
+                }
+            }
         }
 
         #endregion

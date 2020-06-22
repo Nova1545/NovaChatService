@@ -83,5 +83,11 @@ namespace Client
 
             }
         }
+
+        public void ShowNotification(string sender, string message, bool ignoreSettings)
+        {
+            generator.MakeToast(appName, sender, message);
+            PlaySound();
+        }
     }
 }
