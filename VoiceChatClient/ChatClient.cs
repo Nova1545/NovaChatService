@@ -15,9 +15,6 @@ namespace VoiceChatClient
         static NetworkStream stream;
 
         static BufferedWaveProvider buffer = new BufferedWaveProvider(new WaveFormat(44100, 2));
-
-        static MixingWaveProvider32 mixer = new MixingWaveProvider32();
-
         static DirectSoundOut sOut = new DirectSoundOut();
 
         static void Main(string[] args)
@@ -31,7 +28,11 @@ namespace VoiceChatClient
             source.StartRecording();
 
             buffer.DiscardOnBufferOverflow = true;
-            sOut.Init(mixer);
+
+            //VolumeWaveProvider16 v = new VolumeWaveProvider16(buffer);
+            //v.Volume = 2.0f;
+
+            sOut.Init(buffer);
             sOut.Volume = 1.0f;
             sOut.Play();
 
@@ -56,15 +57,14 @@ namespace VoiceChatClient
             try
             {
                 int bytesCount = ns.EndRead(ar);
-                if(bytesCount > 0)
+                ns.BeginRead(ByteBuffer, 0, ByteBuffer.Length, Read, ns);
+                if (bytesCount > 0)
                 {
                     byte[] data = new byte[bytesCount];
                     Array.Copy(ByteBuffer, 0, data, 0, bytesCount);
 
                     buffer.AddSamples(data, 0, bytesCount);
-
                 }
-                ns.BeginRead(ByteBuffer, 0, ByteBuffer.Length, Read, ns);
             }
             catch { }
         }

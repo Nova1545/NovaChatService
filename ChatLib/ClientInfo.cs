@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using ChatLib.Administrator;
 using ChatLib.DataStates;
 
 namespace ChatLib.Extras
@@ -17,6 +18,8 @@ namespace ChatLib.Extras
         public int RoomId { get; private set; }
         public string GUID { get; private set; }
         public IPAddress ClientAddress { get; private set; }
+        public Admin Admin { get; private set; }
+        public bool Muted { get; private set; }
 
         public ClientInfo(string name, NetworkStream stream, ClientType clientType, IPAddress clientAddress)
         {
@@ -28,6 +31,7 @@ namespace ChatLib.Extras
             IsSecure = false;
             GUID = Guid.NewGuid().ToString();
             ClientAddress = clientAddress;
+            Muted = false;
         }
 
         public ClientInfo(string name, SslStream stream, ClientType clientType, IPAddress clientAddress)
@@ -40,11 +44,16 @@ namespace ChatLib.Extras
             IsSecure = true;
             GUID = Guid.NewGuid().ToString();
             ClientAddress = clientAddress;
+            Muted = false;
         }
 
         public void SetRoomID(int id) => RoomId = id;
 
         public void SetName(string name) => Name = name;
+
+        public void SetAdmin(Admin admin) => Admin = admin;
+
+        public void ToggleMute() => Muted = !Muted;
 
         public override string ToString()
         {

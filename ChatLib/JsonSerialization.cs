@@ -6,6 +6,7 @@ using ChatLib.DataStates;
 using Newtonsoft.Json;
 using System.Drawing;
 using ChatLib.Extras;
+using System.Net;
 
 namespace ChatLib.Json
 {
@@ -169,7 +170,7 @@ namespace ChatLib.Json
             return sb.ToString();
         }
 
-        public static string Serialize(this Dictionary<string, ClientInfo> clients)
+        public static string SerializeClients(this Dictionary<string, ClientInfo> clients)
         {
             StringBuilder sb = new StringBuilder();
             StringWriter sw = new StringWriter(sb);
@@ -218,6 +219,55 @@ namespace ChatLib.Json
                 }
             }
             return Rooms;
+        }
+
+        public static string SerializePun(this Dictionary<IPAddress, RevokedPerms> punishment)
+        {
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("Clients");
+                writer.WriteStartArray();
+
+                foreach (KeyValuePair<IPAddress, RevokedPerms> pun in punishment)
+                {
+                    writer.WriteStartObject();
+
+                    writer.WritePropertyName("Address");
+                    writer.WriteValue(pun.Key.ToString());
+
+                    writer.WritePropertyName("Revoked");
+                    writer.WriteValue(pun.Value);
+
+                    writer.WriteEndObject();
+                }
+                writer.WriteEndArray();
+            }
+            return sb.ToString();
+        }
+
+        public static Dictionary<IPAddress, RevokedPerms> DeserializePun(this string json)
+        {
+            JsonTextReader reader = new JsonTextReader(new StringReader(json));
+            Dictionary<IPAddress, RevokedPerms> Punisment = new Dictionary<IPAddress, RevokedPerms>();
+
+            reader.Read();
+            reader.Read();
+            while (reader.Read())
+            {
+                if (reader.Value != null)
+                {
+                    IPAddress ip = IPAddress.Parse(reader.ReadAsString());
+                    reader.Read();
+                    RevokedPerms revoked = (RevokedPerms)reader.ReadAsInt32();
+                    Punisment.Add(ip, revoked);
+                }
+            }
+            return Punisment;
         }
     }
 }

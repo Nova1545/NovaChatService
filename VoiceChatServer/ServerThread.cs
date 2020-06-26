@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -9,17 +10,27 @@ namespace VoiceChatServer
 {
     public class ServerThread
     {
-        private TcpClient Client;
+        public TcpClient Client;
         public byte[] ReadBuffer = new byte[1024];
         public string Name;
 
         public delegate void OnDataReceived(byte[] data);
         public event OnDataReceived OnDataReceivedCallback;
 
+        public MixingWaveProvider32 Mixer;
+        private BufferedWaveProvider Buffer;
+        public Wave16ToFloatProvider Float;
+        public WaveProviderToWaveStream Stream;
+
         public ServerThread(TcpClient client, string name)
         {
             Client = client;
             Name = name;
+
+            Mixer = new MixingWaveProvider32();
+            Buffer = new BufferedWaveProvider(new WaveFormat(44100, 2));
+            Float = new Wave16ToFloatProvider(Buffer);
+            Stream = new WaveProviderToWaveStream(Mixer);
         }
 
         public void Receive(IAsyncResult ar)
@@ -32,7 +43,9 @@ namespace VoiceChatServer
                     byte[] data = new byte[bytesRead];
                     Array.Copy(ReadBuffer, 0, data, 0, bytesRead);
 
-                    OnDataReceivedCallback?.Invoke(data);
+                    //OnDataReceivedCallback?.Invoke(data);
+
+                    Buffer.AddSamples(data, 0, data.Length);
 
                     Client.Client.BeginReceive(ReadBuffer, 0, ReadBuffer.Length, SocketFlags.None, Receive, Client.Client);
                 }
