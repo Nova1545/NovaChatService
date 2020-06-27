@@ -10,6 +10,10 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Threading;
 using System.Collections;
+using NAudio.Wave;
+using NAudio;
+using System.IO.Pipes;
+using System.Threading.Tasks;
 
 namespace VoiceChatServer
 {
@@ -17,43 +21,75 @@ namespace VoiceChatServer
     {
         static TcpListener Server;
         static List<ServerThread> Clients = new List<ServerThread>();
+        static DirectSoundOut sOut = new DirectSoundOut();
 
         static void Main(string[] args)
         {
             Server = new TcpListener(IPAddress.Parse("10.0.0.86"), 8910);
 
-            try
-            {
-                Server.Start();
+            Server.Start();
 
-                while (true)
+            bool x = true;
+
+            Thread t = new Thread(() => St_OnDataReceivedCallback());
+            t.Start();
+
+            while (true)
+            {
+                TcpClient client = Server.AcceptTcpClient();
+
+                ServerThread st = new ServerThread(client, Guid.NewGuid().ToString());
+                //st.OnDataReceivedCallback += St_OnDataReceivedCallback;
+
+                foreach (ServerThread thread in Clients)
                 {
-                    TcpClient client = Server.AcceptTcpClient();
-
-                    ServerThread st = new ServerThread(client, Guid.NewGuid().ToString());
-                    st.OnDataReceivedCallback += St_OnDataReceivedCallback;
-
-                    try
-                    {
-                        Clients.Add(st);
-                        client.Client.BeginReceive(st.ReadBuffer, 0, st.ReadBuffer.Length, SocketFlags.None, st.Receive, client.Client);
-                    }
-                    catch { }
+                    thread.Mixer.AddInputStream(st.Float);
+                    Console.WriteLine(thread.Mixer.InputCount);
                 }
-            }
-            catch { }
-        }
 
-        private static void St_OnDataReceivedCallback(byte[] data)
-        {
-            foreach (ServerThread sv in Clients)
-            {
+                Clients.Add(st);
+
+                foreach (ServerThread thread in Clients.Where(h => h.Name != st.Name).ToArray())
+                {
+                    st.Mixer.AddInputStream(thread.Float);
+                }
+
+                //if (x == false)
+                //{
+                //    sOut.Init(Clients[0].Mixer);
+                //    sOut.Play();
+                //}
+                //x = false;
+
                 try
                 {
-                    sv.Send(data);
+                    client.Client.BeginReceive(st.ReadBuffer, 0, st.ReadBuffer.Length, SocketFlags.None, st.Receive, client.Client);
                 }
                 catch { }
             }
+        }
+
+        static void St_OnDataReceivedCallback(/*byte[] data*/)
+        {
+            while (true)
+            {
+                try
+                {
+                    foreach (ServerThread server in Clients)
+                    {
+                        foreach (ServerThread thread in Clients.Where(h => h.Name != server.Name).ToArray())
+                        {
+                            
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        static void Write(IAsyncResult ar)
+        {
+            ((NetworkStream)ar.AsyncState).EndWrite(ar);
         }
     }
 }

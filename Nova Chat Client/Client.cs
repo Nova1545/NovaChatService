@@ -204,6 +204,7 @@ namespace Client
                     user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
                     user.OnMessageTransferReceivedCallback += User_OnMessageTransferReceivedCallback;
                     user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
+                    user.OnMessageInitReceivedCallback += User_OnMessageInitReceivedCallback;
                     //user.OnMessageAnyReceivedCallback += User_OnMessageAnyReceivedCallback;
                     user.OnMessageRequestReceivedCallback += User_OnMessageRequestReceivedCallback;
                     user.OnMesssageInformationReceivedCallback += User_OnMesssageInformationReceivedCallback;
@@ -220,6 +221,28 @@ namespace Client
 
             t.IsBackground = true;
             t.Start();
+        }
+
+        private void User_OnMessageInitReceivedCallback(ChatLib.Message message)
+        {
+            if(message.Content == "admin")
+            {
+                string password = "";
+                using (TextInput input = new TextInput())
+                {
+                    if (input.ShowDialog() == DialogResult.OK)
+                    {
+                        password = input.Password;
+                    }
+                    else
+                    {
+                        user.CreateStatus(StatusType.Disconnecting);
+                        ChangeConnectionInputState(true);
+                        return;
+                    }
+                }
+                user.Init(password);
+            }
         }
 
         private void User_OnMessageRequestReceivedCallback(ChatLib.Message message)

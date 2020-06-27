@@ -10,7 +10,6 @@ using ChatLib.Extras;
 using ChatLib.Json;
 using System.Threading.Tasks;
 using System.Linq;
-using System.Drawing;
 using System.Reflection;
 using Microsoft.CSharp.RuntimeBinder;
 using System.Diagnostics;
@@ -18,9 +17,9 @@ using System.Xml;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
-using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
+using ChatLib.Administrator;
 
 namespace ServerV2
 {
@@ -28,7 +27,11 @@ namespace ServerV2
     {
         static Dictionary<string, ClientInfo> Clients;
         static Dictionary<string, Room> Rooms;
+
         static List<IPAddress> BanList;
+        static Dictionary<IPAddress, RevokedPerms> PunishmentList;
+        static List<Admin> Admins;
+
         static BotHandler BotHandler;
 
         static int WebPort = 8911;
@@ -61,6 +64,7 @@ namespace ServerV2
             Clients = new Dictionary<string, ClientInfo>();
             Rooms = new Dictionary<string, Room>();
             BanList = new List<IPAddress>();
+            PunishmentList = new Dictionary<IPAddress, RevokedPerms>();
 
             LoadConfig();
             LoadBots();
@@ -106,76 +110,36 @@ namespace ServerV2
                 }
                 else if(command[0] == "ban")
                 {
-                    if(Clients.Any(x => x.Value.Name == command[1]))
-                    {
-                        ClientInfo client = Clients.Where(x => x.Value.Name == command[1]).First().Value;
-                        Room r = Rooms.Where(x => x.Value.ID == client.RoomId).First().Value;
-                        BanList.Add(client.ClientAddress);
-                        File.AppendAllText("banned.txt", client.ClientAddress.ToString());
-                        Message error = new Message("error", MessageType.Status);
-                        error.SetStatusType(StatusType.ErrorDisconnect);
-                        error.SetContent("You have been banned from this server");
-                        if (Clients.ContainsKey(client.GUID))
-                        {
-                            r.RemoveUser(client);
-                            Clients.Remove(client.GUID);
-                        }
-
-                        if(client.ClientType == ClientType.Web)
-                        {
-                            SendJsonMessage(client, error.ToJsonMessage());
-                        }
-                        else
-                        {
-                            SendMessage(client, error);
-                        }
-
-                        ClientInfo[] bannedClients = Clients.Where(x => x.Value.ClientAddress == client.ClientAddress).Select(x => x.Value).ToArray();
-                        foreach (ClientInfo clients in bannedClients)
-                        {
-                            r = Rooms.Where(x => x.Value.ID == client.RoomId).First().Value;
-                            File.AppendAllText("banned.txt", client.ClientAddress.ToString());
-                            error = new Message("error", MessageType.Status);
-                            error.SetStatusType(StatusType.ErrorDisconnect);
-                            error.SetContent("You have been remove from this server because someone on your ip has been banned");
-                            if (Clients.ContainsKey(client.GUID))
-                            {
-                                r.RemoveUser(client);
-                                Clients.Remove(client.GUID);
-                            }
-
-                            if (client.ClientType == ClientType.Web)
-                            {
-                                SendJsonMessage(client, error.ToJsonMessage());
-                            }
-                            else
-                            {
-                                SendMessage(client, error);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Unknown user: " + command[1]);
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
+                    Ban(command[1]);
                 }
                 else if(command[0] == "unban")
                 {
-                    if (BanList.Contains(IPAddress.Parse(command[1])))
+                    IPAddress addr = IPAddress.Parse(command[1]);
+                    if (PunishmentList.ContainsKey(addr))
                     {
-                        BanList.Remove(IPAddress.Parse(command[1]));
-                        string file = "";
-                        foreach (string line in File.ReadAllLines("banned.txt"))
+                        PunishmentList.Remove(addr);
+                        if (PunishmentList.Count == 0)
                         {
-                            if (line == command[1])
-                            {
-                                continue;
-                            }
-                            file += line + "\n";
+                            File.Delete("Punished.json");
                         }
-                        File.WriteAllText("banned.txt", file);
+                        else
+                        {
+                            File.WriteAllText("Punished.json", PunishmentList.SerializePun());
+                        }
+                    }
+                }
+                else if(command[0] == "admins")
+                {
+                    foreach (Admin admin in Admins)
+                    {
+                        Console.WriteLine(admin.Perms.ToString());
+                    }
+                }
+                else if(command[0] == "puns")
+                {
+                    foreach (KeyValuePair<IPAddress, RevokedPerms> pun in PunishmentList)
+                    {
+                        Console.WriteLine($"[{pun.Key}] {pun.Value}");
                     }
                 }
             }
@@ -191,10 +155,18 @@ namespace ServerV2
             try
             {
                 IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
-                if (BanList.Contains(addr))
+                bool clientMuted = false;
+                if (PunishmentList.ContainsKey(addr))
                 {
-                    client.GetStream().Close();
-                    return;
+                    if (PunishmentList[addr] == RevokedPerms.Banned)
+                    {
+                        client.GetStream().Close();
+                        return;
+                    }
+                    else if(PunishmentList[addr] == RevokedPerms.Muted)
+                    {
+                        clientMuted = true;
+                    }
                 }
 
                 if (X509 == null)
@@ -220,6 +192,10 @@ namespace ServerV2
                         if (json.MessageType == MessageType.Initialize && Clients.Any(x => x.Value.Name == json.Name) == false)
                         {
                             ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
+                            if (clientMuted)
+                            {
+                                c.ToggleMute();
+                            }
                             Clients.Add(c.GUID, c);
                             ThreadPool.QueueUserWorkItem(WebWorker, c);
                         }
@@ -261,6 +237,10 @@ namespace ServerV2
                         if (json.MessageType == MessageType.Initialize && Clients.Any(x => x.Value.Name == json.Name) == false)
                         {
                             ClientInfo c = new ClientInfo(json.Name, stream, ClientType.Web, addr);
+                            if (clientMuted)
+                            {
+                                c.ToggleMute();
+                            }
                             Clients.Add(c.GUID, c);
                             ThreadPool.QueueUserWorkItem(WebWorker, c);
                         }
@@ -294,15 +274,23 @@ namespace ServerV2
             try
             {
                 IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
-                if (BanList.Contains(addr))
+                bool clientMuted = false;
+                if (PunishmentList.ContainsKey(addr))
                 {
-                    client.GetStream().Close();
-                    return;
+                    if (PunishmentList[addr] == RevokedPerms.Banned)
+                    {
+                        client.GetStream().Close();
+                        return;
+                    }
+                    else if (PunishmentList[addr] == RevokedPerms.Muted)
+                    {
+                        clientMuted = true;
+                    }
                 }
 
                 if (X509 == null)
                 {
-                    Message secure = new Message(HasPassword? "locked" : "unlocked", MessageType.Initialize);
+                    Message secure = new Message(HasPassword || Admins.Count > 0? "locked" : "unlocked", MessageType.Initialize);
                     secure.SetContent("");
                     NetworkStream stream = client.GetStream();
                     MessageHelpers.SetMessage(stream, secure);
@@ -315,27 +303,71 @@ namespace ServerV2
                         MessageHelpers.SetMessage(stream, m);
                         return;
                     }
-                    if (m.Content != sPassword)
+                    if (!Admins.Any(x => x.Username == m.Name))
                     {
-                        m = new Message("Server", MessageType.Status);
-                        m.SetStatusType(StatusType.ErrorDisconnect);
-                        m.SetContent("Incorrect Password");
-                        MessageHelpers.SetMessage(stream, m);
-                    }
-                    else
-                    {
-                        if (Clients.Any(x => x.Value.Name == m.Name))
+                        if (m.Content == sPassword)
                         {
-                            m = new Message("Server", MessageType.Status);
-                            m.SetStatusType(StatusType.ErrorDisconnect);
-                            m.SetContent($"User with name {m.Name} alread exsites");
-                            MessageHelpers.SetMessage(stream, m);
+                            if (Clients.Any(x => x.Value.Name == m.Name))
+                            {
+                                m = new Message("Server", MessageType.Status);
+                                m.SetStatusType(StatusType.ErrorDisconnect);
+                                m.SetContent($"User with name {m.Name} alread exsites");
+                                MessageHelpers.SetMessage(stream, m);
+                            }
+                            else
+                            {
+                                ClientInfo c = new ClientInfo(m.Name, stream, ClientType.Desktop, addr);
+                                if (clientMuted)
+                                {
+                                    c.ToggleMute();
+                                }
+                                Clients.Add(c.GUID, c);
+                                ThreadPool.QueueUserWorkItem(DesktopWorker, c);
+                            }
                         }
                         else
                         {
-                            ClientInfo c = new ClientInfo(m.Name, stream, ClientType.Desktop, addr);
-                            Clients.Add(c.GUID, c);
-                            ThreadPool.QueueUserWorkItem(DesktopWorker, c);
+                            m = new Message("Server", MessageType.Status);
+                            m.SetStatusType(StatusType.ErrorDisconnect);
+                            m.SetContent("Incorrect Password");
+                            MessageHelpers.SetMessage(stream, m);
+                        }
+                    }
+                    else
+                    {
+                        Admin admin = Admins.Where(x => x.Username == m.Name).First();
+                        m = new Message("Server", MessageType.Initialize);
+                        m.SetContent("admin");
+                        MessageHelpers.SetMessage(stream, m);
+
+                        m = MessageHelpers.GetMessage(stream);
+                        if (m.Content == admin.Password)
+                        {
+                            if (Clients.Any(x => x.Value.Name == m.Name))
+                            {
+                                m = new Message("Server", MessageType.Status);
+                                m.SetStatusType(StatusType.ErrorDisconnect);
+                                m.SetContent($"User with name {m.Name} alread exsites");
+                                MessageHelpers.SetMessage(stream, m);
+                            }
+                            else
+                            {
+                                ClientInfo c = new ClientInfo(m.Name, stream, ClientType.Desktop, addr);
+                                c.SetAdmin(admin);
+                                if (clientMuted)
+                                {
+                                    c.ToggleMute();
+                                }
+                                Clients.Add(c.GUID, c);
+                                ThreadPool.QueueUserWorkItem(DesktopWorker, c);
+                            }
+                        }
+                        else
+                        {
+                            m = new Message("Server", MessageType.Status);
+                            m.SetStatusType(StatusType.ErrorDisconnect);
+                            m.SetContent("Incorrect Password");
+                            MessageHelpers.SetMessage(stream, m);
                         }
                     }
                 }
@@ -356,27 +388,71 @@ namespace ServerV2
                         MessageHelpers.SetMessage(stream, m);
                         return;
                     }
-                    if (m.Content != sPassword)
+                    if (!Admins.Any(x => x.Username == m.Name))
                     {
-                        m = new Message("Server", MessageType.Status);
-                        m.SetStatusType(StatusType.ErrorDisconnect);
-                        m.SetContent("Incorrect Password");
-                        MessageHelpers.SetMessage(stream, m);
-                    }
-                    else
-                    {
-                        if (Clients.Any(x => x.Value.Name == m.Name))
+                        if (m.Content == sPassword)
                         {
-                            m = new Message("Server", MessageType.Status);
-                            m.SetStatusType(StatusType.ErrorDisconnect);
-                            m.SetContent($"User with name {m.Name} alread exsites");
-                            MessageHelpers.SetMessage(stream, m);
+                            if (Clients.Any(x => x.Value.Name == m.Name))
+                            {
+                                m = new Message("Server", MessageType.Status);
+                                m.SetStatusType(StatusType.ErrorDisconnect);
+                                m.SetContent($"User with name {m.Name} alread exsites");
+                                MessageHelpers.SetMessage(stream, m);
+                            }
+                            else
+                            {
+                                ClientInfo c = new ClientInfo(m.Name, stream, ClientType.Desktop, addr);
+                                if (clientMuted)
+                                {
+                                    c.ToggleMute();
+                                }
+                                Clients.Add(c.GUID, c);
+                                ThreadPool.QueueUserWorkItem(DesktopWorker, c);
+                            }
                         }
                         else
                         {
-                            ClientInfo c = new ClientInfo(m.Name, stream, ClientType.Desktop, addr);
-                            Clients.Add(c.GUID, c);
-                            ThreadPool.QueueUserWorkItem(DesktopWorker, c);
+                            m = new Message("Server", MessageType.Status);
+                            m.SetStatusType(StatusType.ErrorDisconnect);
+                            m.SetContent("Incorrect Password");
+                            MessageHelpers.SetMessage(stream, m);
+                        }
+                    }
+                    else
+                    {
+                        Admin admin = Admins.Where(x => x.Username == m.Name).First();
+                        m = new Message("Server", MessageType.Initialize);
+                        m.SetContent("admin");
+                        MessageHelpers.SetMessage(stream, m);
+
+                        m = MessageHelpers.GetMessage(stream);
+                        if (m.Content == admin.Password)
+                        {
+                            if (Clients.Any(x => x.Value.Name == m.Name))
+                            {
+                                m = new Message("Server", MessageType.Status);
+                                m.SetStatusType(StatusType.ErrorDisconnect);
+                                m.SetContent($"User with name {m.Name} alread exsites");
+                                MessageHelpers.SetMessage(stream, m);
+                            }
+                            else
+                            {
+                                ClientInfo c = new ClientInfo(m.Name, stream, ClientType.Desktop, addr);
+                                c.SetAdmin(admin);
+                                if (clientMuted)
+                                {
+                                    c.ToggleMute();
+                                }
+                                Clients.Add(c.GUID, c);
+                                ThreadPool.QueueUserWorkItem(DesktopWorker, c);
+                            }
+                        }
+                        else
+                        {
+                            m = new Message("Server", MessageType.Status);
+                            m.SetStatusType(StatusType.ErrorDisconnect);
+                            m.SetContent("Incorrect Password");
+                            MessageHelpers.SetMessage(stream, m);
                         }
                     }
                 }
@@ -400,7 +476,7 @@ namespace ServerV2
         // Workers to handle incoming/outgoing data
         static void WebWorker(object state)
         {
-            ClientInfo client = (ClientInfo)state;
+            ClientInfo client = Clients[((ClientInfo)state).GUID]; ;
 
             Room r = Rooms.Where(x => x.Value.ID == DefaultRoomID).First().Value;
 
@@ -460,6 +536,11 @@ namespace ServerV2
                 {
                     JsonMessage m = client.IsSecure ? JsonMessageHelpers.GetJsonMessage(client.SStream) : JsonMessageHelpers.GetJsonMessage(client.Stream);
                     m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
+
+                    if (client.Muted)
+                    {
+                        continue;
+                    }
 
                     // Send to bots for proccesing
                     var results = OnJsonMessageSentCallback?.GetInvocationList().Select(x => x.DynamicInvoke(m, client)).ToArray();
@@ -587,7 +668,7 @@ namespace ServerV2
 
         static void DesktopWorker(object state)
         {
-            ClientInfo client = (ClientInfo)state;
+            ClientInfo client = Clients[((ClientInfo)state).GUID];
 
             Room r = Rooms.Where(x => x.Value.ID == DefaultRoomID).First().Value;
 
@@ -646,6 +727,70 @@ namespace ServerV2
                 {
                     Message m = client.IsSecure ? MessageHelpers.GetMessage(client.SStream) : MessageHelpers.GetMessage(client.Stream);
                     m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
+
+                    if (client.Muted)
+                    {
+                        continue;
+                    }
+
+                    if (!client.Admin.Equals(default(Admin)) && m.Content.StartsWith("/"))
+                    {
+                        string[] command = m.Content.Split('|');
+                        if(command[0] == "/ban" && (client.Admin.Perms & Perms.Ban) == Perms.Ban)
+                        {
+                            string user = command[1];
+                            if (Ban(user))
+                            {
+                                m = new Message("Server", MessageType.Message);
+                                m.SetColor(NColor.FromRGB(0, 255, 0));
+                                m.SetContent(user + " has been banned");
+                                SendMessage(client, m);
+                            }
+                            else
+                            {
+                                m = new Message("Server", MessageType.Message);
+                                m.SetColor(NColor.FromRGB(0, 255, 0));
+                                m.SetContent(user + " has been not been banned");
+                                SendMessage(client, m);
+                            }
+                        }
+                        else if (command[0] == "/kick" && (client.Admin.Perms & Perms.Kick) == Perms.Kick)
+                        {
+                            string user = command[1];
+                            if (Kick(user))
+                            {
+                                m = new Message("Server", MessageType.Message);
+                                m.SetColor(NColor.FromRGB(0, 255, 0));
+                                m.SetContent(user + " has been kicked");
+                                SendMessage(client, m);
+                            }
+                            else
+                            {
+                                m = new Message("Server", MessageType.Message);
+                                m.SetColor(NColor.FromRGB(0, 255, 0));
+                                m.SetContent(user + " has been not been kicked");
+                                SendMessage(client, m);
+                            }
+                        }
+                        else if(command[0] == "/mute" && (client.Admin.Perms & Perms.Mute) == Perms.Mute)
+                        {
+                            if (Mute(command[1]))
+                            {
+                                m = new Message("Server", MessageType.Message);
+                                m.SetColor(NColor.FromRGB(0, 255, 0));
+                                m.SetContent(command[1] + " has been muted/unmuted");
+                                SendMessage(client, m);
+                            }
+                            else
+                            {
+                                m = new Message("Server", MessageType.Message);
+                                m.SetColor(NColor.FromRGB(0, 255, 0));
+                                m.SetContent(command[1] + " has been not been muted");
+                                SendMessage(client, m);
+                            }
+                        }
+                        continue;
+                    }
 
                     // Send to bots for proccesing
                     var results = OnMessageSentCallback?.GetInvocationList().Select(x => x.DynamicInvoke(m, client)).ToArray();
@@ -942,6 +1087,60 @@ namespace ServerV2
                 Console.ReadLine();
                 return;
             }
+
+            Admins = new List<Admin>();
+            XmlNode adminNode = settings.SelectSingleNode("Config/Admins");
+            XmlNodeList admins = adminNode.SelectNodes("Admin");
+            foreach (XmlNode admin in admins)
+            {
+                XmlNode perms = admin.SelectSingleNode("Perms");
+                Perms adminPerms = Perms.None;
+                foreach (XmlNode perm in perms.ChildNodes)
+                {
+                    if(perm.Name == "CanKick")
+                    {
+                        if (perm.InnerText == "true")
+                        {
+                            adminPerms &= ~Perms.None;
+                            adminPerms |= Perms.Kick;
+                        }
+                    }
+                    else if (perm.Name == "CanMute")
+                    {
+                        if (perm.InnerText == "true")
+                        {
+                            adminPerms &= ~Perms.None;
+                            adminPerms |= Perms.Mute;
+                        }
+                    }
+                    else if (perm.Name == "CanBan")
+                    {
+                        if (perm.InnerText == "true")
+                        {
+                            adminPerms &= ~Perms.None;
+                            adminPerms |= Perms.Ban;
+                        }
+                    }
+                    else if (perm.Name == "CanMove")
+                    {
+                        if (perm.InnerText == "true")
+                        {
+                            adminPerms &= ~Perms.None;
+                            adminPerms |= Perms.Move;
+                        }
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Unknown Permission");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                }
+                XmlNode userInfo = admin.SelectSingleNode("UserInfo");
+                Admins.Add(new Admin(userInfo.InnerText, userInfo.Attributes[0].InnerText, adminPerms));
+            }
+
+
             string unhash = settings.SelectSingleNode("Config/GeneralSettings/ServerPassword").InnerText;
             SHA256 sha = SHA256.Create();
             byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(unhash));
@@ -960,8 +1159,7 @@ namespace ServerV2
 
             try
             {
-                string[] ips = File.ReadAllLines("banned.txt");
-                BanList.AddRange(ips.Select(x => IPAddress.Parse(x)));
+                PunishmentList = File.ReadAllText("Punished.json").DeserializePun();
 
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("Banned Loaded");
@@ -1220,7 +1418,7 @@ namespace ServerV2
             }
         }
 
-        public static Message InformationHandler(InfomationType type, string name)
+        static Message InformationHandler(InfomationType type, string name)
         {
             if (type == InfomationType.ConnectedUsers)
             {
@@ -1270,6 +1468,155 @@ namespace ServerV2
                 m.SetColor(NColor.FromRGB(127, 255, 212));
                 m.SetContent("Unknown");
                 return m;
+            }
+        }
+
+        static bool Ban(string user)
+        {
+            if (Clients.Any(x => x.Value.Name == user))
+            {
+                ClientInfo client = Clients.Where(x => x.Value.Name == user).First().Value;
+                Room r = Rooms.Where(x => x.Value.ID == client.RoomId).First().Value;
+
+                PunishmentList.Add(client.ClientAddress, RevokedPerms.Banned);
+
+                string json = PunishmentList.SerializePun();
+                File.WriteAllText("Punished.json", json);
+
+                Message error = new Message("error", MessageType.Status);
+                error.SetStatusType(StatusType.ErrorDisconnect);
+                error.SetContent("You have been banned from this server");
+                if (Clients.ContainsKey(client.GUID))
+                {
+                    r.RemoveUser(client);
+                    Clients.Remove(client.GUID);
+                }
+
+                if (client.ClientType == ClientType.Web)
+                {
+                    SendJsonMessage(client, error.ToJsonMessage());
+                }
+                else
+                {
+                    SendMessage(client, error);
+                }
+
+                ClientInfo[] bannedClients = Clients.Where(x => x.Value.ClientAddress == client.ClientAddress).Select(x => x.Value).ToArray();
+                foreach (ClientInfo clients in bannedClients)
+                {
+                    r = Rooms.Where(x => x.Value.ID == client.RoomId).First().Value;
+                    error = new Message("error", MessageType.Status);
+                    error.SetStatusType(StatusType.ErrorDisconnect);
+                    error.SetContent("You have been remove from this server because someone on your ip has been banned");
+                    if (Clients.ContainsKey(client.GUID))
+                    {
+                        r.RemoveUser(client);
+                        Clients.Remove(client.GUID);
+                    }
+
+                    if (client.ClientType == ClientType.Web)
+                    {
+                        SendJsonMessage(client, error.ToJsonMessage());
+                    }
+                    else
+                    {
+                        SendMessage(client, error);
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Unknown user: " + user);
+                Console.ForegroundColor = ConsoleColor.White;
+                return false;
+            }
+        }
+
+        static bool Kick(string user)
+        {
+            if (Clients.Any(x => x.Value.Name == user))
+            {
+                ClientInfo client = Clients.Where(x => x.Value.Name == user).First().Value;
+                Room r = Rooms.Where(x => x.Value.ID == client.RoomId).First().Value;
+                Message error = new Message("error", MessageType.Status);
+                error.SetStatusType(StatusType.ErrorDisconnect);
+                error.SetContent("You have been kicked from this server");
+                if (Clients.ContainsKey(client.GUID))
+                {
+                    r.RemoveUser(client);
+                    Clients.Remove(client.GUID);
+                }
+
+                if (client.ClientType == ClientType.Web)
+                {
+                    SendJsonMessage(client, error.ToJsonMessage());
+                }
+                else
+                {
+                    SendMessage(client, error);
+                }
+
+                ClientInfo[] bannedClients = Clients.Where(x => x.Value.ClientAddress == client.ClientAddress).Select(x => x.Value).ToArray();
+                foreach (ClientInfo clients in bannedClients)
+                {
+                    r = Rooms.Where(x => x.Value.ID == client.RoomId).First().Value;
+                    error = new Message("error", MessageType.Status);
+                    error.SetStatusType(StatusType.ErrorDisconnect);
+                    error.SetContent("You have been removed from this server because someone on your ip has been kicked");
+                    if (Clients.ContainsKey(client.GUID))
+                    {
+                        r.RemoveUser(client);
+                        Clients.Remove(client.GUID);
+                    }
+
+                    if (client.ClientType == ClientType.Web)
+                    {
+                        SendJsonMessage(client, error.ToJsonMessage());
+                    }
+                    else
+                    {
+                        SendMessage(client, error);
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        static bool Mute(string user)
+        {
+            if(Clients.Any(x => x.Value.Name == user))
+            {
+                ClientInfo c = Clients.Where(x => x.Value.Name == user).First().Value;
+                c.ToggleMute();
+
+                PunishmentList.Add(c.ClientAddress, RevokedPerms.Muted);
+
+                string json = PunishmentList.SerializePun();
+                File.WriteAllText("Punished.json", json);
+
+                Message m = new Message("Server", MessageType.Message);
+                m.SetColor(NColor.FromRGB(0, 255, 0));
+                m.SetContent("You have been muted");
+
+                if(c.ClientType == ClientType.Web)
+                {
+                    SendJsonMessage(c, m.ToJsonMessage());
+                }
+                else
+                {
+                    SendMessage(c, m);
+                }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

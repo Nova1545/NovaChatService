@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Admin.cs" />
     <Compile Include="Attributes.cs" />
     <Compile Include="BotAb.cs" />
     <Compile Include="BotHandler.cs" />
