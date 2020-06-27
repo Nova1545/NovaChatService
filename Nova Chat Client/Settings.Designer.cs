@@ -33,22 +33,21 @@
             this.SettingsTabView = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.label3 = new System.Windows.Forms.Label();
-            this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.radioButton5 = new System.Windows.Forms.RadioButton();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.toggleLog = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.radioButton4 = new System.Windows.Forms.RadioButton();
+            this.radioButton3 = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.radioButton5 = new System.Windows.Forms.RadioButton();
             this.radioButton6 = new System.Windows.Forms.RadioButton();
             this.button2 = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
-            this.toggleLog = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
@@ -73,9 +72,12 @@
             this.SettingsTabView.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
-            this.tableLayoutPanel5.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tableLayoutPanel7.SuspendLayout();
             this.tableLayoutPanel8.SuspendLayout();
@@ -126,172 +128,195 @@
             // 
             // tableLayoutPanel2
             // 
-            this.tableLayoutPanel2.ColumnCount = 2;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel4, 0, 0);
+            this.tableLayoutPanel2.ColumnCount = 3;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.tableLayoutPanel2.Controls.Add(this.groupBox1, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.groupBox2, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.groupBox3, 2, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 326F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 326F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(780, 326);
-            this.tableLayoutPanel2.TabIndex = 1;
+            this.tableLayoutPanel2.TabIndex = 3;
             // 
-            // tableLayoutPanel3
+            // groupBox1
             // 
-            this.tableLayoutPanel3.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
-            this.tableLayoutPanel3.ColumnCount = 1;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Controls.Add(this.label3, 0, 0);
-            this.tableLayoutPanel3.Controls.Add(this.tableLayoutPanel5, 0, 1);
-            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(393, 3);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 2;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.799443F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 92.20055F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(384, 320);
-            this.tableLayoutPanel3.TabIndex = 1;
+            this.groupBox1.Controls.Add(this.panel1);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox1.Location = new System.Drawing.Point(3, 3);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(253, 320);
+            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Visual Element Settings";
             // 
-            // label3
+            // panel1
             // 
-            this.label3.AutoSize = true;
-            this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(4, 1);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(376, 24);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Notifications";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.panel1.Controls.Add(this.toggleLog);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 18);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(247, 299);
+            this.panel1.TabIndex = 0;
             // 
-            // tableLayoutPanel5
+            // toggleLog
             // 
-            this.tableLayoutPanel5.ColumnCount = 2;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel5.Controls.Add(this.radioButton5, 1, 1);
-            this.tableLayoutPanel5.Controls.Add(this.label5, 1, 0);
-            this.tableLayoutPanel5.Controls.Add(this.label4, 0, 0);
-            this.tableLayoutPanel5.Controls.Add(this.radioButton1, 0, 1);
-            this.tableLayoutPanel5.Controls.Add(this.radioButton2, 0, 3);
-            this.tableLayoutPanel5.Controls.Add(this.radioButton3, 0, 4);
-            this.tableLayoutPanel5.Controls.Add(this.radioButton4, 0, 2);
-            this.tableLayoutPanel5.Controls.Add(this.radioButton6, 1, 2);
-            this.tableLayoutPanel5.Controls.Add(this.button2, 1, 3);
-            this.tableLayoutPanel5.Controls.Add(this.checkBox1, 1, 4);
-            this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(4, 29);
-            this.tableLayoutPanel5.Name = "tableLayoutPanel5";
-            this.tableLayoutPanel5.RowCount = 5;
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 22.72727F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 22.72727F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 22.72727F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 22.72727F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(376, 287);
-            this.tableLayoutPanel5.TabIndex = 1;
+            this.toggleLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.toggleLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F);
+            this.toggleLog.Location = new System.Drawing.Point(3, 3);
+            this.toggleLog.Name = "toggleLog";
+            this.toggleLog.Size = new System.Drawing.Size(241, 30);
+            this.toggleLog.TabIndex = 4;
+            this.toggleLog.Tag = "true";
+            this.toggleLog.Text = "Show Log";
+            this.toggleLog.UseVisualStyleBackColor = true;
+            this.toggleLog.Click += new System.EventHandler(this.toggleLog_Click);
             // 
-            // radioButton5
+            // groupBox2
             // 
-            this.radioButton5.AutoSize = true;
-            this.radioButton5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.radioButton5.Location = new System.Drawing.Point(191, 29);
-            this.radioButton5.Name = "radioButton5";
-            this.radioButton5.Size = new System.Drawing.Size(182, 59);
-            this.radioButton5.TabIndex = 11;
-            this.radioButton5.TabStop = true;
-            this.radioButton5.Text = "Default";
-            this.radioButton5.UseVisualStyleBackColor = true;
-            this.radioButton5.CheckedChanged += new System.EventHandler(this.radioButton5_CheckedChanged);
+            this.groupBox2.Controls.Add(this.tableLayoutPanel4);
+            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox2.Location = new System.Drawing.Point(262, 3);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(254, 320);
+            this.groupBox2.TabIndex = 4;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Notification Style";
             // 
-            // label5
+            // tableLayoutPanel4
             // 
-            this.label5.AutoSize = true;
-            this.label5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label5.Location = new System.Drawing.Point(191, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(182, 26);
-            this.label5.TabIndex = 9;
-            this.label5.Text = "Sound Style";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label4.Location = new System.Drawing.Point(3, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(182, 26);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "Notification Style";
-            // 
-            // radioButton1
-            // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.radioButton1.Location = new System.Drawing.Point(3, 29);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(182, 59);
-            this.radioButton1.TabIndex = 4;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Toast and Sound";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
-            // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.radioButton2.Location = new System.Drawing.Point(3, 159);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(182, 59);
-            this.radioButton2.TabIndex = 5;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "Toast Only";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
-            // 
-            // radioButton3
-            // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.radioButton3.Location = new System.Drawing.Point(3, 224);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(182, 60);
-            this.radioButton3.TabIndex = 6;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Disabled";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            this.tableLayoutPanel4.ColumnCount = 1;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.Controls.Add(this.radioButton4, 0, 2);
+            this.tableLayoutPanel4.Controls.Add(this.radioButton3, 0, 3);
+            this.tableLayoutPanel4.Controls.Add(this.radioButton2, 0, 1);
+            this.tableLayoutPanel4.Controls.Add(this.radioButton1, 0, 0);
+            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 4;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(248, 299);
+            this.tableLayoutPanel4.TabIndex = 16;
             // 
             // radioButton4
             // 
             this.radioButton4.AutoSize = true;
             this.radioButton4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.radioButton4.Location = new System.Drawing.Point(3, 94);
+            this.radioButton4.Location = new System.Drawing.Point(3, 151);
             this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(182, 59);
-            this.radioButton4.TabIndex = 10;
+            this.radioButton4.Size = new System.Drawing.Size(242, 68);
+            this.radioButton4.TabIndex = 15;
             this.radioButton4.TabStop = true;
             this.radioButton4.Text = "Sound Only";
             this.radioButton4.UseVisualStyleBackColor = true;
             this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButton4_CheckedChanged);
+            this.radioButton4.Click += new System.EventHandler(this.radioButton4_CheckedChanged);
+            // 
+            // radioButton3
+            // 
+            this.radioButton3.AutoSize = true;
+            this.radioButton3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.radioButton3.Location = new System.Drawing.Point(3, 225);
+            this.radioButton3.Name = "radioButton3";
+            this.radioButton3.Size = new System.Drawing.Size(242, 71);
+            this.radioButton3.TabIndex = 13;
+            this.radioButton3.TabStop = true;
+            this.radioButton3.Text = "Disabled";
+            this.radioButton3.UseVisualStyleBackColor = true;
+            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            this.radioButton3.Click += new System.EventHandler(this.radioButton3_CheckedChanged);
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.radioButton2.Location = new System.Drawing.Point(3, 77);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(242, 68);
+            this.radioButton2.TabIndex = 12;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "Toast Only";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            this.radioButton2.Click += new System.EventHandler(this.radioButton2_CheckedChanged);
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.radioButton1.Location = new System.Drawing.Point(3, 3);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(242, 68);
+            this.radioButton1.TabIndex = 11;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "Toast and Sound";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
+            this.radioButton1.Click += new System.EventHandler(this.radioButton1_CheckedChanged);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.tableLayoutPanel3);
+            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox3.Location = new System.Drawing.Point(522, 3);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(255, 320);
+            this.groupBox3.TabIndex = 5;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Sound Style";
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.ColumnCount = 1;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel3.Controls.Add(this.radioButton5, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.radioButton6, 0, 1);
+            this.tableLayoutPanel3.Controls.Add(this.button2, 0, 2);
+            this.tableLayoutPanel3.Controls.Add(this.checkBox1, 0, 3);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 18);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 4;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(249, 299);
+            this.tableLayoutPanel3.TabIndex = 20;
+            // 
+            // radioButton5
+            // 
+            this.radioButton5.AutoSize = true;
+            this.radioButton5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.radioButton5.Location = new System.Drawing.Point(3, 3);
+            this.radioButton5.Name = "radioButton5";
+            this.radioButton5.Size = new System.Drawing.Size(243, 68);
+            this.radioButton5.TabIndex = 16;
+            this.radioButton5.TabStop = true;
+            this.radioButton5.Text = "Default";
+            this.radioButton5.UseVisualStyleBackColor = true;
+            this.radioButton5.CheckedChanged += new System.EventHandler(this.radioButton5_CheckedChanged);
             // 
             // radioButton6
             // 
             this.radioButton6.AutoSize = true;
             this.radioButton6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.radioButton6.Location = new System.Drawing.Point(191, 94);
+            this.radioButton6.Location = new System.Drawing.Point(3, 77);
             this.radioButton6.Name = "radioButton6";
-            this.radioButton6.Size = new System.Drawing.Size(182, 59);
-            this.radioButton6.TabIndex = 12;
+            this.radioButton6.Size = new System.Drawing.Size(243, 68);
+            this.radioButton6.TabIndex = 17;
             this.radioButton6.TabStop = true;
             this.radioButton6.Text = "Custom";
             this.radioButton6.UseVisualStyleBackColor = true;
@@ -299,10 +324,11 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(191, 159);
+            this.button2.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.button2.Location = new System.Drawing.Point(3, 170);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(98, 32);
-            this.button2.TabIndex = 13;
+            this.button2.Size = new System.Drawing.Size(84, 30);
+            this.button2.TabIndex = 18;
             this.button2.Text = "Browse";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
@@ -311,54 +337,13 @@
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkBox1.Location = new System.Drawing.Point(191, 224);
+            this.checkBox1.Location = new System.Drawing.Point(3, 225);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(182, 60);
-            this.checkBox1.TabIndex = 14;
+            this.checkBox1.Size = new System.Drawing.Size(243, 71);
+            this.checkBox1.TabIndex = 19;
             this.checkBox1.Text = "Play sound even when focused";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
-            // tableLayoutPanel4
-            // 
-            this.tableLayoutPanel4.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
-            this.tableLayoutPanel4.ColumnCount = 1;
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.Controls.Add(this.toggleLog, 0, 1);
-            this.tableLayoutPanel4.Controls.Add(this.label2, 0, 0);
-            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 3);
-            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
-            this.tableLayoutPanel4.RowCount = 2;
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.799443F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 92.20055F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(384, 320);
-            this.tableLayoutPanel4.TabIndex = 2;
-            // 
-            // toggleLog
-            // 
-            this.toggleLog.Dock = System.Windows.Forms.DockStyle.Top;
-            this.toggleLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F);
-            this.toggleLog.Location = new System.Drawing.Point(4, 29);
-            this.toggleLog.Name = "toggleLog";
-            this.toggleLog.Size = new System.Drawing.Size(376, 56);
-            this.toggleLog.TabIndex = 1;
-            this.toggleLog.Tag = "true";
-            this.toggleLog.Text = "Show Log";
-            this.toggleLog.UseVisualStyleBackColor = true;
-            this.toggleLog.Click += new System.EventHandler(this.toggleLog_Click);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(4, 1);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(376, 24);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Visual Element Settings";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tabPage2
             // 
@@ -619,12 +604,14 @@
             this.SettingsTabView.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel3.PerformLayout();
-            this.tableLayoutPanel5.ResumeLayout(false);
-            this.tableLayoutPanel5.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel4.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.tableLayoutPanel3.ResumeLayout(false);
+            this.tableLayoutPanel3.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tableLayoutPanel7.ResumeLayout(false);
             this.tableLayoutPanel8.ResumeLayout(false);
@@ -646,19 +633,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TabControl SettingsTabView;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.RadioButton radioButton1;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.RadioButton radioButton4;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
-        public System.Windows.Forms.Button toggleLog;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel8;
@@ -666,7 +640,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel9;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ColorDialog colorDialog1;
-        private System.Windows.Forms.RadioButton radioButton5;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox ColorSelectorDisplay;
@@ -675,12 +648,25 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox RoomSelectorDisplay;
         private System.Windows.Forms.ComboBox RoomSelector;
-        private System.Windows.Forms.RadioButton radioButton6;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel11;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.RadioButton radioButton3;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.RadioButton radioButton5;
+        private System.Windows.Forms.RadioButton radioButton6;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        private System.Windows.Forms.RadioButton radioButton4;
+        private System.Windows.Forms.Panel panel1;
+        public System.Windows.Forms.Button toggleLog;
     }
 }

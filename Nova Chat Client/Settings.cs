@@ -79,7 +79,48 @@ namespace Client
 
             if (settings.ContainsKey("NotificationStyle"))
             {
-                notifications.SelectedStyle = (NotificationType)settings["NotificationStyle"];
+                switch(settings["NotificationStyle"])
+                {
+                    case NotificationType.Disabled:
+                        radioButton1.Checked = false;
+                        radioButton4.Checked = false;
+                        radioButton2.Checked = false;
+                        radioButton3.Checked = true;
+                        groupBox3.Enabled = false;
+                        break;
+
+                    case NotificationType.SoundOnly:
+                        radioButton1.Checked = false;
+                        radioButton4.Checked = false;
+                        radioButton2.Checked = true;
+                        radioButton3.Checked = false;
+                        groupBox3.Enabled = true;
+                        break;
+
+                    case NotificationType.ToastOnly:
+                        radioButton1.Checked = false;
+                        radioButton4.Checked = true;
+                        radioButton2.Checked = false;
+                        radioButton3.Checked = false;
+                        groupBox3.Enabled = false;
+                        break;
+
+                    case NotificationType.Both:
+                        radioButton1.Checked = true;
+                        radioButton4.Checked = false;
+                        radioButton2.Checked = false;
+                        radioButton3.Checked = false;
+                        groupBox3.Enabled = true;
+                        break;
+
+                    default:
+                        radioButton1.Checked = true;
+                        radioButton4.Checked = false;
+                        radioButton2.Checked = false;
+                        radioButton3.Checked = false;
+                        groupBox3.Enabled = true;
+                        break;
+                }
             }
         }
 
@@ -194,17 +235,17 @@ namespace Client
 
         private void radioButton4_CheckedChanged(object sender, EventArgs e)
         {
-
+            RegOps.WriteSetting("NotificationStyle", "SoundOnly", RegistryValueKind.String, ref settings);
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
-
+            RegOps.WriteSetting("NotificationStyle", "ToastOnly", RegistryValueKind.String, ref settings);
         }
 
         private void radioButton3_CheckedChanged(object sender, EventArgs e)
         {
-
+            RegOps.WriteSetting("NotificationStyle", "Disabled", RegistryValueKind.String, ref settings);
         }
 
         #endregion

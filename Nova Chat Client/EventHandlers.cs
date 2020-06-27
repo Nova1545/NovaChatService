@@ -1,8 +1,8 @@
 ﻿using ChatLib;
 using ChatLib.DataStates;
-using ChatLib.Extras;
 using Microsoft.Win32;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -16,18 +16,14 @@ namespace Client
 {
     partial class Tcp_Client
     {
-        #region Casts
-        public Color NColorToColor(NColor color)
-        {
-            return Color.FromArgb(color.R, color.G, color.B);
-        }
 
-        public NColor ColorToNColor(Color color)
+        private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            return NColor.FromRGB(color.R, color.G, color.B);
-        }
+            switch (e.PropertyName)
+            {
 
-        #endregion
+            }
+        }
 
         private void crashServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -223,30 +219,6 @@ namespace Client
             LoadSettings();
         }
 
-        private void LoadSettings()
-        {
-            RegOps.ReadSettings(ref settings);
-
-            this.settings.CollectionChanged += Settings_CollectionChanged;
-
-            if (settings.ContainsKey("ShowLog"))
-            {
-                if ((bool)settings["ShowLog"])
-                {
-                    SetLogVisibility(true);
-                }
-                else
-                {
-                    SetLogVisibility(false);
-                }
-            }
-
-            if (settings.ContainsKey("ServerPath"))
-            {
-                ServerPath = settings["ServerPath"].ToString();
-            }
-        }
-
         private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             AboutBox.ShowDialog();
@@ -282,14 +254,6 @@ namespace Client
         private void killAllInstancesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             KillAll(Process.GetCurrentProcess().ProcessName);
-        }
-
-        private void Settings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
-            {
-                //notifications.SetNotificationStyle((NotificationManager.NotificationType)RegOps.GetSettingFromDict("NotificationStyle", settings));
-            }
         }
 
         private void setPathToolStripMenuItem_Click(object sender, EventArgs e)

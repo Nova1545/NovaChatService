@@ -3,7 +3,6 @@ using ChatLib.DataStates;
 using ChatLib.Extras;
 using ChatLib.Json;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -41,7 +40,7 @@ namespace Client
         {
             foreach (string argument in args)
             {
-                if (argument == "/debug")
+                if (argument.ToLower() == "/debug")
                 {
                     debug = true;
                 }
@@ -51,7 +50,7 @@ namespace Client
             print("Welcome to the Nova Chat Client. Please enter an IP address above and click 'Connect' to begin.\n" +
                 "Press 'Delete' when focused in this box to clear it, or use the 'Clear History' button in the menu.", Chat);
 
-            notifications = new NotificationManager(ref settings);
+            notifications = new NotificationManager(this, ref settings);
             SettingsWindow = new Settings(this, ref settings, notifications);
             TagColor = NColor.FromRGB(rnd.Next(256), rnd.Next(256), rnd.Next(256));
         }
@@ -307,7 +306,7 @@ namespace Client
 
         private void sendToastToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            notifications.ShowNotification("System", "This is a test notification", true);
+            notifications.ShowNotification("System", "This is a test notification");
         }
     }
 }

@@ -1,16 +1,35 @@
 ﻿using ChatLib.DataStates;
 using ChatLib.Extras;
-using System;
-using System.Diagnostics;
 using System.Drawing;
-using System.Net;
-using System.Net.Sockets;
 using System.Windows.Forms;
 
 namespace Client
 {
     partial class Tcp_Client
     {
+        private void LoadSettings()
+        {
+            RegOps.ReadSettings(ref settings);
+
+            settings.PropertyChanged += Settings_PropertyChanged;
+
+            if (settings.ContainsKey("ShowLog"))
+            {
+                if ((bool)settings["ShowLog"])
+                {
+                    SetLogVisibility(true);
+                }
+                else
+                {
+                    SetLogVisibility(false);
+                }
+            }
+
+            if (settings.ContainsKey("ServerPath"))
+            {
+                ServerPath = settings["ServerPath"].ToString();
+            }
+        }
 
         private void FixClient()
         {
@@ -54,6 +73,19 @@ namespace Client
                 return false;
             }
         }
+
+        #region Casts
+        public Color NColorToColor(NColor color)
+        {
+            return Color.FromArgb(color.R, color.G, color.B);
+        }
+
+        public NColor ColorToNColor(Color color)
+        {
+            return NColor.FromRGB(color.R, color.G, color.B);
+        }
+
+        #endregion
 
         public NColor GetTagColor()
         {

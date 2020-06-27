@@ -8,9 +8,9 @@ namespace Client
     public class NotificationManager
     {
 
-        public NotificationManager(ref ObservableDictionary<string, object> settingsDictionary)
+        public NotificationManager(Tcp_Client parent, ref ObservableDictionary<string, object> settingsDictionary)
         {
-            
+            this.parent = parent;
         }
 
         public enum NotificationType
@@ -27,6 +27,7 @@ namespace Client
         private string SoundLocation = "";
 
         string appName = "Nova Chat";
+        private Tcp_Client parent;
 
         public void SetSoundLocation(string path)
         {
@@ -62,32 +63,29 @@ namespace Client
 
         public void ShowNotification(string sender, string message)
         {
-            switch (SelectedStyle)
+            if (!parent.debug)
             {
-                case NotificationType.SoundOnly:
-                    PlaySound();
-                    break;
+                switch (SelectedStyle)
+                {
+                    case NotificationType.SoundOnly:
+                        PlaySound();
+                        break;
 
-                case NotificationType.ToastOnly:
-                    generator.MakeToast(appName, sender, message);
-                    break;
+                    case NotificationType.ToastOnly:
+                        generator.MakeToast(appName, sender, message);
+                        break;
 
-                case NotificationType.Both:
-                    generator.MakeToast(appName, sender, message);
-                    PlaySound();
-                    break;
-
-                default:
-                    // Do nothing
-                    break;
-
+                    case NotificationType.Both:
+                        generator.MakeToast(appName, sender, message);
+                        PlaySound();
+                        break;
+                }
             }
-        }
-
-        public void ShowNotification(string sender, string message, bool ignoreSettings)
-        {
-            generator.MakeToast(appName, sender, message);
-            PlaySound();
+            else
+            {
+                generator.MakeToast(appName, sender, message);
+                PlaySound();
+            }
         }
     }
 }
