@@ -61,6 +61,20 @@ namespace ServerV2
 
         static void Main(string[] args)
         {
+            Console.Write("[");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("Warning ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("Error ");
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Write("Information ");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("Ok ");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("Phasing");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("]");
+
             Clients = new Dictionary<string, ClientInfo>();
             Rooms = new Dictionary<string, Room>();
             BanList = new List<IPAddress>();
@@ -74,6 +88,15 @@ namespace ServerV2
                 TcpListener WebServer = new TcpListener(IPAddress, WebPort);
                 WebServer.Start();
                 WebServer.BeginAcceptTcpClient(OnWebAccept, WebServer);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Web Server Started");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("Web Server Not Started");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
             if (DesktopActive)
@@ -81,6 +104,15 @@ namespace ServerV2
                 TcpListener DesktopServer = new TcpListener(IPAddress, DesktopPort);
                 DesktopServer.Start();
                 DesktopServer.BeginAcceptTcpClient(OnDesktopAccept, DesktopServer);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Desktop Server Started");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("Desktop Server Not Started");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
             bool run = true;
@@ -290,7 +322,7 @@ namespace ServerV2
 
                 if (X509 == null)
                 {
-                    Message secure = new Message(HasPassword || Admins.Count > 0? "locked" : "unlocked", MessageType.Initialize);
+                    Message secure = new Message(HasPassword? "locked" : "unlocked", MessageType.Initialize);
                     secure.SetContent("");
                     NetworkStream stream = client.GetStream();
                     MessageHelpers.SetMessage(stream, secure);
@@ -460,7 +492,7 @@ namespace ServerV2
             catch (Exception e)
             {
                 Console.WriteLine(e.Message + " in " + e.TargetSite + " at line " + GetLineNumber(e).ToString());
-                client.GetStream().Close();
+                //client.GetStream().Close();
                 return;
             }
         }
@@ -733,6 +765,7 @@ namespace ServerV2
                         continue;
                     }
 
+                    Console.WriteLine("Here");
                     if (!client.Admin.Equals(default(Admin)) && m.Content.StartsWith("/"))
                     {
                         string[] command = m.Content.Split('|');
@@ -819,9 +852,11 @@ namespace ServerV2
                                     r = Rooms.Where(x => x.Value.ID == Result).First().Value;
                                     if (!r.IsFull)
                                     {
+                                        old.RemoveUser(client);
                                         OnUserChangeRoomCallback?.Invoke(client, old, r);
                                         r.AddUser(client);
                                         client.SetRoomID(r.ID);
+
                                         Message message = new Message("Server", MessageType.Message);
                                         message.SetContent($"Move to room {r.Name}({r.ID})");
                                         message.SetColor(NColor.FromRGB(0, 255, 0));
@@ -878,7 +913,7 @@ namespace ServerV2
                     {
                         SendMessage(client, InformationHandler(m.InfomationType, ""));
                     }
-
+                    Console.WriteLine("Sending to all");
                     SendToAll(client, m);
                 }
                 catch (Exception e)
@@ -940,9 +975,20 @@ namespace ServerV2
         static void LoadConfig()
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Loading Configuration...");
+            Console.WriteLine("=========Loading Configuration=========");
             XmlDocument settings = new XmlDocument();
-            settings.Load("config.xml");
+            try
+            {
+                settings.Load("config.xml");
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Failed to Read config.xml");
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+                Environment.Exit(1);
+            }
             XmlNode roomsNode = settings.SelectSingleNode("Config/Rooms");
             XmlNodeList rooms = roomsNode.SelectNodes("Room");
             Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -951,10 +997,15 @@ namespace ServerV2
                 Console.WriteLine("Overriden Default Room(s)");
                 Rooms = new Dictionary<string, Room>();
             }
+            else
+            {
+                Room r = new Room("Main", 0);
+                Rooms.Add(r.GUID, r);
+            }
             
             if(!int.TryParse(roomsNode.Attributes[1].InnerText, out DefaultRoomID))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Failed to read defaultRoomID, reverting to default (Room id 0)");
             }
 
@@ -969,7 +1020,7 @@ namespace ServerV2
                 }
                 catch
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Failed to Generate Room " + node.InnerText);
                     Console.ForegroundColor = ConsoleColor.DarkCyan;
                 }
@@ -979,7 +1030,7 @@ namespace ServerV2
             {
                 if (!int.TryParse(webPort, out WebPort))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Failed to read WebPort, reverting to default port (8911)");
                 }
                 else
@@ -998,7 +1049,7 @@ namespace ServerV2
             {
                 if (!int.TryParse(desktopPort, out DesktopPort))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Failed to read DesktopPort, reverting to default port (8910)");
                 }
                 else
@@ -1017,7 +1068,7 @@ namespace ServerV2
             {
                 if (!IPAddress.TryParse(ip, out IPAddress))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Failed to read ServerIp, reverting to default (Automatic " + GetLocalIPAddress() + ")");
                     IPAddress = IPAddress.Parse(GetLocalIPAddress());
                 }
@@ -1037,18 +1088,18 @@ namespace ServerV2
             {
                 if (!bool.TryParse(settings.SelectSingleNode("Config/GeneralSettings/WebPort").Attributes[0].InnerText, out WebActive))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Failed to read WebPort active attribute");
                 }
                 if (!bool.TryParse(settings.SelectSingleNode("Config/GeneralSettings/DesktopPort").Attributes[0].InnerText, out DesktopActive))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Failed to read WebPort active attribute");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Failed to read DesktopPort active attribute");
                 }
             }
             catch
             {
-                Console.ForegroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Failed to read active states");
             }
             string sslPath = settings.SelectSingleNode("Config/GeneralSettings/PfxCertificate").InnerText;
@@ -1062,7 +1113,7 @@ namespace ServerV2
                 }
                 catch (Exception e)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("Failed to load Pfx Certificate, reverting to non-ssl");
                     Console.WriteLine(e.Message);
                 }
@@ -1072,20 +1123,23 @@ namespace ServerV2
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("No Pfx Certificate provided, reverting to non-ssl");
             }
-
+            bool error = false;
             if (Rooms.Count == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("[Server not started] Please add atleast one room to the server or set overrideDefault to false. Press enter to quit.");
-                Console.ReadLine();
-                return;
+                error = true;
             }
             if (!DesktopActive && !WebActive)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("[Server not started] Please set atleast one server to active (Web or Desktop). Press enter to quit.");
+                error = true;
+            }
+            if (error)
+            {
                 Console.ReadLine();
-                return;
+                Environment.Exit(0);
             }
 
             Admins = new List<Admin>();
@@ -1131,7 +1185,7 @@ namespace ServerV2
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Unknown Permission");
                         Console.ForegroundColor = ConsoleColor.White;
                     }
@@ -1171,7 +1225,7 @@ namespace ServerV2
             }
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Complete!");
+            Console.WriteLine("=========Complete!=========");
             Console.ForegroundColor = ConsoleColor.White;
         }
 
@@ -1179,7 +1233,7 @@ namespace ServerV2
         static void LoadBots()
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Loading Bots...");
+            Console.WriteLine("=========Loading Bots=========");
 
             BotHandler = new BotHandler();
             BotHandler.OnReqestClients += () => { return Clients; };
@@ -1207,11 +1261,11 @@ namespace ServerV2
                     Bot bot = (Bot)Attribute.GetCustomAttribute(type, typeof(Bot));
                     if (bot != null)
                     {
-                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
                         Console.WriteLine($"{bot.Name} By {bot.Creator}");
                         Console.ForegroundColor = ConsoleColor.Gray;
                         Console.WriteLine(bot.Desc);
-                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
                         Console.WriteLine($"Version: {bot.Version}");
                         Console.ForegroundColor = ConsoleColor.White;
                         dynamic c = Activator.CreateInstance(type, BotHandler);
@@ -1265,10 +1319,11 @@ namespace ServerV2
                 }
             }
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Complete!");
+            Console.WriteLine("=========Complete!=========");
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        // Helpers
         static string GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -1282,7 +1337,6 @@ namespace ServerV2
             throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
-        // Helpers
         static async void SendToAll(ClientInfo sender, Message m, bool ignoreUserRoom = false)
         {
             List<Task> tasks = new List<Task>();
@@ -1527,7 +1581,7 @@ namespace ServerV2
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Unknown user: " + user);
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
@@ -1595,14 +1649,21 @@ namespace ServerV2
                 ClientInfo c = Clients.Where(x => x.Value.Name == user).First().Value;
                 c.ToggleMute();
 
-                PunishmentList.Add(c.ClientAddress, RevokedPerms.Muted);
+                if (!c.Muted)
+                {
+                    PunishmentList.Add(c.ClientAddress, RevokedPerms.Muted);
+                }
+                else
+                {
+                    PunishmentList.Remove(c.ClientAddress);
+                }
 
                 string json = PunishmentList.SerializePun();
                 File.WriteAllText("Punished.json", json);
 
                 Message m = new Message("Server", MessageType.Message);
                 m.SetColor(NColor.FromRGB(0, 255, 0));
-                m.SetContent("You have been muted");
+                m.SetContent("You have been " + (c.Muted? "muted" : "unmuted"));
 
                 if(c.ClientType == ClientType.Web)
                 {

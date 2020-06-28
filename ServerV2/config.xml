@@ -3,10 +3,10 @@
   <!-- overrideDefault -> removes default rooms -->
   <!-- defaultRoomID -> Sets the room that the server puts a joining user in, will be overrider if said room is full -->
   <Rooms overrideDefault="true" defaultRoomID="0">
-    <!-- 0 and 1 are already taken by the default rooms -->
-    <!-- Set overrideDefault to true to use id 0 and 1-->
-    
-    <!-- No 2 rooms can have the same id -->
+    <!-- 0 is already taken by the default room -->
+    <!-- Set overrideDefault to true to use id 0-->
+
+    <!--No 2 rooms can have the same id-->
     <Room id="0" userLimit="-1" maxBufferSize="30">Join</Room>
     <Room id="1" userLimit="10" maxBufferSize="30">Main 2</Room>
     <Room id="2" userLimit="10" maxBufferSize="30">Main 3</Room>
@@ -22,15 +22,6 @@
         <CanMove>false</CanMove>
       </Perms>
     </Admin>
-    <Admin>
-      <UserInfo password="123456789">GentlyTech</UserInfo>
-      <Perms>
-        <CanKick>true</CanKick>
-        <CanMute>true</CanMute>
-        <CanBan>true</CanBan>
-        <CanMove>false</CanMove>
-      </Perms>
-    </Admin>
   </Admins>
   <!-- Leave blank for no admin -->
   
@@ -39,11 +30,11 @@
     <ServerIp></ServerIp>
     <!-- Need either WebPort, DesktopPort or both. Can be left blank to use the default ports -->
     <!-- active tells whether or not to put that server online (ie. if you only want web clients to connect, set desktop active to false and webport active to true)-->
-    <WebPort active="true">8911</WebPort>
-    <DesktopPort active="true">8910</DesktopPort>    
-    <ServerPassword>Test</ServerPassword> <!-- Only allows users with the password to join -->
+    <WebPort active="true"></WebPort>
+    <DesktopPort active="true"></DesktopPort>    
+    <ServerPassword></ServerPassword> <!-- Only allows users with the password to join -->
     
     <!-- Leave blank to disable ssl, note, if using our web interface you require ssl. -->
-    <PfxCertificate password="">certificate.pfx</PfxCertificate>
+    <PfxCertificate password=""></PfxCertificate>
   </GeneralSettings>
 </Config>
