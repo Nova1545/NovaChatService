@@ -158,7 +158,7 @@ namespace Client
                         {
                             user.CreateStatus(StatusType.Disconnecting);
                             ChangeConnectionInputState(true);
-                            FixClient();
+                            //FixClient();
                             return;
                         }
                     }

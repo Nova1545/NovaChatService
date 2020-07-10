@@ -174,6 +174,14 @@ namespace ServerV2
                         Console.WriteLine($"[{pun.Key}] {pun.Value}");
                     }
                 }
+                else if(command[0] == "send")
+                {
+                    Console.WriteLine("Input text");
+                    Message m = new Message("Server", MessageType.Message);
+                    m.SetContent(Console.ReadLine());
+                    //SendToAll(m);
+                    SendMessage(Clients.First().Value, m);
+                }
             }
         }
 
@@ -765,7 +773,6 @@ namespace ServerV2
                         continue;
                     }
 
-                    Console.WriteLine("Here");
                     if (!client.Admin.Equals(default(Admin)) && m.Content.StartsWith("/"))
                     {
                         string[] command = m.Content.Split('|');
@@ -1461,6 +1468,70 @@ namespace ServerV2
                         else
                         {
                             tasks.Add(MessageHelpers.SetMessageAsync(client.Stream, m.ToMessage()));
+                        }
+                    }
+                }
+            }
+
+            while (tasks.Any())
+            {
+                tasks.Remove(await Task.WhenAny(tasks));
+            }
+        }
+
+        static async void SendToAll(Message m)
+        {
+            List<Task> tasks = new List<Task>();
+            Console.WriteLine(Clients.Count);
+            foreach (ClientInfo client in Clients.Select(x => x.Value).ToArray())
+            {
+                if (m.EndPoint == "")
+                {
+                    if (client.ClientType == ClientType.Web)
+                    {
+                        if (client.IsSecure)
+                        {
+                            tasks.Add(JsonMessageHelpers.SetJsonMessageAsync(client.SStream, m.ToJsonMessage()));
+                        }
+                        else
+                        {
+                            tasks.Add(JsonMessageHelpers.SetJsonMessageAsync(client.Stream, m.ToJsonMessage()));
+                        }
+                    }
+                    else
+                    {
+                        if (client.IsSecure)
+                        {
+                            tasks.Add(MessageHelpers.SetMessageAsync(client.SStream, m));
+                        }
+                        else
+                        {
+                            tasks.Add(MessageHelpers.SetMessageAsync(client.Stream, m));
+                        }
+                    }
+                }
+                else if (client.Name == m.EndPoint)
+                {
+                    if (client.ClientType == ClientType.Web)
+                    {
+                        if (client.IsSecure)
+                        {
+                            tasks.Add(JsonMessageHelpers.SetJsonMessageAsync(client.SStream, m.ToJsonMessage()));
+                        }
+                        else
+                        {
+                            tasks.Add(JsonMessageHelpers.SetJsonMessageAsync(client.Stream, m.ToJsonMessage()));
+                        }
+                    }
+                    else
+                    {
+                        if (client.IsSecure)
+                        {
+                            tasks.Add(MessageHelpers.SetMessageAsync(client.SStream, m));
+                        }
+                        else
+                        {
+                            tasks.Add(MessageHelpers.SetMessageAsync(client.Stream, m));
                         }
                     }
                 }
