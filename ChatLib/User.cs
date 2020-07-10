@@ -59,6 +59,7 @@ namespace ChatLib
             Name = name;
             AutoSend = autoSend;
             Stream = stream;
+            SStream = null;
             Active = true;
             IsSecure = false;
             ThreadPool.QueueUserWorkItem(Listen, Stream);
@@ -69,6 +70,7 @@ namespace ChatLib
             Name = name;
             AutoSend = autoSend;
             SStream = sstream;
+            Stream = null;
             Active = true;
             IsSecure = true;
             ThreadPool.QueueUserWorkItem(Listen, SStream);
@@ -209,6 +211,7 @@ namespace ChatLib
                 Message m = new Message(Name, MessageType.Initialize);
                 SHA256 sha = SHA256.Create();
                 byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                sha.Dispose();
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < hash.Length; i++)
                 {
@@ -222,6 +225,7 @@ namespace ChatLib
                 Message m = new Message(Name, MessageType.Initialize);
                 SHA256 sha = SHA256.Create();
                 byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                sha.Dispose();
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < hash.Length; i++)
                 {
@@ -290,6 +294,7 @@ namespace ChatLib
                     NetworkStream nStream = (NetworkStream)stream;
                     while (Active)
                     {
+                        Console.WriteLine("Hey! " + Active);
                         Message m = MessageHelpers.GetMessage(nStream);
                         Console.WriteLine("Message");
                         switch (m.MessageType)
@@ -316,7 +321,9 @@ namespace ChatLib
                                 OnMesssageInformationReceivedCallback?.Invoke(m);
                                 break;
                         }
+                        Console.WriteLine("All");
                         OnMessageAnyReceivedCallback?.Invoke(m);
+                        Console.WriteLine("All Complete");
                     }
                 }
             }
