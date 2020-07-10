@@ -62,6 +62,7 @@ namespace Client
             this.setPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.crashServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToastToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.getInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -353,7 +354,8 @@ namespace Client
             this.killAllInstancesToolStripMenuItem,
             this.startServerInstanceToolStripMenuItem,
             this.crashServerToolStripMenuItem,
-            this.sendToastToolStripMenuItem});
+            this.sendToastToolStripMenuItem,
+            this.getInfoToolStripMenuItem});
             this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
             this.debugToolStripMenuItem.Size = new System.Drawing.Size(68, 24);
             this.debugToolStripMenuItem.Text = "Debug";
@@ -402,6 +404,13 @@ namespace Client
             this.sendToastToolStripMenuItem.Size = new System.Drawing.Size(238, 26);
             this.sendToastToolStripMenuItem.Text = "Send Toast";
             this.sendToastToolStripMenuItem.Click += new System.EventHandler(this.sendToastToolStripMenuItem_Click);
+            // 
+            // getInfoToolStripMenuItem
+            // 
+            this.getInfoToolStripMenuItem.Name = "getInfoToolStripMenuItem";
+            this.getInfoToolStripMenuItem.Size = new System.Drawing.Size(238, 26);
+            this.getInfoToolStripMenuItem.Text = "Get Info";
+            this.getInfoToolStripMenuItem.Click += new System.EventHandler(this.getInfoToolStripMenuItem_Click);
             // 
             // openFileDialog1
             // 
@@ -471,5 +480,6 @@ namespace Client
         private System.Windows.Forms.ToolStripMenuItem setPathToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem crashServerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sendToastToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem getInfoToolStripMenuItem;
     }
 }

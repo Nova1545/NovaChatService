@@ -126,7 +126,7 @@ namespace Client
             Log.ScrollToCaret();
         }
 
-        public void printToLog(string text, Color color)
+        public void PrintToLog(string text, Color color)
         {
             Log.AppendText(text + "\n", color);
             Log.ScrollToCaret();
@@ -176,10 +176,10 @@ namespace Client
             if (R >= 0 && R <= 255 && R >= 0 && G <= 255 && R >= 0 && B <= 255)
             {
                 this.TagColor = NColor.FromRGB(R, G, B);
-                printToLog("Changing tag color to (" + R.ToString() + ", " + G.ToString() + ", " + B.ToString() + ")", Color.Teal);
+                PrintToLog("Changing tag color to (" + R.ToString() + ", " + G.ToString() + ", " + B.ToString() + ")", Color.Teal);
                 return "(" + R.ToString() + ", " + G.ToString() + ", " + B.ToString() + ")";
             }
-            printToLog("Invalid Color", Color.Red);
+            PrintToLog("Invalid Color", Color.Red);
             return "Invalid Color";
         }
 

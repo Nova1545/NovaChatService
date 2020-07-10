@@ -70,7 +70,7 @@ namespace Client
                     catch (Exception ex)
                     {
                         print("Couldn't run command", Chat, Color.Red);
-                        printToLog("Couldn't run command -> " + ex.Message, Color.Red);
+                        PrintToLog("Couldn't run command -> " + ex.Message, Color.Red);
                     }
                 }
                 else if (chatBox.Text.StartsWith("/color"))
@@ -325,11 +325,6 @@ namespace Client
 
             // Do not allow this client to communicate with unauthenticated servers.
             return false;
-        }
-
-        private void sendToastToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            notifications.ShowNotification("System", "This is a test notification");
         }
     }
 }

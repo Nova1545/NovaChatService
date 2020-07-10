@@ -270,5 +270,16 @@ namespace Client
                 }
             }
         }
+
+        private void sendToastToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            notifications.ShowNotification("System", "This is a test notification");
+        }
+
+        private void getInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tcpClient != null)
+                PrintToLog("Connected: " + tcpClient.Connected.ToString(), Color.Blue);
+        }
     }
 }
