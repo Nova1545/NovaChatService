@@ -19,27 +19,20 @@ namespace ChatLib.Extras
                 int read = stream.Read(len, 0, 4 - total);
                 total += read;
             }
-            int dataLen = BitConverter.ToInt32(len, 0);
-            byte[] bytes = new byte[dataLen];
-            byte[] buffer = new byte[1024];
-            MemoryStream ms = new MemoryStream();
             total = 0;
-            while(total < dataLen)
+            byte[] data = new byte[BitConverter.ToInt32(len, 0)];
+            while (total < BitConverter.ToInt32(len, 0))
             {
-                int readcount = stream.Read(buffer, 0, buffer.Length);
-                total += readcount;
-                ms.Write(buffer, 0, readcount);
+                total += stream.Read(data, 0, BitConverter.ToInt32(len, 0));
             }
-            bytes = ms.ToArray();
-            ms.Dispose();
-            return (Message)new BinaryFormatter().Deserialize(new MemoryStream(bytes));
+
+            return (Message)new BinaryFormatter().Deserialize(new MemoryStream(data));
         }
 
         public static void SetMessage(NetworkStream stream, Message message)
         {
             MemoryStream ms = new MemoryStream();
-            BinaryFormatter bf = new BinaryFormatter();
-            bf.Serialize(ms, message);
+            new BinaryFormatter().Serialize(ms, message);
             byte[] dataBytes = ms.ToArray();
             byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
             try
@@ -48,7 +41,6 @@ namespace ChatLib.Extras
                 stream.Write(dataBytes, 0, dataBytes.Length);
             }
             catch { }
-            ms.Dispose();
         }
 
         public static async Task SetMessageAsync(NetworkStream stream, Message message)
