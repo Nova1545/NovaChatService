@@ -26,5 +26,10 @@ namespace NovaChatClient
         {
             this.InitializeComponent();
         }
+
+        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
     }
 }

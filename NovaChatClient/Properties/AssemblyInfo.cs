@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("NovaChatClient")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A simple chat client using TCP/IP")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Nova Studios and Yep Development Studios")]
 [assembly: AssemblyProduct("NovaChatClient")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCopyright("Copyright © Nova Studios and Yep Development Studios 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
