@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en-US" target-language="zh-CN" original="UWPCLIENTUI/LOCALIZATIONS/EN-US/RESOURCES.RESW" tool-id="MultilingualAppToolkit" product-name="n/a" product-version="n/a" build-num="n/a">
+    <header>
+      <tool tool-id="MultilingualAppToolkit" tool-name="Multilingual App Toolkit" tool-version="4.0.6916.0" tool-company="Microsoft" />
+    </header>
+    <body>
+      <group id="UWPCLIENTUI/LOCALIZATIONS/EN-US/RESOURCES.RESW" datatype="resx">
+        <trans-unit id="ConnectButton.Content" translate="yes" xml:space="preserve">
+          <source>Connect</source>
+          <target state="translated" state-qualifier="tm-suggestion">连接</target>
+        </trans-unit>
+        <trans-unit id="IPInput.PlaceholderText" translate="yes" xml:space="preserve">
+          <source>IP Address</source>
+          <target state="translated" state-qualifier="tm-suggestion">IP 地址</target>
+        </trans-unit>
+        <trans-unit id="LoginDescription.Text" translate="yes" xml:space="preserve">
+          <source>Create a username and enter the address of the server you want to connect to.</source>
+          <target state="translated">创造一位用户名然后输入一个IP地址.</target>
+        </trans-unit>
+        <trans-unit id="LoginTitle.Text" translate="yes" xml:space="preserve">
+          <source>Nova Chat Client</source>
+          <target state="translated">Nova 聊天客户</target>
+        </trans-unit>
+        <trans-unit id="PasswordInput.PlaceholderText" translate="yes" xml:space="preserve">
+          <source>Password</source>
+          <target state="translated" state-qualifier="tm-suggestion">密码</target>
+        </trans-unit>
+        <trans-unit id="UsernameInput.PlaceholderText" translate="yes" xml:space="preserve">
+          <source>Username</source>
+          <target state="translated" state-qualifier="tm-suggestion">用户名</target>
+        </trans-unit>
+        <trans-unit id="AdminPasswordInput.PlaceholderText" translate="yes" xml:space="preserve">
+          <source>Admin Password</source>
+          <target state="translated">管理员密码</target>
+        </trans-unit>
+        <trans-unit id="UseAdminPasswordCheckbox.Content" translate="yes" xml:space="preserve">
+          <source>Login as Admin</source>
+          <target state="translated">以管理员身份登录</target>
+        </trans-unit>
+        <trans-unit id="SettingsButton.ToolTipService.ToolTip" translate="yes" xml:space="preserve">
+          <source>Settings</source>
+          <target state="translated">设定</target>
+        </trans-unit>
+        <trans-unit id="BackButton.Content" translate="yes" xml:space="preserve">
+          <source>Go Back</source>
+          <target state="new">Go Back</target>
+        </trans-unit>
+      </group>
+    </body>
+  </file>
+</xliff>

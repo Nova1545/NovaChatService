@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ConnectButton.Content" xml:space="preserve">
+    <value>连接</value>
+  </data>
+  <data name="IPInput.PlaceholderText" xml:space="preserve">
+    <value>IP 地址</value>
+  </data>
+  <data name="LoginDescription.Text" xml:space="preserve">
+    <value>创造一位用户名然后输入一个IP地址.</value>
+  </data>
+  <data name="LoginTitle.Text" xml:space="preserve">
+    <value>Nova 聊天客户</value>
+  </data>
+  <data name="PasswordInput.PlaceholderText" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="UsernameInput.PlaceholderText" xml:space="preserve">
+    <value>用户名</value>
+  </data>
+  <data name="AdminPasswordInput.PlaceholderText" xml:space="preserve">
+    <value>管理员密码</value>
+  </data>
+  <data name="UseAdminPasswordCheckbox.Content" xml:space="preserve">
+    <value>以管理员身份登录</value>
+  </data>
+  <data name="SettingsButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>设定</value>
+  </data>
+</root>
