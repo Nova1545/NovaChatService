@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NovaChatClient.Pages;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using static NovaChatClient.Globals;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -51,7 +53,8 @@ namespace NovaChatClient
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            Username = UsernameInput.Text;
+            Frame.Navigate(typeof(ChatUI));
         }
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)

@@ -44,7 +44,31 @@
         </trans-unit>
         <trans-unit id="BackButton.Content" translate="yes" xml:space="preserve">
           <source>Go Back</source>
-          <target state="new">Go Back</target>
+          <target state="translated">返回</target>
+        </trans-unit>
+        <trans-unit id="PasswordDialog.PrimaryButtonText" translate="yes" xml:space="preserve">
+          <source>Continue</source>
+          <target state="translated">继续</target>
+        </trans-unit>
+        <trans-unit id="PasswordDialog.SecondaryButtonText" translate="yes" xml:space="preserve">
+          <source>Cancel</source>
+          <target state="translated">取消</target>
+        </trans-unit>
+        <trans-unit id="PasswordDialog.Title" translate="yes" xml:space="preserve">
+          <source>Password Required</source>
+          <target state="translated">输入密码</target>
+        </trans-unit>
+        <trans-unit id="PasswordDialogDescription.Text" translate="yes" xml:space="preserve">
+          <source>Ask the server owner for the password if you don't have it.</source>
+          <target state="translated">如果您没有密码，请询问服务器所有者。</target>
+        </trans-unit>
+        <trans-unit id="AppName" translate="yes" xml:space="preserve">
+          <source>Nova Chat Client</source>
+          <target state="translated">Nova 聊天客户</target>
+        </trans-unit>
+        <trans-unit id="MessageInput.PlaceholderText" translate="yes" xml:space="preserve">
+          <source>Type a Message</source>
+          <target state="translated">输入讯息</target>
         </trans-unit>
       </group>
     </body>

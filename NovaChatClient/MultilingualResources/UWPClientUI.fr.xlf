@@ -46,6 +46,30 @@
           <source>Go Back</source>
           <target state="new">Go Back</target>
         </trans-unit>
+        <trans-unit id="PasswordDialog.PrimaryButtonText" translate="yes" xml:space="preserve">
+          <source>Continue</source>
+          <target state="new">Continue</target>
+        </trans-unit>
+        <trans-unit id="PasswordDialog.SecondaryButtonText" translate="yes" xml:space="preserve">
+          <source>Cancel</source>
+          <target state="new">Cancel</target>
+        </trans-unit>
+        <trans-unit id="PasswordDialog.Title" translate="yes" xml:space="preserve">
+          <source>Password Required</source>
+          <target state="new">Password Required</target>
+        </trans-unit>
+        <trans-unit id="PasswordDialogDescription.Text" translate="yes" xml:space="preserve">
+          <source>Ask the server owner for the password if you don't have it.</source>
+          <target state="new">Ask the server owner for the password if you don't have it.</target>
+        </trans-unit>
+        <trans-unit id="AppName" translate="yes" xml:space="preserve">
+          <source>Nova Chat Client</source>
+          <target state="new">Nova Chat Client</target>
+        </trans-unit>
+        <trans-unit id="MessageInput.PlaceholderText" translate="yes" xml:space="preserve">
+          <source>Type a Message</source>
+          <target state="new">Type a Message</target>
+        </trans-unit>
       </group>
     </body>
   </file>

@@ -4,11 +4,35 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:NovaChatClient.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:root="using:NovaChatClient"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-
+    <Grid Padding="10">
+        <ListView x:Name="ChatField">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="root:FormattedMessage">
+                    <Grid Padding="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Width="50" Height="50" Grid.Column="0">
+                            <Ellipse.Fill>
+                                <SolidColorBrush Color="White"/>
+                                <!--ImageBrush ImageSource=""/>-->
+                            </Ellipse.Fill>
+                        </Ellipse>
+                        <StackPanel Grid.Column="1" Padding="10">
+                            <TextBlock Text="{x:Bind Name}" FontWeight="Bold"/>
+                            <TextBlock Text="{x:Bind Message}"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        
+        <TextBox x:Uid="MessageInput" x:Name="MessageInput" PlaceholderText="Type a Message"  VerticalAlignment="Bottom" Width="Auto" AcceptsReturn="False" KeyDown="MessageInput_KeyDown"/>
     </Grid>
 </Page>

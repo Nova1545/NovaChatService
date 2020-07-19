@@ -125,6 +125,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FormattedMessage.cs" />
+    <Compile Include="Globals.cs" />
     <Compile Include="Pages\ChatUI.xaml.cs">
       <DependentUpon>ChatUI.xaml</DependentUpon>
     </Compile>

@@ -12,19 +12,26 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
+using Windows.System;
+using static NovaChatClient.Globals;
 
 namespace NovaChatClient.Pages
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class ChatUI : Page
     {
         public ChatUI()
         {
             this.InitializeComponent();
+        }
+
+        private void MessageInput_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                TextBox txt = (TextBox)sender;
+                ChatField.Items.Add(new FormattedMessage(Username, txt.Text, DateTime.Now));
+                txt.Text = "";
+            }
         }
     }
 }
