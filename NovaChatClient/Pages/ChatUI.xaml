@@ -9,8 +9,28 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid Padding="10">
-        <ListView x:Name="ChatField">
+    <Grid Padding="10" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0">
+            
+        </StackPanel>
+        <Button x:Uid="SettingsButton" x:Name="SettingsButton" Grid.Row="1" Background="Transparent" Click="SettingsButton_Click">
+            <SymbolIcon Symbol="Setting"/>
+        </Button>
+        <ListView x:Name="ChatField" Grid.Row="0" Grid.Column="1">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView"
+                              VerticalAlignment="Bottom"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="root:FormattedMessage">
                     <Grid Padding="10">
@@ -25,7 +45,10 @@
                             </Ellipse.Fill>
                         </Ellipse>
                         <StackPanel Grid.Column="1" Padding="10">
-                            <TextBlock Text="{x:Bind Name}" FontWeight="Bold"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{x:Bind Name}" FontWeight="Bold"/>
+                                <TextBlock Text="{x:Bind Date}" Margin="5,0,0,0"/>
+                            </StackPanel>
                             <TextBlock Text="{x:Bind Message}"/>
                         </StackPanel>
                     </Grid>
@@ -33,6 +56,15 @@
             </ListView.ItemTemplate>
         </ListView>
         
-        <TextBox x:Uid="MessageInput" x:Name="MessageInput" PlaceholderText="Type a Message"  VerticalAlignment="Bottom" Width="Auto" AcceptsReturn="False" KeyDown="MessageInput_KeyDown"/>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Uid="MessageInput" x:Name="MessageInput" PlaceholderText="Type a Message"  VerticalAlignment="Bottom" Width="Auto" AcceptsReturn="False" Grid.Column="0" KeyDown="MessageInput_KeyDown"/>
+            <Button x:Uid="SendButton" x:Name="SendButton" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="Auto" Grid.Column="1" ToolTipService.ToolTip="Send" Click="SendButton_Click">
+                <SymbolIcon Symbol="Send"/>
+            </Button>
+        </Grid>
     </Grid>
 </Page>

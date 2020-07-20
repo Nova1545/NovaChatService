@@ -12,14 +12,14 @@
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="300">
             <TextBlock x:Uid="LoginTitle" Text="Nova Chat Client" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" FontSize="28"/>
             <TextBlock x:Uid="LoginDescription" Text="Create a username and enter the address of the server you want to connect to." HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" TextWrapping="Wrap" TextAlignment="Center"/>
-            <TextBox x:Uid="UsernameInput" x:Name="UsernameInput" PlaceholderText="Username" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10" MinWidth="200"/>
-            <TextBox x:Uid="IPInput" x:Name="IPInput" PlaceholderText="IP Address" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10" MinWidth="200"/>
-            <CheckBox x:Uid="UseAdminPasswordCheckbox" Content="Login as Admin" HorizontalAlignment="Center" Margin="10" Click="CheckBox_Click"/>
-            <PasswordBox x:Uid="AdminPasswordInput" x:Name="AdminPasswordInput" PlaceholderText="Admin Password" HorizontalAlignment="Center" Margin="10" MinWidth="200" Visibility="Collapsed"/>
+            <TextBox x:Uid="UsernameInput" x:Name="UsernameInput" PlaceholderText="Username" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10" MinWidth="200" KeyDown="UsernameInput_KeyDown"/>
+            <TextBox x:Uid="IPInput" x:Name="IPInput" PlaceholderText="IP Address" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10" MinWidth="200" KeyDown="IPInput_KeyDown"/>
+            <CheckBox x:Uid="UseAdminPasswordCheckbox" x:Name="UseAdminPasswordCheckbox" Content="Login as Admin" HorizontalAlignment="Center" Margin="10" Click="UseAdminPasswordCheckbox_Click"/>
+            <PasswordBox x:Uid="AdminPasswordInput" x:Name="AdminPasswordInput" PlaceholderText="Admin Password" HorizontalAlignment="Center" Margin="10" MinWidth="200" Visibility="Collapsed" KeyDown="AdminPasswordInput_KeyDown"/>
             <Button x:Uid="ConnectButton" x:Name="ConnectButton" Content="Connect"  HorizontalAlignment="Center" Margin="10" MinWidth="200" Click="ConnectButton_Click"/>
         </StackPanel>
         <Button x:Uid="SettingsButton" x:Name="SettingsButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Transparent" Margin="10" Click="SettingsButton_Click">
-            <SymbolIcon Symbol="Setting"></SymbolIcon>
+            <SymbolIcon Symbol="Setting"/>
         </Button>
     </Grid>
 </Page>

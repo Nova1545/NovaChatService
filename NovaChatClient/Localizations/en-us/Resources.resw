@@ -156,6 +156,9 @@
   <data name="PasswordInput.PlaceholderText" xml:space="preserve">
     <value>Password</value>
   </data>
+  <data name="SendButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Send</value>
+  </data>
   <data name="SettingsButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Settings</value>
   </data>

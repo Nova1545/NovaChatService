@@ -70,6 +70,10 @@
           <source>Type a Message</source>
           <target state="translated">输入讯息</target>
         </trans-unit>
+        <trans-unit id="SendButton.ToolTipService.ToolTip" translate="yes" xml:space="preserve">
+          <source>Send</source>
+          <target state="new">Send</target>
+        </trans-unit>
       </group>
     </body>
   </file>

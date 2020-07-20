@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using static NovaChatClient.Globals;
+using Windows.System;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -57,7 +58,7 @@ namespace NovaChatClient
             Frame.Navigate(typeof(ChatUI));
         }
 
-        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        private void UseAdminPasswordCheckbox_Click(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = (CheckBox)sender;
 
@@ -73,7 +74,38 @@ namespace NovaChatClient
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-           Frame.Navigate(typeof(Pages.Settings));
+           Frame.Navigate(typeof(Settings));
+        }
+
+        private void UsernameInput_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                IPInput.Focus(FocusState.Keyboard);
+            }
+        }
+
+        private void IPInput_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                if (UseAdminPasswordCheckbox.IsChecked == true)
+                {
+                    AdminPasswordInput.Focus(FocusState.Keyboard);
+                }
+                else
+                {
+                    ConnectButton_Click(sender, e);
+                }
+            }
+        }
+
+        private void AdminPasswordInput_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                ConnectButton_Click(sender, e);
+            }
         }
     }
 }
