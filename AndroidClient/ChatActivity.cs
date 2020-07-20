@@ -33,6 +33,10 @@ namespace AndroidClient
         private Button SendBtn;
         private EditText Message;
 
+        // Password Input/Dialog
+        private EditText Password;
+        private AlertDialog AlertDialog;
+
         // Other stuff i could care less about
         private string username;
         private int port;
@@ -51,6 +55,8 @@ namespace AndroidClient
             port = int.Parse(Intent.GetStringExtra("Port"));
             address = Intent.GetStringExtra("Ip");
             username = Intent.GetStringExtra("Username");
+
+            
         }
 
         private void Message_KeyPress(object sender, View.KeyEventArgs e)
@@ -128,42 +134,100 @@ namespace AndroidClient
         protected override void OnStop()
         {
             base.OnStop();
-            user.CreateStatus(StatusType.Disconnecting);
+            if (user != null)
+            {
+                user.CreateStatus(StatusType.Disconnecting);
+            }
         }
 
         protected override void OnStart()
         {
             base.OnStart();
             client = new TcpClient(address, port);
-            Toast.MakeText(this, "Connected", ToastLength.Short).Show();
 
             NetworkStream stream = client.GetStream();
 
             Message secure = MessageHelpers.GetMessage(stream);
-            if(secure.Content != "")
-            {
-                SslStream ssl = new SslStream(stream);
-                ssl.AuthenticateAsClient(secure.Content);
 
-                user = new User(username, ssl);
-                user.Init();
+            if (secure.Name == "locked")
+            {
+                View content = LayoutInflater.Inflate(Resource.Layout.layout_pass, null);
+
+                Button button1 = (Button)content.FindViewById(Resource.Id.dialog_btn_cancel);
+                Button button2 = (Button)content.FindViewById(Resource.Id.dialog_btn_sure);
+
+                Password = content.FindViewById<EditText>(Resource.Id.input_password);
+
+                AlertDialog = new AlertDialog.Builder(this).Create();
+                AlertDialog.SetView(content);
+
+                //AlertDialog.DismissEvent += (s, e) => { Finish(); };
+                AlertDialog.Show();
+
+                button2.Click += (s, e) => 
+                {
+                    if (secure.Content != "")
+                    {
+                        SslStream ssl = new SslStream(stream);
+                        ssl.AuthenticateAsClient(secure.Content);
+
+                        user = new User(username, ssl);
+                        user.Init(Password.Text);
+                    }
+                    else
+                    {
+                        user = new User(username, stream);
+                        user.Init(Password.Text);
+                    }
+
+                    user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
+                    user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
+                    user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
+
+                    Messages = FindViewById<TextView>(Resource.Id.ChatList);
+                    SendBtn = FindViewById<Button>(Resource.Id.button1);
+                    SendBtn.Click += SendBtn_Click;
+                    Message = FindViewById<EditText>(Resource.Id.input_message);
+
+                    Message.KeyPress += Message_KeyPress;
+                    Toast.MakeText(this, "Connected", ToastLength.Short).Show();
+                    AlertDialog.Dismiss();
+                };
+                button1.Click += (s, e) =>
+                {
+                    AlertDialog.Dismiss();
+                    Finish();
+                };
             }
             else
             {
-                user = new User(username, stream);
-                user.Init();
+                if (secure.Content != "")
+                {
+                    SslStream ssl = new SslStream(stream);
+                    ssl.AuthenticateAsClient(secure.Content);
+
+                    user = new User(username, ssl);
+                    user.Init();
+                }
+                else
+                {
+                    user = new User(username, stream);
+                    user.Init();
+                }
+
+                user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
+                user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
+                user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
+
+                Messages = FindViewById<TextView>(Resource.Id.ChatList);
+                SendBtn = FindViewById<Button>(Resource.Id.button1);
+                SendBtn.Click += SendBtn_Click;
+                Message = FindViewById<EditText>(Resource.Id.input_message);
+
+                Message.KeyPress += Message_KeyPress;
+
+                Toast.MakeText(this, "Connected", ToastLength.Short).Show();
             }
-
-            user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
-            user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
-            user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
-
-            Messages = FindViewById<TextView>(Resource.Id.ChatList);
-            SendBtn = FindViewById<Button>(Resource.Id.button1);
-            SendBtn.Click += SendBtn_Click;
-            Message = FindViewById<EditText>(Resource.Id.input_message);
-
-            Message.KeyPress += Message_KeyPress;
         }
 
         Color NColorToColor(NColor color)

@@ -261,7 +261,6 @@ namespace ChatLib
                     {
                         SslStream nStream = (SslStream)stream;
                         Message m = MessageHelpers.GetMessage(nStream);
-                        Console.WriteLine(m.MessageType);
                         switch (m.MessageType)
                         {
                             case MessageType.Message:
@@ -294,9 +293,7 @@ namespace ChatLib
                     NetworkStream nStream = (NetworkStream)stream;
                     while (Active)
                     {
-                        Console.WriteLine("Hey! " + Active);
                         Message m = MessageHelpers.GetMessage(nStream);
-                        Console.WriteLine("Message");
                         switch (m.MessageType)
                         {
                             case MessageType.Message:
@@ -321,9 +318,7 @@ namespace ChatLib
                                 OnMesssageInformationReceivedCallback?.Invoke(m);
                                 break;
                         }
-                        Console.WriteLine("All");
                         OnMessageAnyReceivedCallback?.Invoke(m);
-                        Console.WriteLine("All Complete");
                     }
                 }
             }

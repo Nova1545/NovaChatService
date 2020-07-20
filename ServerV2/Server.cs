@@ -28,8 +28,7 @@ namespace ServerV2
         static Dictionary<string, ClientInfo> Clients;
         static Dictionary<string, Room> Rooms;
 
-        static List<IPAddress> BanList;
-        static Dictionary<IPAddress, RevokedPerms> PunishmentList;
+        static List<Punishment> PunishmentList;
         static List<Admin> Admins;
 
         static BotHandler BotHandler;
@@ -77,8 +76,7 @@ namespace ServerV2
 
             Clients = new Dictionary<string, ClientInfo>();
             Rooms = new Dictionary<string, Room>();
-            BanList = new List<IPAddress>();
-            PunishmentList = new Dictionary<IPAddress, RevokedPerms>();
+            PunishmentList = new List<Punishment>();
 
             LoadConfig();
             LoadBots();
@@ -133,54 +131,58 @@ namespace ServerV2
                         Console.WriteLine(client.Value.ToString());
                     }
                 }
-                else if(command[0] == "bans")
-                {
-                    foreach (IPAddress address in BanList)
-                    {
-                        Console.WriteLine(address.ToString());
-                    }
-                }
                 else if(command[0] == "ban")
                 {
-                    Ban(command[1]);
+                    if (int.TryParse(command[2], out int d))
+                    {
+                        Ban(command[1], d);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unknown Duration");
+                    }
                 }
                 else if(command[0] == "unban")
                 {
-                    IPAddress addr = IPAddress.Parse(command[1]);
-                    if (PunishmentList.ContainsKey(addr))
-                    {
-                        PunishmentList.Remove(addr);
-                        if (PunishmentList.Count == 0)
-                        {
-                            File.Delete("Punished.json");
-                        }
-                        else
-                        {
-                            File.WriteAllText("Punished.json", PunishmentList.SerializePun());
-                        }
-                    }
+                    //IPAddress addr = IPAddress.Parse(command[1]);
+                    //if (PunishmentList.ContainsKey(addr))
+                    //{
+                    //    PunishmentList.Remove(addr);
+                    //    if (PunishmentList.Count == 0)
+                    //    {
+                    //        File.Delete("Punished.json");
+                    //    }
+                    //    else
+                    //    {
+                    //        File.WriteAllText("Punished.json", PunishmentList.SerializePun());
+                    //    }
+                    //}
                 }
                 else if(command[0] == "admins")
                 {
                     foreach (Admin admin in Admins)
                     {
-                        Console.WriteLine(admin.Perms.ToString());
+                        string status = Clients.Any(x => x.Value.Admin.Username == admin.Username) ? "Online" : "Offline";
+                        Console.WriteLine($"[{admin.Username}]");
+                        Console.WriteLine($"Perms -> {admin.Perms.ToString()}");
+                        Console.WriteLine($"Status -> {status}");
+
                     }
                 }
                 else if(command[0] == "puns")
                 {
-                    foreach (KeyValuePair<IPAddress, RevokedPerms> pun in PunishmentList)
-                    {
-                        Console.WriteLine($"[{pun.Key}] {pun.Value}");
-                    }
+                    //foreach (KeyValuePair<IPAddress, RevokedPerms> pun in PunishmentList)
+                    //{
+                    //    Console.WriteLine($"[{pun.Key}] {pun.Value}");
+                    //}
                 }
-                else if(command[0] == "send")
+                else if(command[0] == "mute")
                 {
-                    Console.WriteLine("Input text");
-                    Message m = new Message("Server", MessageType.Message);
-                    m.SetContent(Console.ReadLine());
-                    //SendToAll(m);
-                    SendMessage(Clients.First().Value, m);
+                    Mute(command[1]);
+                }
+                else if(command[0] == "kick")
+                {
+                    Kick(command[1]);
                 }
             }
         }
@@ -195,15 +197,16 @@ namespace ServerV2
             try
             {
                 IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                CheckTempBan(addr);
                 bool clientMuted = false;
-                if (PunishmentList.ContainsKey(addr))
+                if (PunishmentList.Any(x => x.ClientAddress == addr))
                 {
-                    if (PunishmentList[addr] == RevokedPerms.Banned)
+                    if (PunishmentList.First(x => x.ClientAddress == addr).RevokedPerms == RevokedPerms.Banned)
                     {
                         client.GetStream().Close();
                         return;
                     }
-                    else if(PunishmentList[addr] == RevokedPerms.Muted)
+                    else if(PunishmentList.First(x => x.ClientAddress == addr).RevokedPerms == RevokedPerms.Muted)
                     {
                         clientMuted = true;
                     }
@@ -314,15 +317,16 @@ namespace ServerV2
             try
             {
                 IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                CheckTempBan(addr);
                 bool clientMuted = false;
-                if (PunishmentList.ContainsKey(addr))
+                if (PunishmentList.Any(x => x.ClientAddress == addr))
                 {
-                    if (PunishmentList[addr] == RevokedPerms.Banned)
+                    if (PunishmentList.First(x => x.ClientAddress == addr).RevokedPerms == RevokedPerms.Banned)
                     {
                         client.GetStream().Close();
                         return;
                     }
-                    else if (PunishmentList[addr] == RevokedPerms.Muted)
+                    else if (PunishmentList.First(x => x.ClientAddress == addr).RevokedPerms == RevokedPerms.Muted)
                     {
                         clientMuted = true;
                     }
@@ -577,11 +581,6 @@ namespace ServerV2
                     JsonMessage m = client.IsSecure ? JsonMessageHelpers.GetJsonMessage(client.SStream) : JsonMessageHelpers.GetJsonMessage(client.Stream);
                     m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
 
-                    if (client.Muted)
-                    {
-                        continue;
-                    }
-
                     // Send to bots for proccesing
                     var results = OnJsonMessageSentCallback?.GetInvocationList().Select(x => x.DynamicInvoke(m, client)).ToArray();
                     if(results.Any(x => (MessageState)x == MessageState.Terminate))
@@ -594,7 +593,7 @@ namespace ServerV2
                         m.SetName(client.Name);
                     }
 
-                    if (m.MessageType == MessageType.Message)
+                    if (m.MessageType == MessageType.Message && !client.Muted)
                     {
                         r.AddMesssage(m.ToMessage());
                     }
@@ -662,6 +661,11 @@ namespace ServerV2
                     }
                     else if (m.MessageType == MessageType.Whisper)
                     {
+
+                        if (client.Muted)
+                        {
+                            continue;
+                        }
                         SendToAll(client, m, true);
                         continue;
                     }
@@ -670,6 +674,10 @@ namespace ServerV2
                         SendJsonMessage(client, InformationHandler(m.InfomationType, "").ToJsonMessage());
                     }
 
+                    if (client.Muted)
+                    {
+                        continue;
+                    }
                     SendToAll(client, m);
                 }
                 catch (Exception e)
@@ -768,30 +776,45 @@ namespace ServerV2
                     Message m = client.IsSecure ? MessageHelpers.GetMessage(client.SStream) : MessageHelpers.GetMessage(client.Stream);
                     m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
 
-                    if (client.Muted)
-                    {
-                        continue;
-                    }
-
                     if (!client.Admin.Equals(default(Admin)) && m.Content.StartsWith("/"))
                     {
                         string[] command = m.Content.Split('|');
                         if(command[0] == "/ban" && (client.Admin.Perms & Perms.Ban) == Perms.Ban)
                         {
                             string user = command[1];
-                            if (Ban(user))
+                            if(command.Length > 2 && int.TryParse(command[2], out int d))
                             {
-                                m = new Message("Server", MessageType.Message);
-                                m.SetColor(NColor.FromRGB(0, 255, 0));
-                                m.SetContent(user + " has been banned");
-                                SendMessage(client, m);
+                                if (Ban(user, d))
+                                {
+                                    m = new Message("Server", MessageType.Message);
+                                    m.SetColor(NColor.FromRGB(0, 255, 0));
+                                    m.SetContent(user + " has been banned");
+                                    SendMessage(client, m);
+                                }
+                                else
+                                {
+                                    m = new Message("Server", MessageType.Message);
+                                    m.SetColor(NColor.FromRGB(0, 255, 0));
+                                    m.SetContent(user + " has been not been banned");
+                                    SendMessage(client, m);
+                                }
                             }
                             else
                             {
-                                m = new Message("Server", MessageType.Message);
-                                m.SetColor(NColor.FromRGB(0, 255, 0));
-                                m.SetContent(user + " has been not been banned");
-                                SendMessage(client, m);
+                                if (Ban(user, -1))
+                                {
+                                    m = new Message("Server", MessageType.Message);
+                                    m.SetColor(NColor.FromRGB(0, 255, 0));
+                                    m.SetContent(user + " has been banned");
+                                    SendMessage(client, m);
+                                }
+                                else
+                                {
+                                    m = new Message("Server", MessageType.Message);
+                                    m.SetColor(NColor.FromRGB(0, 255, 0));
+                                    m.SetContent(user + " has been not been banned");
+                                    SendMessage(client, m);
+                                }
                             }
                         }
                         else if (command[0] == "/kick" && (client.Admin.Perms & Perms.Kick) == Perms.Kick)
@@ -844,7 +867,7 @@ namespace ServerV2
                         m.SetName(client.Name);
                     }
 
-                    if (m.MessageType == MessageType.Message)
+                    if (m.MessageType == MessageType.Message && !client.Muted)
                     {
                         r.AddMesssage(m);
                     }
@@ -913,6 +936,11 @@ namespace ServerV2
                     }
                     else if (m.MessageType == MessageType.Whisper)
                     {
+
+                        if (client.Muted)
+                        {
+                            continue;
+                        }
                         SendToAll(client, m, true);
                         continue;
                     }
@@ -920,7 +948,11 @@ namespace ServerV2
                     {
                         SendMessage(client, InformationHandler(m.InfomationType, ""));
                     }
-                    Console.WriteLine("Sending to all");
+
+                    if (client.Muted)
+                    {
+                        continue;
+                    }
                     SendToAll(client, m);
                 }
                 catch (Exception e)
@@ -1165,6 +1197,10 @@ namespace ServerV2
                             adminPerms &= ~Perms.None;
                             adminPerms |= Perms.Kick;
                         }
+                        else
+                        {
+                            adminPerms &= ~Perms.Kick;
+                        }
                     }
                     else if (perm.Name == "CanMute")
                     {
@@ -1172,6 +1208,10 @@ namespace ServerV2
                         {
                             adminPerms &= ~Perms.None;
                             adminPerms |= Perms.Mute;
+                        }
+                        else
+                        {
+                            adminPerms &= ~Perms.Mute;
                         }
                     }
                     else if (perm.Name == "CanBan")
@@ -1181,6 +1221,10 @@ namespace ServerV2
                             adminPerms &= ~Perms.None;
                             adminPerms |= Perms.Ban;
                         }
+                        else
+                        {
+                            adminPerms &= ~Perms.Ban;
+                        }
                     }
                     else if (perm.Name == "CanMove")
                     {
@@ -1188,6 +1232,10 @@ namespace ServerV2
                         {
                             adminPerms &= ~Perms.None;
                             adminPerms |= Perms.Move;
+                        }
+                        else
+                        {
+                            adminPerms &= ~Perms.Move;
                         }
                     }
                     else
@@ -1276,6 +1324,14 @@ namespace ServerV2
                         Console.WriteLine($"Version: {bot.Version}");
                         Console.ForegroundColor = ConsoleColor.White;
                         dynamic c = Activator.CreateInstance(type, BotHandler);
+                        if(!(c is BotAb))
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                            Console.WriteLine("Failed to load " + path);
+                            Console.WriteLine("File doesnt contain class inheriting type 'BotAb'");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            continue;
+                        }
                         try
                         {
                             try
@@ -1596,14 +1652,14 @@ namespace ServerV2
             }
         }
 
-        static bool Ban(string user)
+        static bool Ban(string user, int duration)
         {
             if (Clients.Any(x => x.Value.Name == user))
             {
                 ClientInfo client = Clients.Where(x => x.Value.Name == user).First().Value;
                 Room r = Rooms.Where(x => x.Value.ID == client.RoomId).First().Value;
 
-                PunishmentList.Add(client.ClientAddress, RevokedPerms.Banned);
+                PunishmentList.Add(new Punishment(client.ClientAddress, RevokedPerms.Banned, duration));
 
                 string json = PunishmentList.SerializePun();
                 File.WriteAllText("Punished.json", json);
@@ -1657,6 +1713,19 @@ namespace ServerV2
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
+        }
+
+        static void CheckTempBan(IPAddress ip)
+        {
+            try
+            {
+                Punishment p = PunishmentList.First(x => x.ClientAddress == ip && x.IsTempBan);
+                if(DateTime.UtcNow >= p.EndDate)
+                {
+                    PunishmentList.Remove(p);
+                }
+            }
+            catch { }
         }
 
         static bool Kick(string user)
@@ -1720,13 +1789,13 @@ namespace ServerV2
                 ClientInfo c = Clients.Where(x => x.Value.Name == user).First().Value;
                 c.ToggleMute();
 
-                if (!c.Muted)
+                if (c.Muted)
                 {
-                    PunishmentList.Add(c.ClientAddress, RevokedPerms.Muted);
+                    PunishmentList.Add(new Punishment(c.ClientAddress, RevokedPerms.Banned));
                 }
                 else
                 {
-                    PunishmentList.Remove(c.ClientAddress);
+                    PunishmentList.Remove(PunishmentList.First(x => x.ClientAddress == c.ClientAddress));
                 }
 
                 string json = PunishmentList.SerializePun();

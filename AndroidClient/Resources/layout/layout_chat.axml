@@ -6,6 +6,7 @@
 	android:layout_height="match_parent"
 	android:minWidth="25px"
 	android:minHeight="25px">
+
 	<TextView
 		android:text=""
 		android:layout_width="match_parent"

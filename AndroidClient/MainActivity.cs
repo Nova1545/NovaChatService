@@ -51,7 +51,6 @@ namespace AndroidClient
 
         private void Servers_ItemLongClick(object sender, AdapterView.ItemLongClickEventArgs e)
         {
-
             Preferences.Set("servers", Preferences.Get("servers", "").Replace(items[e.Position] + "|", ""));
 
             items.RemoveAt(e.Position);
@@ -80,11 +79,11 @@ namespace AndroidClient
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            int id = item.ItemId;
-            if (id == Resource.Id.action_settings)
-            {
-                return true;
-            }
+            //int id = item.ItemId;
+            //if (id == Resource.Id.action_settings)
+            //{
+            //    return true;
+            //}
 
             return base.OnOptionsItemSelected(item);
         }
@@ -95,6 +94,10 @@ namespace AndroidClient
 
         private void FabOnClick(object sender, EventArgs eventArgs)
         {
+            Intent intent = new Intent(this, typeof(Drawer));
+            StartActivity(intent);
+            return;
+
             View view = (View) sender;
             //Snackbar.Make(view, "Replace with your own action", Snackbar.LengthLong)
             //    .SetAction("Action", (View.IOnClickListener)null).Show();

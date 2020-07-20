@@ -32,9 +32,9 @@
     <!-- active tells whether or not to put that server online (ie. if you only want web clients to connect, set desktop active to false and webport active to true)-->
     <WebPort active="true"></WebPort>
     <DesktopPort active="true"></DesktopPort>    
-    <ServerPassword></ServerPassword> <!-- Only allows users with the password to join -->
+    <ServerPassword>1234</ServerPassword> <!-- Only allows users with the password to join -->
     
     <!-- Leave blank to disable ssl, note, if using our web interface you require ssl. -->
-    <PfxCertificate password=""></PfxCertificate>
+    <PfxCertificate password="certificate.pfx"></PfxCertificate>
   </GeneralSettings>
 </Config>

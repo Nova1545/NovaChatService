@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Drawing;
 using ChatLib.Extras;
 using System.Net;
+using ChatLib.Administrator;
 
 namespace ChatLib.Json
 {
@@ -221,7 +222,7 @@ namespace ChatLib.Json
             return Rooms;
         }
 
-        public static string SerializePun(this Dictionary<IPAddress, RevokedPerms> punishment)
+        public static string SerializePun(this List<Punishment> punishment)
         {
             StringBuilder sb = new StringBuilder();
             StringWriter sw = new StringWriter(sb);
@@ -233,15 +234,24 @@ namespace ChatLib.Json
                 writer.WritePropertyName("Clients");
                 writer.WriteStartArray();
 
-                foreach (KeyValuePair<IPAddress, RevokedPerms> pun in punishment)
+                foreach (Punishment pun in punishment)
                 {
                     writer.WriteStartObject();
 
-                    writer.WritePropertyName("Address");
-                    writer.WriteValue(pun.Key.ToString());
+                    writer.WritePropertyName("ClientAddress");
+                    writer.WriteValue(pun.ClientAddress.ToString());
 
-                    writer.WritePropertyName("Revoked");
-                    writer.WriteValue(pun.Value);
+                    writer.WritePropertyName("RevokedPerms");
+                    writer.WriteValue(pun.RevokedPerms);
+
+                    writer.WritePropertyName("IsTempBan");
+                    writer.WriteValue(pun.IsTempBan);
+
+                    writer.WritePropertyName("StartDate");
+                    writer.WriteValue(pun.StartDate.ToString());
+
+                    writer.WritePropertyName("EndDate");
+                    writer.WriteValue(pun.EndDate.ToString());
 
                     writer.WriteEndObject();
                 }
@@ -250,10 +260,10 @@ namespace ChatLib.Json
             return sb.ToString();
         }
 
-        public static Dictionary<IPAddress, RevokedPerms> DeserializePun(this string json)
+        public static List<Punishment> DeserializePun(this string json)
         {
             JsonTextReader reader = new JsonTextReader(new StringReader(json));
-            Dictionary<IPAddress, RevokedPerms> Punisment = new Dictionary<IPAddress, RevokedPerms>();
+            List<Punishment> Punisment = new List<Punishment>();
 
             reader.Read();
             reader.Read();
@@ -264,7 +274,15 @@ namespace ChatLib.Json
                     IPAddress ip = IPAddress.Parse(reader.ReadAsString());
                     reader.Read();
                     RevokedPerms revoked = (RevokedPerms)reader.ReadAsInt32();
-                    Punisment.Add(ip, revoked);
+                    reader.Read();
+                    bool tempban = (bool)reader.ReadAsBoolean();
+                    reader.Read();
+                    DateTime start = DateTime.Parse(reader.ReadAsString());
+                    reader.Read();
+                    DateTime end = DateTime.Parse(reader.ReadAsString());
+                    reader.Read();
+
+                    Punisment.Add(new Punishment(ip, revoked, tempban, start, end));
                 }
             }
             return Punisment;
