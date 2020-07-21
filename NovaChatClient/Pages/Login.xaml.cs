@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using static NovaChatClient.Globals;
 using Windows.System;
+using System.Net;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -55,6 +56,25 @@ namespace NovaChatClient
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
             Username = UsernameInput.Text;
+
+            string[] addrSplit = IPInput.Text.Split(':');
+            if (addrSplit.Length == 2)
+            {
+                Address = IPInput.Text;
+                if(int.TryParse(addrSplit[1], out int port))
+                {
+                    Port = port;
+                }
+                else
+                {
+                    Port = 8910;
+                }
+            }
+            else
+            {
+                Address = IPInput.Text;
+                Port = 8910;
+            }
             Frame.Navigate(typeof(ChatUI));
         }
 

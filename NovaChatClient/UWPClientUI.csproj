@@ -244,6 +244,12 @@
   <ItemGroup>
     <PRIResource Include="Localizations\zh-CN\Resources.resw" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ChatLibUWP\ChatLibUWP.csproj">
+      <Project>{af6a272d-ea72-4e27-8baa-0752ee035f74}</Project>
+      <Name>ChatLibUWP</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

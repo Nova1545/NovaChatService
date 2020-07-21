@@ -24,6 +24,8 @@ namespace NovaChatClient
             this.InitializeComponent();
         }
 
+        public string Password => PasswordInput.Password;
+
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
         }
