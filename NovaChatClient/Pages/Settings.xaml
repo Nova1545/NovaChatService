@@ -9,5 +9,6 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <TextBlock x:Name="Version" Text="[Version]" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
     </Grid>
 </Page>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -26,6 +27,10 @@ namespace NovaChatClient.Pages
         public Settings()
         {
             this.InitializeComponent();
+
+            PackageVersion version = Package.Current.Id.Version;
+
+            Version.Text = "Nova Chat Client Version "+ string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
