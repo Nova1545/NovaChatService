@@ -120,7 +120,7 @@ namespace NovaChatClient.Pages
 
         private void User_OnMessageWhisperReceivedCallback(Message message)
         {
-            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 ChatField.Items.Add(new FormattedMessage("[Private] " + message.Name, message.Content, DateTime.Now, message.Color));
             }).GetResults();
@@ -184,6 +184,11 @@ namespace NovaChatClient.Pages
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(Settings));
+        }
+
+        private void LeaveChatButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(MainPage));
         }
     }
 }

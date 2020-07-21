@@ -19,7 +19,9 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" Grid.Column="0">
-            
+            <Button x:Uid="LeaveChatButton" x:Name="LeaveChatButton" Background="Transparent" Click="LeaveChatButton_Click">
+                <SymbolIcon Symbol="LeaveChat"/>
+            </Button>
         </StackPanel>
         <Button x:Uid="SettingsButton" x:Name="SettingsButton" Grid.Row="1" Background="Transparent" Click="SettingsButton_Click">
             <SymbolIcon Symbol="Setting"/>

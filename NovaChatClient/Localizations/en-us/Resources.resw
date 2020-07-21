@@ -132,6 +132,9 @@
   <data name="IPInput.PlaceholderText" xml:space="preserve">
     <value>IP Address</value>
   </data>
+  <data name="LeaveChatButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Leave Chat</value>
+  </data>
   <data name="LoginDescription.Text" xml:space="preserve">
     <value>Create a username and enter the address of the server you want to connect to.</value>
   </data>

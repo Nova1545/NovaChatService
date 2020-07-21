@@ -78,6 +78,10 @@
           <source>Go Back</source>
           <target state="new">Go Back</target>
         </trans-unit>
+        <trans-unit id="LeaveChatButton.ToolTipService.ToolTip" translate="yes" xml:space="preserve">
+          <source>Leave Chat</source>
+          <target state="new">Leave Chat</target>
+        </trans-unit>
       </group>
     </body>
   </file>

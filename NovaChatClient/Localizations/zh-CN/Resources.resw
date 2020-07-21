@@ -57,4 +57,16 @@
   <data name="MessageInput.PlaceholderText" xml:space="preserve">
     <value>输入讯息</value>
   </data>
+  <data name="SendButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>发送</value>
+  </data>
+  <data name="VersionLabel" xml:space="preserve">
+    <value>Nova 聊天客户 版本</value>
+  </data>
+  <data name="BackButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>返回</value>
+  </data>
+  <data name="LeaveChatButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>关闭聊天</value>
+  </data>
 </root>

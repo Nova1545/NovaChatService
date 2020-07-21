@@ -68,15 +68,19 @@
         </trans-unit>
         <trans-unit id="SendButton.ToolTipService.ToolTip" translate="yes" xml:space="preserve">
           <source>Send</source>
-          <target state="new">Send</target>
+          <target state="translated">发送</target>
         </trans-unit>
         <trans-unit id="VersionLabel" translate="yes" xml:space="preserve">
           <source>Nova Chat Client Version</source>
-          <target state="new">Nova Chat Client Version</target>
+          <target state="translated">Nova 聊天客户 版本</target>
         </trans-unit>
         <trans-unit id="BackButton.ToolTipService.ToolTip" translate="yes" xml:space="preserve">
           <source>Go Back</source>
-          <target state="new">Go Back</target>
+          <target state="translated">返回</target>
+        </trans-unit>
+        <trans-unit id="LeaveChatButton.ToolTipService.ToolTip" translate="yes" xml:space="preserve">
+          <source>Leave Chat</source>
+          <target state="translated">关闭聊天</target>
         </trans-unit>
       </group>
     </body>
