@@ -18,7 +18,7 @@ namespace NovaChatClient
             this.Name = Name;
             this.Message = Message;
             this.Date = Date;
-            this.Color = new SolidColorBrush(Windows.UI.Color.FromArgb(1, Color.R, Color.G, Color.B));
+            this.Color = new SolidColorBrush(Windows.UI.Color.FromArgb(255, Color.R, Color.G, Color.B));
         }
     }
 }
