@@ -87,7 +87,7 @@ namespace NovaChatClient.Pages
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                ChatField.Items.Add(new FormattedMessage("[Private] " + message.Name, message.Content, DateTime.Now, message.Color));
+                ChatField.Items.Add(new FormattedMessage(message.Name, message.Content, DateTime.Now, message.Color));
             });
         }
 

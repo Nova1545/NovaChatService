@@ -35,6 +35,6 @@
     <ServerPassword>1234</ServerPassword> <!-- Only allows users with the password to join -->
     
     <!-- Leave blank to disable ssl, note, if using our web interface you require ssl. -->
-    <PfxCertificate password="certificate.pfx"></PfxCertificate>
+    <PfxCertificate password="">certificate.pfx</PfxCertificate>
   </GeneralSettings>
 </Config>
