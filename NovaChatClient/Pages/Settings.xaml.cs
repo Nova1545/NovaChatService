@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Resources;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -14,8 +15,6 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace NovaChatClient.Pages
 {
@@ -30,18 +29,18 @@ namespace NovaChatClient.Pages
 
             PackageVersion version = Package.Current.Id.Version;
 
-            Version.Text = "Nova Chat Client Version "+ string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
+            Version.Text = new ResourceLoader().GetString("VersionLabel") + " " + string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             if (Frame.CanGoBack)
             {
-                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+                Frame.GoBack();
             }
             else
             {
-                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+                Frame.Navigate(typeof(MainPage));
             }
         }
     }

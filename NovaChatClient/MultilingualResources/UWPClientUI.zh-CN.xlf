@@ -42,10 +42,6 @@
           <source>Settings</source>
           <target state="translated">设定</target>
         </trans-unit>
-        <trans-unit id="BackButton.Content" translate="yes" xml:space="preserve">
-          <source>Go Back</source>
-          <target state="translated">返回</target>
-        </trans-unit>
         <trans-unit id="PasswordDialog.PrimaryButtonText" translate="yes" xml:space="preserve">
           <source>Continue</source>
           <target state="translated">继续</target>
@@ -73,6 +69,14 @@
         <trans-unit id="SendButton.ToolTipService.ToolTip" translate="yes" xml:space="preserve">
           <source>Send</source>
           <target state="new">Send</target>
+        </trans-unit>
+        <trans-unit id="VersionLabel" translate="yes" xml:space="preserve">
+          <source>Nova Chat Client Version</source>
+          <target state="new">Nova Chat Client Version</target>
+        </trans-unit>
+        <trans-unit id="BackButton.ToolTipService.ToolTip" translate="yes" xml:space="preserve">
+          <source>Go Back</source>
+          <target state="new">Go Back</target>
         </trans-unit>
       </group>
     </body>

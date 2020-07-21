@@ -21,6 +21,12 @@ namespace ChatLib.Extras
             return new NColor(r, g, b);
         }
 
+        public static NColor GenerateRandomColor()
+        {
+            Random rand = new Random();
+            return new NColor(rand.Next(0, 256), rand.Next(0, 256), rand.Next(0, 256));
+        }
+
         public static NColor Blue
         {
             get

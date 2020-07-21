@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatLib.Extras;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -12,5 +13,7 @@ namespace NovaChatClient
         public static string Username { get; set; }
         public static string Address { get; set; }
         public static int Port { get; set; }
+
+        public static NColor Color { get; set; }
     }
 }

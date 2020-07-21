@@ -123,7 +123,7 @@
   <data name="AppName" xml:space="preserve">
     <value>Nova Chat Client</value>
   </data>
-  <data name="BackButton.Content" xml:space="preserve">
+  <data name="BackButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Go Back</value>
   </data>
   <data name="ConnectButton.Content" xml:space="preserve">
@@ -167,5 +167,8 @@
   </data>
   <data name="UsernameInput.PlaceholderText" xml:space="preserve">
     <value>Username</value>
+  </data>
+  <data name="VersionLabel" xml:space="preserve">
+    <value>Nova Chat Client Version</value>
   </data>
 </root>

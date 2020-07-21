@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Windows.UI;
+using ChatLib.Extras;
+using Windows.UI.Xaml.Media;
 
 namespace NovaChatClient
 {
@@ -12,11 +11,14 @@ namespace NovaChatClient
         public string Message { get; private set; }
         public DateTime Date { get; private set; }
 
-        public FormattedMessage(string Name, string Message, DateTime Date)
+        public Brush Color { get; private set; }
+
+        public FormattedMessage(string Name, string Message, DateTime Date, NColor Color)
         {
             this.Name = Name;
             this.Message = Message;
             this.Date = Date;
+            this.Color = new SolidColorBrush(Windows.UI.Color.FromArgb(1, Color.R, Color.G, Color.B));
         }
     }
 }

@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:root="using:NovaChatClient"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource SystemControlAcrylicWindowMediumHighBrush}">
 
     <Grid Padding="10" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
@@ -38,12 +38,7 @@
                             <ColumnDefinition Width="50"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Ellipse Width="50" Height="50" Grid.Column="0">
-                            <Ellipse.Fill>
-                                <SolidColorBrush Color="White"/>
-                                <!--ImageBrush ImageSource=""/>-->
-                            </Ellipse.Fill>
-                        </Ellipse>
+                        <Ellipse Width="50" Height="50" Grid.Column="0" Fill="{x:Bind Color}"/>
                         <StackPanel Grid.Column="1" Padding="10">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{x:Bind Name}" FontWeight="Bold"/>

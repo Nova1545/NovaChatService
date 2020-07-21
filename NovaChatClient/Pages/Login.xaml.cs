@@ -30,27 +30,6 @@ namespace NovaChatClient
         public MainPage()
         {
             this.InitializeComponent();
-            SystemNavigationManager.GetForCurrentView().BackRequested += App_BackRequested;
-        }
-
-        private void App_BackRequested(object sender, BackRequestedEventArgs e)
-        {
-            if (Frame.CanGoBack)
-            {
-                Frame.GoBack();
-            }
-        }
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            if (Frame.CanGoBack)
-            {
-                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
-            }
-            else
-            {
-                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-            }
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
@@ -75,6 +54,7 @@ namespace NovaChatClient
                 Address = IPInput.Text;
                 Port = 8910;
             }
+
             Frame.Navigate(typeof(ChatUI));
         }
 

@@ -39,9 +39,6 @@
   <data name="SettingsButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>设定</value>
   </data>
-  <data name="BackButton.Content" xml:space="preserve">
-    <value>返回</value>
-  </data>
   <data name="PasswordDialog.PrimaryButtonText" xml:space="preserve">
     <value>继续</value>
   </data>
