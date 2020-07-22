@@ -941,12 +941,17 @@ namespace ServerV2
                     }
                     else if (m.MessageType == MessageType.Whisper)
                     {
-
                         if (client.Muted)
                         {
                             continue;
                         }
-                        SendToAll(client, m, true);
+                        Console.WriteLine("Wisper from " + client.Name + " to " + m.EndPoint + " Recevied and Sent to Endpoint");
+                        try
+                        {
+                            ClientInfo d = Clients.Where(x => x.Value.Name == m.EndPoint).First().Value;
+                            SendMessage(d, m);
+                        }
+                        catch { }
                         continue;
                     }
                     else if (m.MessageType == MessageType.Infomation)
