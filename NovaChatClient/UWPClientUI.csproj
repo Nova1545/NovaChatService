@@ -233,13 +233,9 @@
   <ItemGroup>
     <XliffResource Include="MultilingualResources\UWPClientUI.fr.xlf" />
     <XliffResource Include="MultilingualResources\UWPClientUI.zh-CN.xlf" />
-    <XliffResource Include="MultilingualResources\UWPClientUI.zh-Hans.xlf" />
   </ItemGroup>
   <ItemGroup>
     <PRIResource Include="Localizations\fr\Resources.resw" />
-  </ItemGroup>
-  <ItemGroup>
-    <PRIResource Include="Localizations\zh-Hans\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
     <PRIResource Include="Localizations\zh-CN\Resources.resw" />

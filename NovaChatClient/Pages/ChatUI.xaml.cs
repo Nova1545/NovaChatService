@@ -160,7 +160,8 @@ namespace NovaChatClient.Pages
         private void SendMessage()
         {
             user.CreateMessage(MessageInput.Text, Color);
-            ChatField.Items.Add(new UserMessage(Username, MessageInput.Text, DateTime.Now, Color));
+            //ChatField.Items.Add(new UserMessage(Username, MessageInput.Text, DateTime.Now, Color));
+            ChatField.Items.Add(new StatusMessage("System", MessageInput.Text));
             MessageInput.Text = "";
         }
 

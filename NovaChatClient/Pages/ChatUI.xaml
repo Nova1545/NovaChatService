@@ -8,6 +8,38 @@
     xmlns:root="using:NovaChatClient"
     mc:Ignorable="d"
     Background="{ThemeResource SystemControlAcrylicWindowMediumHighBrush}">
+    
+    <Page.Resources>
+        <DataTemplate x:Key="UserMessageTemplate" x:DataType="root:UserMessage">
+            <Grid Padding="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Ellipse Width="50" Height="50" Grid.Column="0" Fill="{x:Bind Color}"/>
+                <StackPanel Grid.Column="1" Padding="10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{x:Bind Name}" FontWeight="Bold"/>
+                        <TextBlock Text="{x:Bind Date}" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <TextBlock Text="{x:Bind Message}"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="StatusMessageTemplate" x:DataType="root:StatusMessage">
+            <StackPanel Padding="10">
+                <TextBlock Text="{x:Bind Header}" FontWeight="Bold"/>
+                <TextBlock Text="{x:Bind Message}" Margin="0,5,0,0"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <root:ChatDataTemplateSelector x:Key="ChatDataTemplateSelector"
+        UserMessageTemplate="{StaticResource UserMessageTemplate}"
+        StatusMessageTemplate="{StaticResource StatusMessageTemplate}">
+        </root:ChatDataTemplateSelector>
+    </Page.Resources>
+    
 
     <Grid Padding="10" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
@@ -26,7 +58,7 @@
         <Button x:Uid="SettingsButton" x:Name="SettingsButton" Grid.Row="1" Background="Transparent" Click="SettingsButton_Click">
             <SymbolIcon Symbol="Setting"/>
         </Button>
-        <ListView x:Name="ChatField" Grid.Row="0" Grid.Column="1">
+        <ListView x:Name="ChatField" Grid.Row="0" Grid.Column="1" ItemTemplateSelector="{StaticResource ChatDataTemplateSelector}">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView"
@@ -34,7 +66,8 @@
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>
-        
+
+
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -46,30 +79,4 @@
             </Button>
         </Grid>
     </Grid>
-    
-    <Page.Resources>
-        <DataTemplate x:Key="UserMessage" x:DataType="root:UserMessage">
-            <Grid Padding="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Ellipse Width="50" Height="50" Grid.Column="0" Fill="{x:Bind Color}"/>
-                <StackPanel Grid.Column="1" Padding="10">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{x:Bind Name}" FontWeight="Bold"/>
-                        <TextBlock Text="{x:Bind Date}" Margin="5,0,0,0"/>
-                    </StackPanel>
-                    <TextBlock Text="{x:Bind Message}"/>
-                </StackPanel>
-            </Grid>
-        </DataTemplate>
-        
-        <DataTemplate x:Key="StatusMessage" x:DataType="root:StatusMessage">
-            <StackPanel>
-                <TextBlock Text="{x:Bind Header}" FontWeight="Bold"/>
-                <TextBlock Text="{x:Bind Message}"/>
-            </StackPanel>
-        </DataTemplate>
-    </Page.Resources>
 </Page>

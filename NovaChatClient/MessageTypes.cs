@@ -2,9 +2,37 @@
 using Windows.UI;
 using ChatLib.Extras;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml;
 
 namespace NovaChatClient
 {
+    public class ChatDataTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate UserMessageTemplate { get; set; }
+        public DataTemplate StatusMessageTemplate { get; set; }
+
+        protected override DataTemplate SelectTemplateCore(object item)
+        {
+            if (item is UserMessage)
+            {
+                return UserMessageTemplate;
+            }
+            else if (item is StatusMessage)
+            {
+                return StatusMessageTemplate;
+            }
+
+            return base.SelectTemplateCore(item);
+        }
+
+        protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
+        {
+            return SelectTemplateCore(item);
+        }
+
+    }
+
     public class UserMessage
     {
         public string Name { get; private set; }
