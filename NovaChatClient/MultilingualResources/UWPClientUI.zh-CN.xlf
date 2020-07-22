@@ -82,6 +82,22 @@
           <source>Leave Chat</source>
           <target state="translated">关闭聊天</target>
         </trans-unit>
+        <trans-unit id="DisconnectDialog.PrimaryButtonText" translate="yes" xml:space="preserve">
+          <source>Yes</source>
+          <target state="new">Yes</target>
+        </trans-unit>
+        <trans-unit id="DisconnectDialog.SecondaryButtonText" translate="yes" xml:space="preserve">
+          <source>No</source>
+          <target state="new">No</target>
+        </trans-unit>
+        <trans-unit id="DisconnectDialog.Title" translate="yes" xml:space="preserve">
+          <source>Confirm</source>
+          <target state="new">Confirm</target>
+        </trans-unit>
+        <trans-unit id="DisconnectDialogDescription.Text" translate="yes" xml:space="preserve">
+          <source>Are you sure you want to disconnect from the server?</source>
+          <target state="new">Are you sure you want to disconnect from the server?</target>
+        </trans-unit>
       </group>
     </body>
   </file>

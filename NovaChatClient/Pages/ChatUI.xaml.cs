@@ -35,6 +35,7 @@ namespace NovaChatClient.Pages
         public ChatUI()
         {
             this.InitializeComponent();
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
             Color = NColor.GenerateRandomColor();
 
@@ -143,32 +144,37 @@ namespace NovaChatClient.Pages
             //}
             if (message.StatusType == StatusType.Disconnecting)
             {
-                user.Close();
-                client.Close();
-                user = null;
-                client.Dispose();
+                Disconnect();
             }
             else if (message.StatusType == StatusType.ErrorDisconnect)
             {
-                user.Close();
-                client.Close();
-                user = null;
-                client.Dispose();
+                Disconnect();
             }
+        }
+
+        private void Disconnect()
+        {
+            user.Close();
+            client.Close();
+            user = null;
+            client.Dispose();
         }
 
         private void SendMessage()
         {
-            user.CreateMessage(MessageInput.Text, Color);
-            ChatField.Items.Add(new UserMessage(Username, MessageInput.Text, DateTime.Now, Color));
-            MessageInput.Text = "";
+            if (MessageInput.Text.Length > 0)
+            {
+                user.CreateMessage(MessageInput.Text, Color);
+                ChatField.Items.Add(new UserMessage(Username, MessageInput.Text, DateTime.Now, Color));
+                MessageInput.Text = "";
+            }
         }
 
         private void MessageInput_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift) == CoreVirtualKeyStates.Down && e.Key == VirtualKey.Enter)
             {
-                MessageInput.Text += "\n";
+                ((TextBox)sender).Text += Environment.NewLine;
             }
             else if (e.Key == VirtualKey.Enter)
             {
@@ -186,9 +192,13 @@ namespace NovaChatClient.Pages
             Frame.Navigate(typeof(Settings));
         }
 
-        private void LeaveChatButton_Click(object sender, RoutedEventArgs e)
+        private async void LeaveChatButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(MainPage));
+            if (await new DisconnectDialog().ShowAsync() == ContentDialogResult.Primary)
+            {
+                Disconnect();
+                Frame.Navigate(typeof(MainPage));
+            }
         }
     }
 }

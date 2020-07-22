@@ -125,6 +125,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DisconnectDialog.xaml.cs">
+      <DependentUpon>DisconnectDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MessageTypes.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Pages\ChatUI.xaml.cs">
@@ -205,6 +208,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="DisconnectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ChatUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

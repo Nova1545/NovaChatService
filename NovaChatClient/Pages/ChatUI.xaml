@@ -73,7 +73,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Uid="MessageInput" x:Name="MessageInput" PlaceholderText="Type a Message"  VerticalAlignment="Bottom" Width="Auto" AcceptsReturn="False" Grid.Column="0" KeyDown="MessageInput_KeyDown"/>
+            <TextBox x:Uid="MessageInput" x:Name="MessageInput" PlaceholderText="Type a Message" VerticalAlignment="Bottom" Width="Auto" AcceptsReturn="False" Grid.Column="0" KeyDown="MessageInput_KeyDown"/>
             <Button x:Uid="SendButton" x:Name="SendButton" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="Auto" Grid.Column="1" ToolTipService.ToolTip="Send" Click="SendButton_Click">
                 <SymbolIcon Symbol="Send"/>
             </Button>

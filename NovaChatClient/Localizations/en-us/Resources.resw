@@ -129,6 +129,18 @@
   <data name="ConnectButton.Content" xml:space="preserve">
     <value>Connect</value>
   </data>
+  <data name="DisconnectDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="DisconnectDialog.SecondaryButtonText" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="DisconnectDialog.Title" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="DisconnectDialogDescription.Text" xml:space="preserve">
+    <value>Are you sure you want to disconnect from the server?</value>
+  </data>
   <data name="IPInput.PlaceholderText" xml:space="preserve">
     <value>IP Address</value>
   </data>
