@@ -87,7 +87,7 @@ namespace NovaChatClient.Pages
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                ChatField.Items.Add(new FormattedMessage(message.Name, message.Content, DateTime.Now, message.Color));
+                ChatField.Items.Add(new UserMessage(message.Name, message.Content, DateTime.Now, message.Color));
             });
         }
 
@@ -122,7 +122,7 @@ namespace NovaChatClient.Pages
         {
             Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                ChatField.Items.Add(new FormattedMessage("[Private] " + message.Name, message.Content, DateTime.Now, message.Color));
+                ChatField.Items.Add(new UserMessage("[Private] " + message.Name, message.Content, DateTime.Now, message.Color));
             }).GetResults();
         }
 
@@ -160,7 +160,7 @@ namespace NovaChatClient.Pages
         private void SendMessage()
         {
             user.CreateMessage(MessageInput.Text, Color);
-            ChatField.Items.Add(new FormattedMessage(Username, MessageInput.Text, DateTime.Now, Color));
+            ChatField.Items.Add(new UserMessage(Username, MessageInput.Text, DateTime.Now, Color));
             MessageInput.Text = "";
         }
 

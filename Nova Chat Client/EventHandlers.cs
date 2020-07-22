@@ -19,10 +19,10 @@ namespace Client
 
         private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
+            /*switch (e.PropertyName)
             {
 
-            }
+            }*/
         }
 
         private void crashServerToolStripMenuItem_Click(object sender, EventArgs e)
