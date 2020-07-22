@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Navigation;
 using static NovaChatClient.Globals;
 using Windows.System;
 using System.Net;
+using ChatLib.Security;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -35,6 +36,8 @@ namespace NovaChatClient
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
             Username = UsernameInput.Text;
+            AdminPassword = AdminPasswordInput.Password.StringToSecure();
+            AdminPasswordInput.Password = "";
 
             string[] addrSplit = IPInput.Text.Split(':');
             if (addrSplit.Length == 2)

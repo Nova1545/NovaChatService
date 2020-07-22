@@ -24,6 +24,8 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Net.Security;
+using ChatLib.Security;
+using System.Reflection;
 
 namespace NovaChatClient.Pages
 {
@@ -31,11 +33,11 @@ namespace NovaChatClient.Pages
     {
         User user;
         TcpClient client;
+        bool leavePressed = false;
 
         public ChatUI()
         {
             this.InitializeComponent();
-            this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
             Color = NColor.GenerateRandomColor();
 
@@ -88,7 +90,7 @@ namespace NovaChatClient.Pages
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                ChatField.Items.Add(new UserMessage(message.Name, message.Content, DateTime.Now, message.Color));
+                ChatField.Items.Add(new FormattedMessage(message.Name, message.Content, DateTime.Now, message.Color));
             });
         }
 
@@ -101,21 +103,7 @@ namespace NovaChatClient.Pages
         {
             if (message.Content == "admin")
             {
-                //string password = "";
-                //using (TextInput input = new TextInput())
-                //{
-                //    if (input.ShowDialog() == DialogResult.OK)
-                //    {
-                //        password = input.Password;
-                //    }
-                //    else
-                //    {
-                //        user.CreateStatus(StatusType.Disconnecting);
-                //        ChangeConnectionInputState(true);
-                //        return;
-                //    }
-                //}
-                //user.Init(password);
+                user.Init(AdminPassword.SecureToString());
             }
         }
 
@@ -123,7 +111,7 @@ namespace NovaChatClient.Pages
         {
             Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                ChatField.Items.Add(new UserMessage("[Private] " + message.Name, message.Content, DateTime.Now, message.Color));
+                ChatField.Items.Add(new FormattedMessage("[Private] " + message.Name, message.Content, DateTime.Now, message.Color));
             }).GetResults();
         }
 
@@ -132,49 +120,65 @@ namespace NovaChatClient.Pages
             
         }
 
-        private void User_OnMessageStatusReceivedCallback(Message message)
+        private async void User_OnMessageStatusReceivedCallback(Message message)
         {
-            //if (message.StatusType == StatusType.Connected)
-            //{
-            //    print(message.Name + " Connected", Log);
-            //}
-            //else if (message.StatusType == StatusType.Disconnected)
-            //{
-            //    print(message.Name + " Disconnected", Log);
-            //}
-            if (message.StatusType == StatusType.Disconnecting)
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                Disconnect();
-            }
-            else if (message.StatusType == StatusType.ErrorDisconnect)
-            {
-                Disconnect();
-            }
-        }
-
-        private void Disconnect()
-        {
-            user.Close();
-            client.Close();
-            user = null;
-            client.Dispose();
+                //if (message.StatusType == StatusType.Connected)
+                //{
+                //    print(message.Name + " Connected", Log);
+                //}
+                //else if (message.StatusType == StatusType.Disconnected)
+                //{
+                //    print(message.Name + " Disconnected", Log);
+                //}
+                if (message.StatusType == StatusType.Disconnecting)
+                {
+                    user.Close();
+                    client.Close();
+                    user = null;
+                    client.Dispose();
+                    Frame.Navigate(typeof(MainPage));
+                }
+                else if (message.StatusType == StatusType.ErrorDisconnect)
+                {
+                    user.Close();
+                    client.Close();
+                    user = null;
+                    client.Dispose();
+                    Frame.Navigate(typeof(MainPage));
+                }
+            });
         }
 
         private void SendMessage()
         {
-            if (MessageInput.Text.Length > 0)
+            try
             {
-                user.CreateMessage(MessageInput.Text, Color);
-                ChatField.Items.Add(new UserMessage(Username, MessageInput.Text, DateTime.Now, Color));
-                MessageInput.Text = "";
+                if (MessageInput.Text.StartsWith("/"))
+                {
+                    string[] command = MessageInput.Text.Replace("/", "").Split("-", StringSplitOptions.RemoveEmptyEntries);
+                    if (command[0].Replace(" ", "") == "wisper")
+                    {
+                        user.CreateWhisper(command[2], Color, command[1]);
+                    }
+                    MessageInput.Text = "";
+                }
+                else
+                {
+                    user.CreateMessage(MessageInput.Text, Color);
+                    ChatField.Items.Add(new FormattedMessage(Username, MessageInput.Text, DateTime.Now, Color));
+                    MessageInput.Text = "";
+                }
             }
+            catch { }
         }
 
         private void MessageInput_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift) == CoreVirtualKeyStates.Down && e.Key == VirtualKey.Enter)
             {
-                ((TextBox)sender).Text += Environment.NewLine;
+                MessageInput.Text += "\n";
             }
             else if (e.Key == VirtualKey.Enter)
             {
@@ -192,11 +196,15 @@ namespace NovaChatClient.Pages
             Frame.Navigate(typeof(Settings));
         }
 
-        private async void LeaveChatButton_Click(object sender, RoutedEventArgs e)
+        private void LeaveChatButton_Click(object sender, RoutedEventArgs e)
         {
-            if (await new DisconnectDialog().ShowAsync() == ContentDialogResult.Primary)
+            if (!leavePressed)
             {
-                Disconnect();
+                user.CreateStatus(StatusType.Disconnecting);
+                leavePressed = true;
+            }
+            else
+            {
                 Frame.Navigate(typeof(MainPage));
             }
         }

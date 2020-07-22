@@ -911,6 +911,11 @@ namespace ServerV2
                                     break;
                                 }
                             case StatusType.Disconnecting:
+
+                                m = new Message(client.Name, MessageType.Status);
+                                m.SetStatusType(StatusType.Disconnecting);
+                                SendMessage(client, m);
+
                                 if (client.IsSecure)
                                 {
                                     client.SStream.Close();
