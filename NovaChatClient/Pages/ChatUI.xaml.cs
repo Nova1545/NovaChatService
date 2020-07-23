@@ -38,6 +38,7 @@ namespace NovaChatClient.Pages
         public ChatUI()
         {
             this.InitializeComponent();
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
             Color = NColor.GenerateRandomColor();
 
@@ -90,7 +91,7 @@ namespace NovaChatClient.Pages
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                ChatField.Items.Add(new FormattedMessage(message.Name, message.Content, DateTime.Now, message.Color));
+                AddChatEntry(message.Name, message.Content, DateTime.Now, message.Color);
             });
         }
 
@@ -111,7 +112,7 @@ namespace NovaChatClient.Pages
         {
             Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                ChatField.Items.Add(new FormattedMessage("[Private] " + message.Name, message.Content, DateTime.Now, message.Color));
+                AddChatEntry("[Private] " + message.Name, message.Content, DateTime.Now, message.Color);
             }).GetResults();
         }
 
@@ -158,7 +159,7 @@ namespace NovaChatClient.Pages
                 if (MessageInput.Text.StartsWith("/"))
                 {
                     string[] command = MessageInput.Text.Replace("/", "").Split("-", StringSplitOptions.RemoveEmptyEntries);
-                    if (command[0].Replace(" ", "") == "wisper")
+                    if (command[0].Replace(" ", "") == "whisper")
                     {
                         user.CreateWhisper(command[2], Color, command[1]);
                     }
@@ -167,7 +168,7 @@ namespace NovaChatClient.Pages
                 else
                 {
                     user.CreateMessage(MessageInput.Text, Color);
-                    ChatField.Items.Add(new FormattedMessage(Username, MessageInput.Text, DateTime.Now, Color));
+                    AddChatEntry(Username, MessageInput.Text, DateTime.Now, Color);
                     MessageInput.Text = "";
                 }
             }
@@ -196,17 +197,39 @@ namespace NovaChatClient.Pages
             Frame.Navigate(typeof(Settings));
         }
 
-        private void LeaveChatButton_Click(object sender, RoutedEventArgs e)
+        private async void LeaveChatButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!leavePressed)
+            if (await new DisconnectDialog().ShowAsync() == ContentDialogResult.Primary)
             {
-                user.CreateStatus(StatusType.Disconnecting);
-                leavePressed = true;
+                if (!leavePressed)
+                {
+                    user.CreateStatus(StatusType.Disconnecting);
+                    leavePressed = true;
+                }
+                else
+                {
+                    Frame.Navigate(typeof(MainPage));
+                }
             }
-            else
-            {
-                Frame.Navigate(typeof(MainPage));
-            }
+        }
+
+        private void AddChatEntry(string Name, string Message, DateTime Date, NColor Color)
+        {
+            ChatField.Items.Add(new UserMessage(Name, Message, Date, Color));
+        }
+
+        private void AddChatEntry(string Header, string Message)
+        {
+            ChatField.Items.Add(new StatusMessage(Header, Message));
+        }
+        private void AddChatEntry(UserMessage MessageObject)
+        {
+            ChatField.Items.Add(MessageObject);
+        }
+
+        private void AddChatEntry(StatusMessage MessageObject)
+        {
+            ChatField.Items.Add(MessageObject);
         }
     }
 }
