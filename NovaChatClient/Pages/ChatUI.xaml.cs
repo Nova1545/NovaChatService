@@ -125,14 +125,14 @@ namespace NovaChatClient.Pages
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                //if (message.StatusType == StatusType.Connected)
-                //{
-                //    print(message.Name + " Connected", Log);
-                //}
-                //else if (message.StatusType == StatusType.Disconnected)
-                //{
-                //    print(message.Name + " Disconnected", Log);
-                //}
+                if (message.StatusType == StatusType.Connected)
+                {
+                    ChatField.Items.Add(new StatusMessage(message.Name, "Connected"));
+                }
+                else if (message.StatusType == StatusType.Disconnected)
+                {
+                    ChatField.Items.Add(new StatusMessage(message.Name, "Disconnected"));
+                }
                 if (message.StatusType == StatusType.Disconnecting)
                 {
                     user.Close();
@@ -162,6 +162,7 @@ namespace NovaChatClient.Pages
                     if (command[0].Replace(" ", "") == "whisper")
                     {
                         user.CreateWhisper(command[2], Color, command[1]);
+                        ChatField.Items.Add(new UserMessage("[Private] " + Username, "'" + command[2] + "' Sent to " + command[1], DateTime.Now, Color));
                     }
                     MessageInput.Text = "";
                 }
