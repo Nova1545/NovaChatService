@@ -171,6 +171,9 @@
   <data name="PasswordInput.PlaceholderText" xml:space="preserve">
     <value>Password</value>
   </data>
+  <data name="PrivateMessageIndicatorText.Text" xml:space="preserve">
+    <value>[Private]</value>
+  </data>
   <data name="SendButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Send</value>
   </data>

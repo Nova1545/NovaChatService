@@ -10,6 +10,7 @@
     Background="{ThemeResource SystemControlAcrylicWindowMediumHighBrush}">
     
     <Page.Resources>
+
         <DataTemplate x:Key="UserMessageTemplate" x:DataType="root:UserMessage">
             <Grid Padding="10">
                 <Grid.ColumnDefinitions>
@@ -19,6 +20,7 @@
                 <Ellipse Width="50" Height="50" Grid.Column="0" Fill="{x:Bind Color}"/>
                 <StackPanel Grid.Column="1" Padding="10">
                     <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Uid="PrivateMessageIndicatorText" Visibility="{x:Bind IsPrivateMessage}" Text="[Private]" Margin="0,0,5,0"/>
                         <TextBlock Text="{x:Bind Name}" FontWeight="Bold"/>
                         <TextBlock Text="{x:Bind Date}" Margin="5,0,0,0"/>
                     </StackPanel>

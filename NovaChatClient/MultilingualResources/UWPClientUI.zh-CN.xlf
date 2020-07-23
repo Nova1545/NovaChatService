@@ -98,6 +98,10 @@
           <source>Are you sure you want to disconnect from the server?</source>
           <target state="new">Are you sure you want to disconnect from the server?</target>
         </trans-unit>
+        <trans-unit id="PrivateMessageIndicatorText.Text" translate="yes" xml:space="preserve">
+          <source>[Private]</source>
+          <target state="new">[Private]</target>
+        </trans-unit>
       </group>
     </body>
   </file>

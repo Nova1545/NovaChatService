@@ -112,7 +112,7 @@ namespace NovaChatClient.Pages
         {
             Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                AddChatEntry("[Private] " + message.Name, message.Content, DateTime.Now, message.Color);
+                AddChatEntry(message.Name, message.Content, DateTime.Now, message.Color, true);
             }).GetResults();
         }
 
@@ -162,7 +162,7 @@ namespace NovaChatClient.Pages
                     if (command[0].Replace(" ", "") == "whisper")
                     {
                         user.CreateWhisper(command[2], Color, command[1]);
-                        ChatField.Items.Add(new UserMessage("[Private] " + Username, "'" + command[2] + "' Sent to " + command[1], DateTime.Now, Color));
+                        ChatField.Items.Add(new UserMessage(Username, "'" + command[2] + "' Sent to " + command[1], DateTime.Now, Color, true));
                     }
                     MessageInput.Text = "";
                 }
@@ -217,6 +217,11 @@ namespace NovaChatClient.Pages
         private void AddChatEntry(string Name, string Message, DateTime Date, NColor Color)
         {
             ChatField.Items.Add(new UserMessage(Name, Message, Date, Color));
+        }
+
+        private void AddChatEntry(string Name, string Message, DateTime Date, NColor Color, bool IsPrivateMessage)
+        {
+            ChatField.Items.Add(new UserMessage(Name, Message, Date, Color, IsPrivateMessage));
         }
 
         private void AddChatEntry(string Header, string Message)

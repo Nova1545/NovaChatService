@@ -32,7 +32,6 @@ namespace NovaChatClient
         }
 
     }
-
     public class UserMessage
     {
         public string Name { get; private set; }
@@ -41,12 +40,23 @@ namespace NovaChatClient
 
         public Brush Color { get; private set; }
 
-        public UserMessage(string Name, string Message, DateTime Date, NColor Color)
+        public Visibility IsPrivateMessage { get; private set; }
+
+        public UserMessage(string Name, string Message, DateTime Date, NColor Color, bool IsPrivateMessage = false)
         {
             this.Name = Name;
             this.Message = Message;
             this.Date = Date;
             this.Color = new SolidColorBrush(Windows.UI.Color.FromArgb(255, Color.R, Color.G, Color.B));
+
+            if (IsPrivateMessage)
+            {
+                this.IsPrivateMessage = Visibility.Visible;
+            }
+            else
+            {
+                this.IsPrivateMessage = Visibility.Collapsed;
+            }
         }
     }
 
