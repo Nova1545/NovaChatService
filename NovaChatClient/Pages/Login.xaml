@@ -16,9 +16,9 @@
             <TextBox x:Uid="IPInput" x:Name="IPInput" PlaceholderText="IP Address" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10" MinWidth="200" KeyDown="IPInput_KeyDown"/>
             <CheckBox x:Uid="UseAdminPasswordCheckbox" x:Name="UseAdminPasswordCheckbox" Content="Login as Admin" HorizontalAlignment="Center" Margin="10" Click="UseAdminPasswordCheckbox_Click"/>
             <PasswordBox x:Uid="AdminPasswordInput" x:Name="AdminPasswordInput" PlaceholderText="Admin Password" HorizontalAlignment="Center" Margin="10" MinWidth="200" Visibility="Collapsed" KeyDown="AdminPasswordInput_KeyDown"/>
-            <Button x:Uid="ConnectButton" x:Name="ConnectButton" Content="Connect"  HorizontalAlignment="Center" Margin="10" MinWidth="200" Click="ConnectButton_Click"/>
+            <Button x:Uid="ConnectButton" x:Name="ConnectButton" Style="{StaticResource ButtonRevealStyle}" Content="Connect"  HorizontalAlignment="Center" Margin="10" MinWidth="200" Click="ConnectButton_Click"/>
         </StackPanel>
-        <Button x:Uid="SettingsButton" x:Name="SettingsButton" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Transparent" Margin="10" Click="SettingsButton_Click">
+        <Button x:Uid="SettingsButton" x:Name="SettingsButton" Style="{StaticResource ButtonRevealStyle}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="Transparent" Margin="10" Click="SettingsButton_Click">
             <SymbolIcon Symbol="Setting"/>
         </Button>
     </Grid>

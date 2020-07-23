@@ -8,7 +8,7 @@
 
   <Identity
     Name="7ea6a2f0-a8a2-4d3f-9736-9f49eee66055"
-    Publisher="CN=andy"
+    Publisher="CN=Yep Development Studios"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="7ea6a2f0-a8a2-4d3f-9736-9f49eee66055" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>

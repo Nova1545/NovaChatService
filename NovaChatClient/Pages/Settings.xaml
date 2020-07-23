@@ -9,7 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Button x:Uid="BackButton" Name="BackButton" Background="Transparent" VerticalAlignment="Top" HorizontalAlignment="Left" ToolTipService.ToolTip="Go Back" Click="BackButton_Click">
+        <Button x:Uid="BackButton" Name="BackButton" Background="Transparent" Style="{StaticResource ButtonRevealStyle}" VerticalAlignment="Top" HorizontalAlignment="Left" ToolTipService.ToolTip="Go Back" Click="BackButton_Click">
             <SymbolIcon Symbol="Back"/>
         </Button>
         
