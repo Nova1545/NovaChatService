@@ -945,13 +945,18 @@ namespace ServerV2
                         {
                             continue;
                         }
-                        Console.WriteLine("Wisper from " + client.Name + " to " + m.EndPoint + " Recevied and Sent to Endpoint");
+
                         try
                         {
                             ClientInfo d = Clients.Where(x => x.Value.Name == m.EndPoint).First().Value;
                             SendMessage(d, m);
                         }
-                        catch { }
+                        catch 
+                        {
+                            m = new Message("Server", MessageType.Message);
+                            m.SetContent($"Unable to find user {m.EndPoint}");
+                            SendMessage(client, m);
+                        }
                         continue;
                     }
                     else if (m.MessageType == MessageType.Infomation)
