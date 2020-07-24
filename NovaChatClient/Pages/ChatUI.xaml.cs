@@ -34,6 +34,7 @@ namespace NovaChatClient.Pages
         User user;
         TcpClient client;
         bool leavePressed = false;
+        bool connected = false;
 
         public ChatUI()
         {
@@ -42,48 +43,61 @@ namespace NovaChatClient.Pages
 
             Color = NColor.GenerateRandomColor();
 
+            Window.Current.Closed += (s, e) => 
+            {
+                if(user != null)
+                {
+                    user.CreateStatus(StatusType.Disconnecting);
+                }
+            };
+
             Loaded += async (s, e) =>
             {
-                client = new TcpClient(Address, Port);
-                NetworkStream stream = client.GetStream();
-                Message secure = MessageHelpers.GetMessage(stream);
-                string password = "";
-                if (secure.Name == "locked")
+                if (!connected)
                 {
-                    PasswordDialog pd = new PasswordDialog();
-                    if(await pd.ShowAsync() == ContentDialogResult.Primary)
+                    client = new TcpClient();
+                    await client.ConnectAsync(Address, Port);
+                    NetworkStream stream = client.GetStream();
+                    Message secure = MessageHelpers.GetMessage(stream);
+                    string password = "";
+                    if (secure.Name == "locked")
                     {
-                        password = pd.Password;
+                        PasswordDialog pd = new PasswordDialog();
+                        if (await pd.ShowAsync() == ContentDialogResult.Primary)
+                        {
+                            password = pd.Password;
+                        }
+                        else
+                        {
+                            if (Frame.CanGoBack)
+                            {
+                                Frame.GoBack();
+                            }
+                        }
+                    }
+
+                    if (secure.Content != "")
+                    {
+                        SslStream ssl = new SslStream(stream);
+                        ssl.AuthenticateAsClient(secure.Content);
+                        user = new User(Username, ssl);
+                        user.Init(password);
                     }
                     else
                     {
-                        if (Frame.CanGoBack)
-                        {
-                            Frame.GoBack();
-                        }
+                        user = new User(Username, stream);
+                        user.Init(password);
                     }
-                }
 
-                if(secure.Content != "")
-                {
-                    SslStream ssl = new SslStream(stream);
-                    ssl.AuthenticateAsClient(secure.Content);
-                    user = new User(Username, ssl);
-                    user.Init(password);
+                    user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
+                    user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
+                    user.OnMessageTransferReceivedCallback += User_OnMessageTransferReceivedCallback;
+                    user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
+                    user.OnMessageInitReceivedCallback += User_OnMessageInitReceivedCallback;
+                    user.OnMesssageInformationReceivedCallback += User_OnMesssageInformationReceivedCallback;
+                    user.OnErrorCallback += (d) => { Debug.WriteLine(d.Message); };
+                    connected = true;
                 }
-                else
-                {
-                    user = new User(Username, stream);
-                    user.Init(password);
-                }
-
-                user.OnMessageReceivedCallback += User_OnMessageReceivedCallback;
-                user.OnMessageStatusReceivedCallback += User_OnMessageStatusReceivedCallback;
-                user.OnMessageTransferReceivedCallback += User_OnMessageTransferReceivedCallback;
-                user.OnMessageWhisperReceivedCallback += User_OnMessageWhisperReceivedCallback;
-                user.OnMessageInitReceivedCallback += User_OnMessageInitReceivedCallback;
-                user.OnMesssageInformationReceivedCallback += User_OnMesssageInformationReceivedCallback;
-                user.OnErrorCallback += (d) => { Debug.WriteLine(d.Message); };
             };
         }
 
@@ -139,6 +153,7 @@ namespace NovaChatClient.Pages
                     client.Close();
                     user = null;
                     client.Dispose();
+                    connected = false;
                     Frame.Navigate(typeof(MainPage));
                 }
                 else if (message.StatusType == StatusType.ErrorDisconnect)
@@ -147,6 +162,7 @@ namespace NovaChatClient.Pages
                     client.Close();
                     user = null;
                     client.Dispose();
+                    connected = false;
                     Frame.Navigate(typeof(MainPage));
                 }
             });
@@ -202,6 +218,7 @@ namespace NovaChatClient.Pages
         {
             if (await new DisconnectDialog().ShowAsync() == ContentDialogResult.Primary)
             {
+                connected = false;
                 if (!leavePressed)
                 {
                     user.CreateStatus(StatusType.Disconnecting);
@@ -228,6 +245,7 @@ namespace NovaChatClient.Pages
         {
             ChatField.Items.Add(new StatusMessage(Header, Message));
         }
+
         private void AddChatEntry(UserMessage MessageObject)
         {
             ChatField.Items.Add(MessageObject);

@@ -317,6 +317,9 @@ namespace ServerV2
             try
             {
                 IPAddress addr = IPAddress.Parse(client.Client.RemoteEndPoint.ToString().Split(':')[0]);
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine($"Incoming connectiong from {addr.ToString()}");
+                Console.ForegroundColor = ConsoleColor.White;
                 CheckTempBan(addr);
                 bool clientMuted = false;
                 if (PunishmentList.Any(x => x.ClientAddress == addr))
@@ -366,6 +369,9 @@ namespace ServerV2
                                     c.ToggleMute();
                                 }
                                 Clients.Add(c.GUID, c);
+                                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                                Console.WriteLine($"User {m.Name} connected from {addr.ToString()}");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 ThreadPool.QueueUserWorkItem(DesktopWorker, c);
                             }
                         }
@@ -403,6 +409,9 @@ namespace ServerV2
                                     c.ToggleMute();
                                 }
                                 Clients.Add(c.GUID, c);
+                                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                                Console.WriteLine($"User {m.Name} connected from {addr.ToString()}");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 ThreadPool.QueueUserWorkItem(DesktopWorker, c);
                             }
                         }
@@ -451,6 +460,9 @@ namespace ServerV2
                                     c.ToggleMute();
                                 }
                                 Clients.Add(c.GUID, c);
+                                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                                Console.WriteLine($"User {m.Name} connected from {addr.ToString()}");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 ThreadPool.QueueUserWorkItem(DesktopWorker, c);
                             }
                         }
@@ -488,6 +500,9 @@ namespace ServerV2
                                     c.ToggleMute();
                                 }
                                 Clients.Add(c.GUID, c);
+                                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                                Console.WriteLine($"User {m.Name} connected from {addr.ToString()}");
+                                Console.ForegroundColor = ConsoleColor.White;
                                 ThreadPool.QueueUserWorkItem(DesktopWorker, c);
                             }
                         }
