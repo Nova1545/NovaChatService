@@ -68,16 +68,17 @@ namespace ChatLib.Extras
                 }
                 else
                 {
+                    List<Message> copy = new List<Message>(Buffer);
                     if (client.IsSecure)
                     {
-                        foreach (Message message in Buffer)
+                        foreach (Message message in copy)
                         {
                             MessageHelpers.SetMessage(client.SStream, message);
                         }
                     }
                     else
                     {
-                        foreach (Message message in Buffer)
+                        foreach (Message message in copy)
                         {
                             MessageHelpers.SetMessage(client.Stream, message);
                         }

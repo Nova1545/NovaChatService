@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
 using ChatLib.Administrator;
 using ChatLib.DataStates;
+using ChatLib.Json;
 
 namespace ChatLib.Extras
 {
@@ -20,6 +25,7 @@ namespace ChatLib.Extras
         public IPAddress ClientAddress { get; private set; }
         public Admin Admin { get; private set; }
         public bool Muted { get; private set; }
+        public BlockingCollection<Message> Queue { get; private set; }
 
         public ClientInfo(string name, NetworkStream stream, ClientType clientType, IPAddress clientAddress)
         {
@@ -32,6 +38,22 @@ namespace ChatLib.Extras
             GUID = Guid.NewGuid().ToString();
             ClientAddress = clientAddress;
             Muted = false;
+
+            Queue = new BlockingCollection<Message>();
+            Task.Factory.StartNew(() =>
+            {
+                foreach (Message buffer in Queue.GetConsumingEnumerable())
+                {
+                    if (ClientType == ClientType.Web)
+                    {
+                        JsonMessageHelpers.SetJsonMessage(Stream, buffer.ToJsonMessage());
+                    }
+                    else
+                    {
+                        MessageHelpers.SetMessage(Stream, buffer);
+                    }
+                }
+            }, TaskCreationOptions.LongRunning);
         }
 
         public ClientInfo(string name, SslStream stream, ClientType clientType, IPAddress clientAddress)
@@ -45,6 +67,32 @@ namespace ChatLib.Extras
             GUID = Guid.NewGuid().ToString();
             ClientAddress = clientAddress;
             Muted = false;
+            Queue = new BlockingCollection<Message>();
+            Task.Factory.StartNew(() =>
+            {
+                foreach (Message buffer in Queue)
+                {
+                    if (ClientType == ClientType.Web)
+                    {
+                        JsonMessageHelpers.SetJsonMessage(SStream, buffer.ToJsonMessage());
+                    }
+                    else
+                    {
+                        MessageHelpers.SetMessage(SStream, buffer);
+                    }
+
+                    //MemoryStream ms = new MemoryStream();
+                    //new BinaryFormatter().Serialize(ms, buffer);
+                    //byte[] dataBytes = ms.ToArray();
+                    //byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
+                    //try
+                    //{
+                    //    stream.Write(dataLen, 0, 4);
+                    //    stream.Write(dataBytes, 0, dataBytes.Length);
+                    //}
+                    //catch { }
+                }
+            }, TaskCreationOptions.LongRunning);
         }
 
         public void SetRoomID(int id) => RoomId = id;
@@ -54,6 +102,8 @@ namespace ChatLib.Extras
         public void SetAdmin(Admin admin) => Admin = admin;
 
         public void ToggleMute() => Muted = !Muted;
+
+        public void AddToQueue(Message message) => Queue.Add(message);
 
         public override string ToString()
         {

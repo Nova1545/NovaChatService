@@ -98,7 +98,7 @@ namespace ChatLib.Extras
             byte[] dataLen = BitConverter.GetBytes((Int32)dataBytes.Length);
             try
             {
-                stream.Write(dataLen, 0, 4);
+                await stream.WriteAsync(dataLen, 0, 4);
                 await stream.WriteAsync(dataBytes, 0, dataBytes.Length);
             }
             catch { }

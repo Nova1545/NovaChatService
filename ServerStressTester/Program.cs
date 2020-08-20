@@ -21,13 +21,14 @@ namespace ServerStressTester
             for (int i = 0; i < threads; i++)
             {
                 Console.WriteLine("Worker Created");
-                Thread.Sleep(500);
+                Thread.Sleep(50);
                 ThreadPool.QueueUserWorkItem(TestThread, null);
             }
 
+            Console.WriteLine("Waiting for [Enter] to end test");
             Console.ReadLine();
-            Console.WriteLine("Stopping");
-            //cts.Cancel();
+            cts.Cancel();
+            Console.ReadLine();
         }
 
         static void TestThread(object d)
@@ -41,13 +42,21 @@ namespace ServerStressTester
                 ssl.AuthenticateAsClient(secure.Content);
 
                 user = new User(Guid.NewGuid().ToString(), ssl);
-                user.Init("1234");
+                user.Init();
             }
             else
             {
                 user = new User(Guid.NewGuid().ToString(), client.GetStream());
-                user.Init("1234");
+                user.Init();
             }
+
+            user.OnMessageStatusReceivedCallback += (message) => 
+            {  
+                if(message.StatusType == StatusType.ErrorDisconnect)
+                {
+                    Console.WriteLine(user.Name + " Error: " + message.Content);
+                }
+            };
 
             Random rnd = new Random();
 

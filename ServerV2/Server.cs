@@ -20,12 +20,13 @@ using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
 using ChatLib.Administrator;
+using System.Collections.Concurrent;
 
 namespace ServerV2
 {
     class Server
     {
-        static Dictionary<string, ClientInfo> Clients;
+        static ConcurrentDictionary<string, ClientInfo> Clients;
         static Dictionary<string, Room> Rooms;
 
         static List<Punishment> PunishmentList;
@@ -74,7 +75,7 @@ namespace ServerV2
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("]");
 
-            Clients = new Dictionary<string, ClientInfo>();
+            Clients = new ConcurrentDictionary<string, ClientInfo>();
             Rooms = new Dictionary<string, Room>();
             PunishmentList = new List<Punishment>();
 
@@ -126,6 +127,7 @@ namespace ServerV2
                 }
                 else if(command[0] == "clients")
                 {
+                    Console.WriteLine($"[Clients {Clients.Count}]");
                     foreach (KeyValuePair<string, ClientInfo> client in Clients)
                     {
                         Console.WriteLine(client.Value.ToString());
@@ -184,6 +186,10 @@ namespace ServerV2
                 {
                     Kick(command[1]);
                 }
+                else if(command[0] == "send")
+                {
+                    SendMessage(Clients.First().Value, new Message("Server", MessageType.Message));
+                }
             }
         }
 
@@ -239,7 +245,7 @@ namespace ServerV2
                             {
                                 c.ToggleMute();
                             }
-                            Clients.Add(c.GUID, c);
+                            Clients.TryAdd(c.GUID, c);
                             ThreadPool.QueueUserWorkItem(WebWorker, c);
                         }
                         else
@@ -284,7 +290,7 @@ namespace ServerV2
                             {
                                 c.ToggleMute();
                             }
-                            Clients.Add(c.GUID, c);
+                            Clients.TryAdd(c.GUID, c);
                             ThreadPool.QueueUserWorkItem(WebWorker, c);
                         }
                         else
@@ -368,7 +374,7 @@ namespace ServerV2
                                 {
                                     c.ToggleMute();
                                 }
-                                Clients.Add(c.GUID, c);
+                                Clients.TryAdd(c.GUID, c);
                                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                                 Console.WriteLine($"User {m.Name} connected from {addr.ToString()}");
                                 Console.ForegroundColor = ConsoleColor.White;
@@ -408,7 +414,7 @@ namespace ServerV2
                                 {
                                     c.ToggleMute();
                                 }
-                                Clients.Add(c.GUID, c);
+                                Clients.TryAdd(c.GUID, c);
                                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                                 Console.WriteLine($"User {m.Name} connected from {addr.ToString()}");
                                 Console.ForegroundColor = ConsoleColor.White;
@@ -459,7 +465,8 @@ namespace ServerV2
                                 {
                                     c.ToggleMute();
                                 }
-                                Clients.Add(c.GUID, c);
+
+                                Clients.TryAdd(c.GUID, c);
                                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                                 Console.WriteLine($"User {m.Name} connected from {addr.ToString()}");
                                 Console.ForegroundColor = ConsoleColor.White;
@@ -499,7 +506,7 @@ namespace ServerV2
                                 {
                                     c.ToggleMute();
                                 }
-                                Clients.Add(c.GUID, c);
+                                Clients.TryAdd(c.GUID, c);
                                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                                 Console.WriteLine($"User {m.Name} connected from {addr.ToString()}");
                                 Console.ForegroundColor = ConsoleColor.White;
@@ -535,7 +542,7 @@ namespace ServerV2
         // Workers to handle incoming/outgoing data
         static void WebWorker(object state)
         {
-            ClientInfo client = Clients[((ClientInfo)state).GUID]; ;
+            ClientInfo client = (ClientInfo)state;
 
             Room r = Rooms.Where(x => x.Value.ID == DefaultRoomID).First().Value;
 
@@ -565,7 +572,7 @@ namespace ServerV2
                     if (Clients.ContainsKey(client.GUID))
                     {
                         r.RemoveUser(client);
-                        Clients.Remove(client.GUID);
+                        Clients.TryRemove(client.GUID, out ClientInfo d);
                     }
 
                     if (client.IsSecure)
@@ -593,14 +600,18 @@ namespace ServerV2
             {
                 try
                 {
+                    Thread.Sleep(10);
                     JsonMessage m = client.IsSecure ? JsonMessageHelpers.GetJsonMessage(client.SStream) : JsonMessageHelpers.GetJsonMessage(client.Stream);
                     m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
 
                     // Send to bots for proccesing
                     var results = OnJsonMessageSentCallback?.GetInvocationList().Select(x => x.DynamicInvoke(m, client)).ToArray();
-                    if(results.Any(x => (MessageState)x == MessageState.Terminate))
+                    if (results != null)
                     {
-                        continue;
+                        if (results.Any(x => (MessageState)x == MessageState.Terminate))
+                        {
+                            continue;
+                        }
                     }
 
                     if (m.Name != client.Name)
@@ -661,7 +672,7 @@ namespace ServerV2
                                 }
 
                                 r.RemoveUser(client);
-                                Clients.Remove(client.GUID);
+                                Clients.TryRemove(client.GUID, out ClientInfo d);
 
                                 JsonMessage json = new JsonMessage(client.Name, MessageType.Status);
                                 json.SetStatusType(StatusType.Disconnected);
@@ -704,7 +715,7 @@ namespace ServerV2
                     if (Clients.ContainsKey(client.GUID))
                     {
                         r.RemoveUser(client);
-                        Clients.Remove(client.GUID);
+                        Clients.TryRemove(client.GUID, out ClientInfo d);
                     }
 
                     if (client.IsSecure)
@@ -731,7 +742,7 @@ namespace ServerV2
 
         static void DesktopWorker(object state)
         {
-            ClientInfo client = Clients[((ClientInfo)state).GUID];
+            ClientInfo client = (ClientInfo)state;
 
             Room r = Rooms.Where(x => x.Value.ID == DefaultRoomID).First().Value;
 
@@ -760,14 +771,15 @@ namespace ServerV2
                     if (Clients.ContainsKey(client.GUID))
                     {
                         r.RemoveUser(client);
-                        Clients.Remove(client.GUID);
+                        Clients.TryRemove(client.GUID, out ClientInfo d);
                     }
 
                     if (client.IsSecure)
                     {
                         if (client.SStream != null)
                         {
-                            MessageHelpers.SetMessage(client.SStream, error);
+                            //MessageHelpers.SetMessage(client.SStream, error);
+                            SendMessage(client, error);
                             client.SStream.Close();
                         }
                     }
@@ -776,7 +788,8 @@ namespace ServerV2
                         client.Stream.Close();
                         if (client.Stream != null)
                         {
-                            MessageHelpers.SetMessage(client.Stream, error);
+                            //MessageHelpers.SetMessage(client.Stream, error);
+                            SendMessage(client, error);
                             client.Stream.Close();
                         }
                     }
@@ -788,6 +801,7 @@ namespace ServerV2
             {
                 try
                 {
+                    Thread.Sleep(10);
                     Message m = client.IsSecure ? MessageHelpers.GetMessage(client.SStream) : MessageHelpers.GetMessage(client.Stream);
                     m.SetContent(m.Content.Replace("<", "&lt;").Replace(">", "&gt;"));
 
@@ -872,9 +886,12 @@ namespace ServerV2
 
                     // Send to bots for proccesing
                     var results = OnMessageSentCallback?.GetInvocationList().Select(x => x.DynamicInvoke(m, client)).ToArray();
-                    if (results.Any(x => (MessageState)x == MessageState.Terminate))
+                    if (results != null)
                     {
-                        continue;
+                        if (results.Any(x => (MessageState)x == MessageState.Terminate))
+                        {
+                            continue;
+                        }
                     }
 
                     if (m.Name != client.Name)
@@ -941,7 +958,7 @@ namespace ServerV2
                                 }
 
                                 r.RemoveUser(client);
-                                Clients.Remove(client.GUID);
+                                Clients.TryRemove(client.GUID, out ClientInfo d);
 
                                 Message json = new Message(client.Name, MessageType.Status);
                                 json.SetStatusType(StatusType.Disconnected);
@@ -990,18 +1007,19 @@ namespace ServerV2
                     OnUserDisconnectCallback?.Invoke(client);
                     Message error = new Message("error", MessageType.Status);
                     error.SetStatusType(StatusType.ErrorDisconnect);
-                    error.SetContent(e.Message);
+                    error.SetContent(e.Message + " " + GetLineNumber(e));
                     if (Clients.ContainsKey(client.GUID))
                     {
                         r.RemoveUser(client);
-                        Clients.Remove(client.GUID);
+                        Clients.TryRemove(client.GUID, out ClientInfo d);
                     }
 
                     if (client.IsSecure)
                     {
                         if (client.SStream != null)
                         {
-                            MessageHelpers.SetMessage(client.SStream, error);
+                            //MessageHelpers.SetMessage(client.SStream, error);
+                            SendMessage(client, error);
                             client.SStream.Close();
                         }
                     }
@@ -1010,7 +1028,8 @@ namespace ServerV2
                         client.Stream.Close();
                         if (client.Stream != null)
                         {
-                            MessageHelpers.SetMessage(client.Stream, error);
+                            //MessageHelpers.SetMessage(client.Stream, error);
+                            SendMessage(client, error);
                             client.Stream.Close();
                         }
                     }
@@ -1022,22 +1041,24 @@ namespace ServerV2
         // Helpers
         static void SendJsonMessage(ClientInfo client, JsonMessage m)
         {
-            if (client.IsSecure)
-            {
-                JsonMessageHelpers.SetJsonMessage(client.SStream, m);
-                return;
-            }
-            JsonMessageHelpers.SetJsonMessage(client.Stream, m);
+            //if (client.IsSecure)
+            //{
+            //    JsonMessageHelpers.SetJsonMessage(client.SStream, m);
+            //    return;
+            //}
+            //JsonMessageHelpers.SetJsonMessage(client.Stream, m);
+            client.AddToQueue(m.ToMessage());
         }
 
         static void SendMessage(ClientInfo client, Message m)
         {
-            if (client.IsSecure)
-            {
-                MessageHelpers.SetMessage(client.SStream, m);
-                return;
-            }
-            MessageHelpers.SetMessage(client.Stream, m);
+            //if (client.IsSecure)
+            //{
+            //    MessageHelpers.SetMessage(client.SStream, m);
+            //    return;
+            //}
+            //MessageHelpers.SetMessage(client.Stream, m);
+            client.AddToQueue(m);
         }
 
         // Server Configuration loading
@@ -1321,7 +1342,7 @@ namespace ServerV2
             Console.WriteLine("=========Loading Bots=========");
 
             BotHandler = new BotHandler();
-            BotHandler.OnReqestClients += () => { return Clients; };
+            //BotHandler.OnReqestClients += () => { return Clients; };
             BotHandler.OnUpdateClient += (c) => { Clients[c.GUID] = c; };
             BotHandler.OnUpdateRoom += (r) => { Rooms[r.GUID] = r; };
             BotHandler.OnRequestRooms += () => { return Rooms; }; 
@@ -1430,10 +1451,12 @@ namespace ServerV2
             throw new Exception("No network adapters with an IPv4 address in the system!");
         }
 
-        static async void SendToAll(ClientInfo sender, Message m, bool ignoreUserRoom = false)
+        #region Old SendToAll
+        /*static async void SendToAll(ClientInfo sender, Message m, bool ignoreUserRoom = false)
         {
             List<Task> tasks = new List<Task>();
-            foreach (ClientInfo client in Clients.Where(x => (x.Value.RoomId == sender.RoomId && !ignoreUserRoom) || ignoreUserRoom).Select(x => x.Value).ToArray())
+            Dictionary<string, ClientInfo> copy = new Dictionary<string, ClientInfo>(Clients);
+            foreach (ClientInfo client in copy.Where(x => (x.Value.RoomId == sender.RoomId && !ignoreUserRoom) || ignoreUserRoom).Select(x => x.Value).ToArray())
             {
                 if(client.GUID == sender.GUID)
                 {
@@ -1501,7 +1524,8 @@ namespace ServerV2
         static async void SendToAll(ClientInfo sender, JsonMessage m, bool ignoreUserRoom = false)
         {
             List<Task> tasks = new List<Task>();
-            foreach (ClientInfo client in Clients.Where(x => (x.Value.RoomId == sender.RoomId && !ignoreUserRoom) || ignoreUserRoom).Select(x => x.Value).ToArray())
+            Dictionary<string, ClientInfo> copy = new Dictionary<string, ClientInfo>(Clients);
+            foreach (ClientInfo client in copy.Where(x => (x.Value.RoomId == sender.RoomId && !ignoreUserRoom) || ignoreUserRoom).Select(x => x.Value).ToArray())
             {
                 if (client.GUID == sender.GUID)
                 {
@@ -1563,69 +1587,48 @@ namespace ServerV2
             {
                 tasks.Remove(await Task.WhenAny(tasks));
             }
-        }
+        }*/
+        #endregion
 
-        static async void SendToAll(Message m)
+        static void SendToAll(ClientInfo sender, Message m, bool ignoreUserRoom = false)
         {
-            List<Task> tasks = new List<Task>();
-            Console.WriteLine(Clients.Count);
-            foreach (ClientInfo client in Clients.Select(x => x.Value).ToArray())
+            Dictionary<string, ClientInfo> copy = new Dictionary<string, ClientInfo>(Clients);
+            foreach (ClientInfo client in copy.Where(x => (x.Value.RoomId == sender.RoomId && !ignoreUserRoom) || ignoreUserRoom).Select(x => x.Value).ToArray())
             {
+                if (client.GUID == sender.GUID)
+                {
+                    continue;
+                }
                 if (m.EndPoint == "")
                 {
-                    if (client.ClientType == ClientType.Web)
-                    {
-                        if (client.IsSecure)
-                        {
-                            tasks.Add(JsonMessageHelpers.SetJsonMessageAsync(client.SStream, m.ToJsonMessage()));
-                        }
-                        else
-                        {
-                            tasks.Add(JsonMessageHelpers.SetJsonMessageAsync(client.Stream, m.ToJsonMessage()));
-                        }
-                    }
-                    else
-                    {
-                        if (client.IsSecure)
-                        {
-                            tasks.Add(MessageHelpers.SetMessageAsync(client.SStream, m));
-                        }
-                        else
-                        {
-                            tasks.Add(MessageHelpers.SetMessageAsync(client.Stream, m));
-                        }
-                    }
+                    client.AddToQueue(m);
                 }
                 else if (client.Name == m.EndPoint)
                 {
-                    if (client.ClientType == ClientType.Web)
-                    {
-                        if (client.IsSecure)
-                        {
-                            tasks.Add(JsonMessageHelpers.SetJsonMessageAsync(client.SStream, m.ToJsonMessage()));
-                        }
-                        else
-                        {
-                            tasks.Add(JsonMessageHelpers.SetJsonMessageAsync(client.Stream, m.ToJsonMessage()));
-                        }
-                    }
-                    else
-                    {
-                        if (client.IsSecure)
-                        {
-                            tasks.Add(MessageHelpers.SetMessageAsync(client.SStream, m));
-                        }
-                        else
-                        {
-                            tasks.Add(MessageHelpers.SetMessageAsync(client.Stream, m));
-                        }
-                    }
+                    client.AddToQueue(m);
+                    return;
                 }
             }
+        }
 
-            while (tasks.Any())
+        static void SendToAll(ClientInfo sender, JsonMessage jm, bool ignoreUserRoom = false)
+        {
+            Dictionary<string, ClientInfo> copy = new Dictionary<string, ClientInfo>(Clients);
+            foreach (ClientInfo client in copy.Where(x => (x.Value.RoomId == sender.RoomId && !ignoreUserRoom) || ignoreUserRoom).Select(x => x.Value).ToArray())
             {
-                tasks.Remove(await Task.WhenAny(tasks));
+                if (client.GUID == sender.GUID)
+                {
+                    continue;
+                }
+                if (jm.EndPoint == "")
+                {
+                    client.AddToQueue(jm.ToMessage());
+                }
+                else if (client.Name == jm.EndPoint)
+                {
+                    client.AddToQueue(jm.ToMessage());
+                    return;
+                }
             }
         }
 
@@ -1700,7 +1703,7 @@ namespace ServerV2
                 if (Clients.ContainsKey(client.GUID))
                 {
                     r.RemoveUser(client);
-                    Clients.Remove(client.GUID);
+                    Clients.TryRemove(client.GUID, out ClientInfo d);
                 }
 
                 if (client.ClientType == ClientType.Web)
@@ -1722,7 +1725,7 @@ namespace ServerV2
                     if (Clients.ContainsKey(client.GUID))
                     {
                         r.RemoveUser(client);
-                        Clients.Remove(client.GUID);
+                        Clients.TryRemove(client.GUID, out ClientInfo d);
                     }
 
                     if (client.ClientType == ClientType.Web)
@@ -1749,6 +1752,10 @@ namespace ServerV2
         {
             try
             {
+                if(PunishmentList.Count == 0)
+                {
+                    return;
+                }
                 Punishment p = PunishmentList.First(x => x.ClientAddress == ip && x.IsTempBan);
                 if(DateTime.UtcNow >= p.EndDate)
                 {
@@ -1770,7 +1777,7 @@ namespace ServerV2
                 if (Clients.ContainsKey(client.GUID))
                 {
                     r.RemoveUser(client);
-                    Clients.Remove(client.GUID);
+                    Clients.TryRemove(client.GUID, out ClientInfo d);
                 }
 
                 if (client.ClientType == ClientType.Web)
@@ -1792,7 +1799,7 @@ namespace ServerV2
                     if (Clients.ContainsKey(client.GUID))
                     {
                         r.RemoveUser(client);
-                        Clients.Remove(client.GUID);
+                        Clients.TryRemove(client.GUID, out ClientInfo d);
                     }
 
                     if (client.ClientType == ClientType.Web)

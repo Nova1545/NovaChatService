@@ -120,26 +120,64 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Admin.cs" />
-    <Compile Include="Attributes.cs" />
-    <Compile Include="BotAb.cs" />
-    <Compile Include="BotHandler.cs" />
-    <Compile Include="ClientInfo.cs" />
-    <Compile Include="CommandHandler.cs" />
-    <Compile Include="DataStates.cs" />
-    <Compile Include="ExtentionHelpers.cs" />
-    <Compile Include="JsonMessage.cs" />
-    <Compile Include="JsonMessageHelpers.cs" />
-    <Compile Include="JsonSerialization.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="MessageHelpers.cs" />
-    <Compile Include="NColor.cs" />
+    <Compile Include="..\ChatLib\Admin.cs">
+      <Link>Admin.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\Attributes.cs">
+      <Link>Attributes.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\BotAb.cs">
+      <Link>BotAb.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\BotHandler.cs">
+      <Link>BotHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\ClientInfo.cs">
+      <Link>ClientInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\CommandHandler.cs">
+      <Link>CommandHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\DataStates.cs">
+      <Link>DataStates.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\ExtentionHelpers.cs">
+      <Link>ExtentionHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\JsonMessage.cs">
+      <Link>JsonMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\JsonMessageHelpers.cs">
+      <Link>JsonMessageHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\JsonSerialization.cs">
+      <Link>JsonSerialization.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\Message.cs">
+      <Link>Message.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\MessageHelpers.cs">
+      <Link>MessageHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\NColor.cs">
+      <Link>NColor.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\Punishment.cs">
+      <Link>Punishment.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\Room.cs">
+      <Link>Room.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\SecurityHelpers.cs">
+      <Link>SecurityHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\TestingClasses.cs">
+      <Link>TestingClasses.cs</Link>
+    </Compile>
+    <Compile Include="..\ChatLib\User.cs">
+      <Link>User.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Punishment.cs" />
-    <Compile Include="Room.cs" />
-    <Compile Include="SecurityHelpers.cs" />
-    <Compile Include="TestingClasses.cs" />
-    <Compile Include="User.cs" />
     <EmbeddedResource Include="Properties\ChatLibUWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
